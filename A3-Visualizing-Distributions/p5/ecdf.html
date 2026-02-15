@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>ECDF - Social Media Hours</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.9.0/p5.min.js"></script>
+  <style>
+    body { font-family: Arial, sans-serif; text-align: center; background: #fafafa; margin: 20px; }
+    h2 { color: #333; }
+    a { color: steelblue; }
+    canvas { display: block; margin: 10px auto; }
+  </style>
+</head>
+<body>
+  <h2>ECDF: Social Media Hours</h2>
+  <p><a href="../index.html">&larr; Back to Home</a></p>
+
+  <script>
+    var table;
+    var sorted = [];
+
+    var W = 800, H = 500;
+    var mL = 70, mR = 30, mT = 30, mB = 60;
+
+    function preload() {
+      table = loadTable('../data/daily_usage.csv', 'csv', 'header');
+    }
+
+    function setup() {
+      createCanvas(W, H);
+
+      // Extract and sort social_media_hours
+      for (var r = 0; r < table.getRowCount(); r++) {
+        sorted.push(parseFloat(table.getString(r, 'social_media_hours')));
+      }
+      sorted.sort(function(a, b) { return a - b; });
+
+      noLoop();
+    }
+
+    function draw() {
+      background(250);
+
+      var pW = W - mL - mR;
+      var pH = H - mT - mB;
+      var n = sorted.length;
+      var dataMin = sorted[0] - 0.2;
+      var dataMax = sorted[n - 1] + 0.2;
+
+      function xMap(val) { return map(val, dataMin, dataMax, mL, mL + pW); }
+      function yMap(cum) { return map(cum, 0, 1, mT + pH, mT); }
+
+      // Background grid
+      stroke(210); strokeWeight(0.5);
+      for (var i = 0; i <= 5; i++) {
+        var y = yMap(i / 5);
+        line(mL, y, mL + pW, y);
+        fill(100); noStroke(); textAlign(RIGHT, CENTER); textSize(11);
+        text((i / 5).toFixed(1), mL - 8, y);
+        stroke(210); strokeWeight(0.5);
+      }
+      for (var v = Math.ceil(dataMin); v <= Math.floor(dataMax); v++) {
+        var x = xMap(v);
+        line(x, mT, x, mT + pH);
+        fill(100); noStroke(); textAlign(CENTER, TOP); textSize(11);
+        text(v, x, mT + pH + 5);
+        stroke(210); strokeWeight(0.5);
+      }
+
+      // Draw ECDF step line
+      stroke(100, 100, 200); strokeWeight(2); noFill();
+      beginShape();
+      for (var i = 0; i < n; i++) {
+        vertex(xMap(sorted[i]), yMap((i + 1) / n));
+      }
+      endShape();
+
+      // Small dots every 5th point
+      fill(100, 100, 200, 120); noStroke();
+      for (var i = 0; i < n; i += 5) {
+        ellipse(xMap(sorted[i]), yMap((i + 1) / n), 4, 4);
+      }
+
+      // Axis titles
+      fill(50); textSize(13);
+      textAlign(CENTER, TOP);
+      text('Social Media Hours', mL + pW / 2, H - 18);
+      push();
+      translate(18, mT + pH / 2);
+      rotate(-HALF_PI);
+      textAlign(CENTER, BOTTOM);
+      text('Cumulative Proportion', 0, 0);
+      pop();
+
+      // Crosshair tooltip on hover
+      if (mouseX >= mL && mouseX <= mL + pW && mouseY >= mT && mouseY <= mT + pH) {
+        var hoverVal = map(mouseX, mL, mL + pW, dataMin, dataMax);
+        // Count how many values are <= hoverVal
+        var cnt = 0;
+        for (var i = 0; i < n; i++) { if (sorted[i] <= hoverVal) cnt++; else break; }
+        var cumP = cnt / n;
+
+        stroke(150, 150, 150, 150); strokeWeight(1);
+        line(mouseX, mT, mouseX, mT + pH);
+        line(mL, yMap(cumP), mL + pW, yMap(cumP));
+
+        showTip(mouseX, mouseY, 'Value: ' + hoverVal.toFixed(2) + 'h\nCumulative: ' + (cumP * 100).toFixed(1) + '%');
+      }
+    }
+
+    function showTip(mx, my, msg) {
+      var parts = msg.split('\n');
+      textSize(12);
+      var tw = 0;
+      for (var i = 0; i < parts.length; i++) tw = Math.max(tw, textWidth(parts[i]));
+      tw += 16;
+      var th = parts.length * 18 + 10;
+      var tx = mx + 12, ty = my - th - 5;
+      if (tx + tw > width) tx = mx - tw - 12;
+      if (ty < 0) ty = my + 15;
+      fill(50, 50, 50, 220); noStroke();
+      rect(tx, ty, tw, th, 4);
+      fill(255); textAlign(LEFT, TOP);
+      for (var i = 0; i < parts.length; i++) text(parts[i], tx + 8, ty + 6 + i * 18);
+    }
+
+    function mouseMoved() { redraw(); }
+  </script>
+</body>
+</html>

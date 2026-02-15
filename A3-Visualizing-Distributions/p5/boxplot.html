@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Box Plot - Work or Study Hours by Age Group</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.9.0/p5.min.js"></script>
+  <style>
+    body { font-family: Arial, sans-serif; text-align: center; background: #fafafa; margin: 20px; }
+    h2 { color: #333; }
+    a { color: steelblue; }
+    canvas { display: block; margin: 10px auto; }
+  </style>
+</head>
+<body>
+  <h2>Box Plot: Work or Study Hours by Age Group</h2>
+  <p><a href="../index.html">&larr; Back to Home</a></p>
+
+  <script>
+    var table;
+    var groups = {};
+    var groupStats = [];
+
+    // Age groups in display order
+    var GROUP_ORDER = ['13-18', '19-25', '26-35', '36-45', '46-60', '60+'];
+    // One color per group
+    var COLORS = [
+      [102, 194, 165], [252, 141, 98], [141, 160, 203],
+      [231, 138, 195], [166, 216, 84], [255, 217, 47]
+    ];
+
+    var W = 900, H = 520;
+    var mL = 70, mR = 40, mT = 30, mB = 70;
+
+    function preload() {
+      table = loadTable('../data/daily_usage.csv', 'csv', 'header');
+    }
+
+    function setup() {
+      createCanvas(W, H);
+
+      // Group values by age_group column
+      for (var r = 0; r < table.getRowCount(); r++) {
+        var g = table.getString(r, 'age_group');
+        var v = parseFloat(table.getString(r, 'work_or_study_hours'));
+        if (!groups[g]) groups[g] = [];
+        groups[g].push(v);
+      }
+
+      // Compute stats (quartiles, fences, outliers) for each group
+      for (var i = 0; i < GROUP_ORDER.length; i++) {
+        var name = GROUP_ORDER[i];
+        var vals = groups[name].slice().sort(function(a, b) { return a - b; });
+        var q1 = pct(vals, 25);
+        var med = pct(vals, 50);
+        var q3 = pct(vals, 75);
+        var iqr = q3 - q1;
+        var loFence = q1 - 1.5 * iqr;
+        var hiFence = q3 + 1.5 * iqr;
+
+        // Whisker ends: nearest data within fences
+        var wLo = vals[0];
+        for (var j = 0; j < vals.length; j++) { if (vals[j] >= loFence) { wLo = vals[j]; break; } }
+        var wHi = vals[vals.length - 1];
+        for (var j = vals.length - 1; j >= 0; j--) { if (vals[j] <= hiFence) { wHi = vals[j]; break; } }
+
+        // Outliers: points outside fences
+        var out = [];
+        for (var j = 0; j < vals.length; j++) {
+          if (vals[j] < loFence || vals[j] > hiFence) out.push(vals[j]);
+        }
+
+        groupStats.push({
+          name: name, q1: q1, median: med, q3: q3,
+          whiskerLow: wLo, whiskerHigh: wHi,
+          outliers: out, color: COLORS[i]
+        });
+      }
+
+      noLoop();
+    }
+
+    function draw() {
+      background(250);
+
+      var pW = W - mL - mR;
+      var pH = H - mT - mB;
+      var dataMin = 0, dataMax = 8;
+
+      // Map data value to y pixel
+      function yMap(val) { return map(val, dataMin, dataMax, mT + pH, mT); }
+
+      var boxW = pW / GROUP_ORDER.length;
+      var innerW = boxW * 0.55;
+
+      // Background grid
+      stroke(210); strokeWeight(0.5);
+      for (var v = dataMin; v <= dataMax; v++) {
+        var y = yMap(v);
+        line(mL, y, mL + pW, y);
+        fill(100); noStroke(); textAlign(RIGHT, CENTER); textSize(11);
+        text(v, mL - 8, y);
+        stroke(210); strokeWeight(0.5);
+      }
+
+      var hoverInfo = null;
+
+      // Draw one box plot per group
+      for (var i = 0; i < groupStats.length; i++) {
+        var s = groupStats[i];
+        var cx = mL + i * boxW + boxW / 2;
+        var capW = innerW * 0.4;
+
+        // Whisker vertical lines
+        stroke(80); strokeWeight(1.5);
+        line(cx, yMap(s.whiskerLow), cx, yMap(s.q1));
+        line(cx, yMap(s.q3), cx, yMap(s.whiskerHigh));
+
+        // Whisker caps
+        line(cx - capW, yMap(s.whiskerLow), cx + capW, yMap(s.whiskerLow));
+        line(cx - capW, yMap(s.whiskerHigh), cx + capW, yMap(s.whiskerHigh));
+
+        // Box from Q1 to Q3
+        fill(s.color[0], s.color[1], s.color[2], 180);
+        stroke(80); strokeWeight(1.5);
+        rect(cx - innerW / 2, yMap(s.q3), innerW, yMap(s.q1) - yMap(s.q3));
+
+        // Median line
+        stroke(40); strokeWeight(2.5);
+        line(cx - innerW / 2, yMap(s.median), cx + innerW / 2, yMap(s.median));
+
+        // Outliers as red dots
+        fill(220, 50, 50); noStroke();
+        for (var o = 0; o < s.outliers.length; o++) {
+          var oy = yMap(s.outliers[o]);
+          ellipse(cx, oy, 8, 8);
+          if (dist(mouseX, mouseY, cx, oy) < 6) {
+            hoverInfo = { x: mouseX, y: mouseY, tip: s.name + '\nOutlier: ' + s.outliers[o].toFixed(1) + 'h' };
+          }
+        }
+
+        // X-axis label
+        fill(60); noStroke(); textAlign(CENTER, TOP); textSize(12);
+        text(s.name, cx, mT + pH + 8);
+
+        // Tooltip on box hover
+        if (!hoverInfo && mouseX > cx - innerW / 2 && mouseX < cx + innerW / 2 &&
+            mouseY > yMap(s.q3) && mouseY < yMap(s.q1)) {
+          hoverInfo = {
+            x: mouseX, y: mouseY,
+            tip: s.name + '\nQ1: ' + s.q1.toFixed(2) + '  Med: ' + s.median.toFixed(2) + '  Q3: ' + s.q3.toFixed(2) +
+                 '\nWhiskers: ' + s.whiskerLow.toFixed(1) + ' - ' + s.whiskerHigh.toFixed(1) +
+                 '\nOutliers: ' + s.outliers.length
+          };
+        }
+      }
+
+      // Axis titles
+      fill(50); textSize(13);
+      textAlign(CENTER, TOP);
+      text('Age Group', mL + pW / 2, H - 22);
+      push();
+      translate(18, mT + pH / 2);
+      rotate(-HALF_PI);
+      textAlign(CENTER, BOTTOM);
+      text('Work or Study Hours', 0, 0);
+      pop();
+
+      if (hoverInfo) showTip(hoverInfo.x, hoverInfo.y, hoverInfo.tip);
+    }
+
+    // Percentile with linear interpolation
+    function pct(arr, p) {
+      var idx = (p / 100) * (arr.length - 1);
+      var lo = Math.floor(idx), hi = Math.ceil(idx);
+      if (lo === hi) return arr[lo];
+      return arr[lo] + (idx - lo) * (arr[hi] - arr[lo]);
+    }
+
+    // Tooltip helper
+    function showTip(mx, my, msg) {
+      var parts = msg.split('\n');
+      textSize(12);
+      var tw = 0;
+      for (var i = 0; i < parts.length; i++) tw = Math.max(tw, textWidth(parts[i]));
+      tw += 16;
+      var th = parts.length * 18 + 10;
+      var tx = mx + 14, ty = my - th - 5;
+      if (tx + tw > width) tx = mx - tw - 14;
+      if (ty < 0) ty = my + 15;
+      fill(50, 50, 50, 225); noStroke();
+      rect(tx, ty, tw, th, 5);
+      fill(255); textAlign(LEFT, TOP);
+      for (var i = 0; i < parts.length; i++) text(parts[i], tx + 8, ty + 6 + i * 18);
+    }
+
+    function mouseMoved() { redraw(); }
+  </script>
+</body>
+</html>

@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>A3 - Visualizing Distributions</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      max-width: 900px;
+      margin: 40px auto;
+      padding: 0 20px;
+      background: #fafafa;
+      color: #333;
+    }
+    h1 { color: #2c3e50; border-bottom: 2px solid #ddd; padding-bottom: 10px; }
+    h2 { color: #34495e; margin-top: 30px; }
+    a { color: steelblue; text-decoration: none; }
+    a:hover { text-decoration: underline; }
+    .chart-link {
+      display: inline-block;
+      background: steelblue;
+      color: white;
+      padding: 10px 20px;
+      border-radius: 5px;
+      margin: 5px 0;
+      font-size: 15px;
+    }
+    .chart-link:hover { background: #2a6496; text-decoration: none; }
+    .section { margin-bottom: 30px; }
+    .screenshot { max-width: 700px; border: 1px solid #ddd; border-radius: 4px; margin: 10px 0; }
+    table { border-collapse: collapse; margin: 10px 0; }
+    td, th { border: 1px solid #ddd; padding: 8px 14px; text-align: left; }
+    th { background: #f0f0f0; }
+  </style>
+</head>
+<body>
+
+  <h1>A3 – Visualizing Distributions using P5.js</h1>
+  <p>
+    <strong>Dataset:</strong> Daily Screen Time Usage (2,800 records)<br>
+    <strong>Variables used:</strong> total_screen_time, work_or_study_hours, entertainment_hours, social_media_hours
+  </p>
+
+  <!-- P5.js Interactive Charts -->
+  <div class="section">
+    <h2>P5.js Interactive Charts</h2>
+    <table>
+      <tr>
+        <th>Chart</th>
+        <th>Variable</th>
+        <th>Link</th>
+      </tr>
+      <tr>
+        <td>Histogram</td>
+        <td>total_screen_time</td>
+        <td><a class="chart-link" href="p5/histogram.html">Open Histogram</a></td>
+      </tr>
+      <tr>
+        <td>Box Plot (with outliers)</td>
+        <td>work_or_study_hours by age_group</td>
+        <td><a class="chart-link" href="p5/boxplot.html">Open Box Plot</a></td>
+      </tr>
+      <tr>
+        <td>Strip Chart (with jitter)</td>
+        <td>entertainment_hours</td>
+        <td><a class="chart-link" href="p5/stripchart.html">Open Strip Chart</a></td>
+      </tr>
+      <tr>
+        <td>ECDF (Extra Credit)</td>
+        <td>social_media_hours</td>
+        <td><a class="chart-link" href="p5/ecdf.html">Open ECDF</a></td>
+      </tr>
+    </table>
+    <p><em>All P5 charts include interactive tooltips (hover to see values).</em></p>
+  </div>
+
+  <!-- Seaborn Screenshots -->
+  <div class="section">
+    <h2>Seaborn Charts (Python)</h2>
+
+    <h3>Histogram – Total Screen Time</h3>
+    <img class="screenshot" src="screenshots/seaborn_histogram.png" alt="Seaborn Histogram">
+
+    <h3>Box Plot – Work or Study Hours by Age Group</h3>
+    <img class="screenshot" src="screenshots/seaborn_boxplot.png" alt="Seaborn Box Plot">
+
+    <h3>Strip Plot – Entertainment Hours</h3>
+    <img class="screenshot" src="screenshots/seaborn_stripplot.png" alt="Seaborn Strip Plot">
+  </div>
+
+</body>
+</html>

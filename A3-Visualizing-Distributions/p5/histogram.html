@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Histogram - Total Screen Time</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.9.0/p5.min.js"></script>
+  <style>
+    body { font-family: Arial, sans-serif; text-align: center; background: #fafafa; margin: 20px; }
+    h2 { color: #333; }
+    a { color: steelblue; }
+    canvas { display: block; margin: 10px auto; }
+  </style>
+</head>
+<body>
+  <h2>Histogram: Total Screen Time (hours)</h2>
+  <p><a href="../index.html">&larr; Back to Home</a></p>
+
+  <script>
+    var table;
+    var values = [];
+    var bins = [];
+    var NUM_BINS = 20;
+
+    // Chart layout
+    var W = 800, H = 500;
+    var mL = 70, mR = 30, mT = 40, mB = 60;
+
+    function preload() {
+      table = loadTable('../data/daily_usage.csv', 'csv', 'header');
+    }
+
+    function setup() {
+      createCanvas(W, H);
+
+      // Extract total_screen_time from CSV
+      for (var r = 0; r < table.getRowCount(); r++) {
+        values.push(parseFloat(table.getString(r, 'total_screen_time')));
+      }
+
+      // Build histogram bins
+      var lo = Math.floor(min(values));
+      var hi = Math.ceil(max(values));
+      var bw = (hi - lo) / NUM_BINS;
+      for (var b = 0; b < NUM_BINS; b++) {
+        bins.push({ low: lo + b * bw, high: lo + (b + 1) * bw, count: 0 });
+      }
+      // Count values per bin
+      for (var j = 0; j < values.length; j++) {
+        var bi = Math.floor((values[j] - lo) / bw);
+        if (bi >= NUM_BINS) bi = NUM_BINS - 1;
+        bins[bi].count++;
+      }
+
+      noLoop();
+    }
+
+    function draw() {
+      background(250);
+      var pW = W - mL - mR;
+      var pH = H - mT - mB;
+      var maxC = max(bins.map(function(b) { return b.count; }));
+      var barW = pW / NUM_BINS;
+
+      // Faint background grid
+      stroke(200); strokeWeight(0.5);
+      for (var g = 0; g <= 5; g++) {
+        var gy = mT + pH - (g / 5) * pH;
+        line(mL, gy, mL + pW, gy);
+        fill(100); noStroke(); textAlign(RIGHT, CENTER); textSize(11);
+        text(Math.round((g / 5) * maxC), mL - 8, gy);
+        stroke(200); strokeWeight(0.5);
+      }
+
+      // Draw bars
+      for (var i = 0; i < bins.length; i++) {
+        var bh = (bins[i].count / maxC) * pH;
+        var bx = mL + i * barW;
+        var by = mT + pH - bh;
+
+        // Highlight bar under mouse
+        if (mouseX >= bx && mouseX < bx + barW && mouseY >= by && mouseY <= mT + pH) {
+          fill(70, 130, 180);
+        } else {
+          fill(100, 160, 210);
+        }
+        stroke(255); strokeWeight(1);
+        rect(bx, by, barW - 1, bh);
+      }
+
+      // X-axis labels
+      fill(80); noStroke(); textAlign(CENTER, TOP); textSize(11);
+      for (var i = 0; i <= bins.length; i += 2) {
+        var lx = mL + i * barW;
+        var lbl = (i < bins.length) ? bins[i].low.toFixed(1) : bins[bins.length - 1].high.toFixed(1);
+        text(lbl, lx, mT + pH + 5);
+      }
+
+      // Axis titles
+      textSize(13); fill(50);
+      textAlign(CENTER, TOP);
+      text('Total Screen Time (hours)', mL + pW / 2, H - 18);
+      push();
+      translate(18, mT + pH / 2);
+      rotate(-HALF_PI);
+      textAlign(CENTER, BOTTOM);
+      text('Frequency', 0, 0);
+      pop();
+
+      // Tooltip on hover
+      for (var i = 0; i < bins.length; i++) {
+        var bh = (bins[i].count / maxC) * pH;
+        var bx = mL + i * barW;
+        var by = mT + pH - bh;
+        if (mouseX >= bx && mouseX < bx + barW && mouseY >= by && mouseY <= mT + pH) {
+          showTip(mouseX, mouseY, bins[i].low.toFixed(1) + ' - ' + bins[i].high.toFixed(1) + 'h\nCount: ' + bins[i].count);
+        }
+      }
+    }
+
+    // Draw tooltip box near the cursor
+    function showTip(mx, my, msg) {
+      var parts = msg.split('\n');
+      textSize(12);
+      var tw = 0;
+      for (var i = 0; i < parts.length; i++) { tw = Math.max(tw, textWidth(parts[i])); }
+      tw += 16;
+      var th = parts.length * 18 + 10;
+      var tx = mx + 12, ty = my - th - 5;
+      if (tx + tw > width) tx = mx - tw - 12;
+      if (ty < 0) ty = my + 15;
+      fill(50, 50, 50, 220); noStroke();
+      rect(tx, ty, tw, th, 4);
+      fill(255); textAlign(LEFT, TOP);
+      for (var i = 0; i < parts.length; i++) {
+        text(parts[i], tx + 8, ty + 6 + i * 18);
+      }
+    }
+
+    function mouseMoved() { redraw(); }
+  </script>
+</body>
+</html>

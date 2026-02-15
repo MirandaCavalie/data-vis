@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Strip Chart - Entertainment Hours</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.9.0/p5.min.js"></script>
+  <style>
+    body { font-family: Arial, sans-serif; text-align: center; background: #fafafa; margin: 20px; }
+    h2 { color: #333; }
+    a { color: steelblue; }
+    canvas { display: block; margin: 10px auto; }
+  </style>
+</head>
+<body>
+  <h2>Strip Chart: Entertainment Hours</h2>
+  <p><a href="../index.html">&larr; Back to Home</a></p>
+
+  <script>
+    var table;
+    var points = [];
+
+    var W = 600, H = 520;
+    var mL = 70, mR = 50, mT = 30, mB = 60;
+    var jitterRange = 100;
+
+    function preload() {
+      table = loadTable('../data/daily_usage.csv', 'csv', 'header');
+    }
+
+    function setup() {
+      createCanvas(W, H);
+
+      // Extract entertainment_hours and assign random horizontal jitter
+      for (var r = 0; r < table.getRowCount(); r++) {
+        var v = parseFloat(table.getString(r, 'entertainment_hours'));
+        points.push({ value: v, jx: random(-jitterRange, jitterRange) });
+      }
+
+      noLoop();
+    }
+
+    function draw() {
+      background(250);
+
+      var pH = H - mT - mB;
+      var dataMin = 0, dataMax = 4;
+      var centerX = W / 2;
+
+      function yMap(val) { return map(val, dataMin, dataMax, mT + pH, mT); }
+
+      // Background grid
+      stroke(210); strokeWeight(0.5);
+      for (var v = dataMin; v <= dataMax; v += 0.5) {
+        var y = yMap(v);
+        line(mL, y, W - mR, y);
+        fill(100); noStroke(); textAlign(RIGHT, CENTER); textSize(11);
+        text(v.toFixed(1), mL - 8, y);
+        stroke(210); strokeWeight(0.5);
+      }
+
+      // Draw jittered points
+      var hovered = null;
+      for (var i = 0; i < points.length; i++) {
+        var px = centerX + points[i].jx;
+        var py = yMap(points[i].value);
+
+        if (dist(mouseX, mouseY, px, py) < 5) {
+          fill(34, 139, 34);
+          ellipse(px, py, 8, 8);
+          hovered = { x: px, y: py, val: points[i].value };
+        } else {
+          fill(60, 179, 113, 80); noStroke();
+          ellipse(px, py, 6, 6);
+        }
+      }
+
+      // Y-axis title
+      fill(50); textSize(13);
+      push();
+      translate(18, mT + pH / 2);
+      rotate(-HALF_PI);
+      textAlign(CENTER, BOTTOM);
+      text('Entertainment Hours', 0, 0);
+      pop();
+
+      // Tooltip
+      if (hovered) {
+        showTip(mouseX, mouseY, 'Entertainment: ' + hovered.val.toFixed(1) + 'h');
+      }
+    }
+
+    function showTip(mx, my, msg) {
+      textSize(12);
+      var tw = textWidth(msg) + 16;
+      var th = 28;
+      var tx = mx + 12, ty = my - th - 5;
+      if (tx + tw > width) tx = mx - tw - 12;
+      if (ty < 0) ty = my + 15;
+      fill(50, 50, 50, 220); noStroke();
+      rect(tx, ty, tw, th, 4);
+      fill(255); textAlign(LEFT, CENTER);
+      text(msg, tx + 8, ty + th / 2);
+    }
+
+    function mouseMoved() { redraw(); }
+  </script>
+</body>
+</html>
