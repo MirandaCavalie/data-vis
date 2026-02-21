@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Bar Chart in D3</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/7.8.5/d3.min.js"></script>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: Arial, sans-serif;
+      background: #fafafa;
+      color: #333;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 30px 20px;
+    }
+    .back-link {
+      align-self: flex-start;
+      max-width: 860px;
+      width: 100%;
+      margin: 0 auto 15px auto;
+      font-size: 14px;
+    }
+    .back-link a { color: steelblue; text-decoration: none; }
+    .back-link a:hover { text-decoration: underline; }
+    .chart-container {
+      background: #fff;
+      border: 1px solid #ddd;
+      border-radius: 6px;
+      padding: 30px;
+      max-width: 860px;
+      width: 100%;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+    }
+    h1 { color: #2c3e50; font-size: 1.4rem; margin-bottom: 4px; }
+    .subtitle { font-size: 0.85rem; color: #777; margin-bottom: 20px; }
+    .axis text { fill: #555; font-family: Arial, sans-serif; font-size: 12px; }
+    .axis path, .axis line { stroke: #ccc; }
+    .axis-label { fill: #555; font-size: 13px; font-family: Arial, sans-serif; }
+    .data-label { fill: #2c3e50; font-size: 12px; font-family: Arial, sans-serif; font-weight: bold; }
+    .bar { cursor: pointer; }
+    .bar:hover { opacity: 0.8; }
+    .tooltip {
+      position: absolute;
+      background: #fff;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+      padding: 8px 12px;
+      font-size: 13px;
+      color: #333;
+      pointer-events: none;
+      opacity: 0;
+      transition: opacity 0.2s;
+      box-shadow: 0 3px 12px rgba(0,0,0,0.12);
+      font-family: Arial, sans-serif;
+    }
+    .tooltip strong { color: steelblue; }
+  </style>
+</head>
+<body>
+  <div class="back-link"><a href="../index.html">← Back to A4</a></div>
+  <div class="chart-container">
+    <h1>Average Total Screen Time by Age Group</h1>
+    <p class="subtitle">Daily hours averaged across 2,800 users — Daily Usage Dataset (2024)</p>
+    <div id="chart"></div>
+  </div>
+  <div class="tooltip" id="tooltip"></div>
+
+  <script>
+    const margin = {top: 25, right: 20, bottom: 55, left: 60};
+    const width = 780 - margin.left - margin.right;
+    const height = 420 - margin.top - margin.bottom;
+
+    const svg = d3.select("#chart")
+      .append("svg")
+      .attr("viewBox", `0 0 ${width + margin.left + margin.right} ${height + margin.top + margin.bottom}`)
+      .attr("preserveAspectRatio", "xMidYMid meet")
+      .append("g")
+      .attr("transform", `translate(${margin.left},${margin.top})`);
+
+    const tooltip = d3.select("#tooltip");
+
+    const colors = ["#4682B4", "#5A9BD5", "#2E75B6", "#3A8FCA", "#1F5F8B", "#6BAED6"];
+    const ageOrder = ["13-18", "19-25", "26-35", "36-45", "46-60", "60+"];
+
+    d3.csv("../data/daily_usage.csv").then(data => {
+      data.forEach(d => { d.total_screen_time = +d.total_screen_time; });
+
+      //d3.rollup for aggregation for the var total_screen_time per age_group 
+      const grouped = d3.rollup(data, v => ({
+        avg: d3.mean(v, d => d.total_screen_time),
+        count: v.length
+      }), d => d.age_group);
+
+      const chartData = ageOrder
+        .filter(g => grouped.has(g))
+        .map((g, i) => ({
+          age_group: g,
+          avg: grouped.get(g).avg,
+          count: grouped.get(g).count,
+          color: colors[i]
+        }));
+
+      const x = d3.scaleBand()
+        .domain(chartData.map(d => d.age_group))
+        .range([0, width])
+        .padding(0.35);
+
+      const y = d3.scaleLinear()
+        .domain([0, d3.max(chartData, d => d.avg) * 1.15])
+        .nice()
+        .range([height, 0]);
+
+      svg.append("g")
+        .call(d3.axisLeft(y).ticks(6).tickSize(-width).tickFormat(""))
+        .call(g => g.select(".domain").remove())
+        .call(g => g.selectAll("line").attr("stroke", "#e8e8e8"));
+
+      svg.append("g")
+        .attr("class", "axis")
+        .attr("transform", `translate(0,${height})`)
+        .call(d3.axisBottom(x).tickSize(0))
+        .selectAll("text").attr("dy", "1em");
+
+      svg.append("g")
+        .attr("class", "axis")
+        .call(d3.axisLeft(y).ticks(6).tickFormat(d => d + "h"))
+        .call(g => g.select(".domain").remove());
+
+      svg.append("text")
+        .attr("class", "axis-label")
+        .attr("x", width / 2)
+        .attr("y", height + 46)
+        .attr("text-anchor", "middle")
+        .text("Age Group");
+
+      svg.append("text")
+        .attr("class", "axis-label")
+        .attr("x", -height / 2)
+        .attr("y", -45)
+        .attr("text-anchor", "middle")
+        .attr("transform", "rotate(-90)")
+        .text("Average Screen Time (hours)");
+
+      svg.selectAll(".bar")
+        .data(chartData)
+        .join("rect")
+        .attr("class", "bar")
+        .attr("x", d => x(d.age_group))
+        .attr("width", x.bandwidth())
+        .attr("y", height)
+        .attr("height", 0)
+        .attr("fill", d => d.color)
+        .attr("rx", 3)
+        .on("mouseover", (event, d) => {
+          tooltip.style("opacity", 1)
+            .html(`<strong>${d.age_group}</strong><br>Avg: ${d.avg.toFixed(2)} hrs<br>Users: ${d.count}`);
+        })
+        .on("mousemove", event => {
+          tooltip.style("left", (event.pageX + 12) + "px")
+            .style("top", (event.pageY - 40) + "px");
+        })
+        .on("mouseout", () => tooltip.style("opacity", 0))
+        .transition()
+        .duration(700)
+        .delay((d, i) => i * 100)
+        .ease(d3.easeCubicOut)
+        .attr("y", d => y(d.avg))
+        .attr("height", d => height - y(d.avg));
+
+      svg.selectAll(".data-label")
+        .data(chartData)
+        .join("text")
+        .attr("class", "data-label")
+        .attr("x", d => x(d.age_group) + x.bandwidth() / 2)
+        .attr("y", d => y(d.avg) - 7)
+        .attr("text-anchor", "middle")
+        .attr("opacity", 0)
+        .text(d => d.avg.toFixed(1) + "h")
+        .transition()
+        .duration(500)
+        .delay((d, i) => i * 100 + 400)
+        .attr("opacity", 1);
+    });
+  </script>
+</body>
+</html>
