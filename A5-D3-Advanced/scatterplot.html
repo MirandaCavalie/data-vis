@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Scatterplot Matrix in D3</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/7.8.5/d3.min.js"></script>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: Arial, sans-serif;
+      background: #fafafa;
+      color: #333;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 30px 20px;
+    }
+    .back-link {
+      align-self: flex-start;
+      max-width: 800px;
+      width: 100%;
+      margin: 0 auto 15px auto;
+      font-size: 14px;
+    }
+    .back-link a { color: steelblue; text-decoration: none; }
+    .back-link a:hover { text-decoration: underline; }
+    .chart-container {
+      background: #fff;
+      border: 1px solid #ddd;
+      border-radius: 6px;
+      padding: 30px;
+      max-width: 800px;
+      width: 100%;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+    }
+    h1 { color: #2c3e50; font-size: 1.4rem; margin-bottom: 4px; }
+    .subtitle { font-size: 0.85rem; color: #777; margin-bottom: 14px; }
+    #filter-controls {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      align-items: center;
+      margin-bottom: 14px;
+    }
+    .filter-label { font-size: 13px; color: #555; margin-right: 2px; }
+    .filter-btn {
+      padding: 4px 11px;
+      border: none;
+      border-radius: 4px;
+      font-size: 12px;
+      font-family: Arial, sans-serif;
+      cursor: pointer;
+      color: white;
+      opacity: 0.95;
+      transition: opacity 0.15s, transform 0.1s;
+    }
+    .filter-btn.inactive { opacity: 0.28; }
+    .filter-btn:hover { opacity: 1; transform: translateY(-1px); }
+    .cell-bg { transition: fill 0.12s; }
+    .diag-label {
+      font-size: 11px;
+      font-weight: bold;
+      fill: #2c3e50;
+      font-family: Arial, sans-serif;
+    }
+    .tooltip {
+      position: absolute;
+      background: #fff;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+      padding: 8px 12px;
+      font-size: 13px;
+      color: #333;
+      pointer-events: none;
+      opacity: 0;
+      transition: opacity 0.2s;
+      box-shadow: 0 3px 12px rgba(0,0,0,0.12);
+      font-family: Arial, sans-serif;
+    }
+    .tooltip strong { color: steelblue; }
+    .legend { display: flex; gap: 12px; flex-wrap: wrap; margin-top: 14px; }
+    .legend-item { display: flex; align-items: center; gap: 5px; font-size: 12px; color: #666; }
+    .legend-swatch { width: 10px; height: 10px; border-radius: 50%; }
+  </style>
+</head>
+<body>
+  <div class="back-link"><a href="index.html">← Back to A5</a></div>
+  <div class="chart-container">
+    <h1>Scatterplot Matrix (SPLOM)</h1>
+    <p class="subtitle">
+      4×4 matrix of numeric usage variables &nbsp;·&nbsp; colored by age group &nbsp;·&nbsp;
+      hover to highlight row/col &nbsp;·&nbsp; click age group to filter
+    </p>
+    <div id="filter-controls">
+      <span class="filter-label">Age Group:</span>
+    </div>
+    <div id="chart"></div>
+    <div class="legend" id="legend"></div>
+  </div>
+  <div class="tooltip" id="tooltip"></div>
+
+  <script>
+    const variables = ["social_media_hours", "work_or_study_hours", "entertainment_hours", "total_screen_time"];
+    const labels    = ["Social Media", "Work / Study", "Entertainment", "Total Screen"];
+    const n         = variables.length;
+
+    const cellSize = 158;
+    const padding  = 16;
+    const totalSide = n * cellSize;
+
+    const ageOrder   = ["13-18", "19-25", "26-35", "36-45", "46-60", "60+"];
+    const colorScale = d3.scaleOrdinal()
+      .domain(ageOrder)
+      .range(["#e74c3c", "#e67e22", "#27ae60", "#4682B4", "#8e44ad", "#2c3e50"]);
+
+    const svgEl  = d3.select("#chart").append("svg")
+      .attr("viewBox", `0 0 ${totalSide} ${totalSide}`)
+      .attr("preserveAspectRatio", "xMidYMid meet");
+
+    const tooltip = d3.select("#tooltip");
+
+    let activeGroups = new Set(ageOrder);
+    let allData      = [];
+    let scales       = {};
+    let updateDots   = () => {}; 
+
+    //filter buttons for d3
+    ageOrder.forEach(g => {
+      d3.select("#filter-controls").append("button")
+        .attr("class", "filter-btn")
+        .attr("id", `btn-${g}`)
+        .style("background", colorScale(g))
+        .text(g)
+        .on("click", () => {
+          if (activeGroups.has(g)) {
+            if (activeGroups.size > 1) activeGroups.delete(g);
+          } else {
+            activeGroups.add(g);
+          }
+          ageOrder.forEach(ag =>
+            d3.select(`#btn-${ag}`).classed("inactive", !activeGroups.has(ag))
+          );
+          updateDots();
+        });
+    });
+
+    d3.csv("data/daily_usage.csv").then(data => {
+      data.forEach(d => { variables.forEach(v => { d[v] = +d[v]; }); });
+      allData = data;
+
+      variables.forEach(v => {
+        scales[v] = d3.scaleLinear()
+          .domain(d3.extent(data, d => d[v])).nice()
+          .range([padding, cellSize - padding]);
+      });
+
+      const cellData = d3.cross(d3.range(n), d3.range(n));
+
+      const cells = svgEl.selectAll(".cell-g")
+        .data(cellData)
+        .join("g")
+        .attr("class", "cell-g")
+        .attr("transform", ([i, j]) => `translate(${i * cellSize},${j * cellSize})`);
+
+      cells.append("rect")
+        .attr("class", "cell-bg")
+        .attr("x", 0.5).attr("y", 0.5)
+        .attr("width", cellSize - 1).attr("height", cellSize - 1)
+        .attr("fill", "none")
+        .attr("stroke", "#ddd");
+
+      cells.filter(([i, j]) => i === j)
+        .append("text")
+        .attr("class", "diag-label")
+        .attr("x", cellSize / 2).attr("y", cellSize / 2)
+        .attr("text-anchor", "middle").attr("dominant-baseline", "middle")
+        .text(([i]) => labels[i]);
+
+      cells.filter(([i, j]) => j === n - 1)
+        .append("g")
+        .attr("class", "axis-tick")
+        .attr("transform", `translate(0,${cellSize - padding})`)
+        .each(function([i]) {
+          d3.select(this).call(
+            d3.axisBottom(scales[variables[i]]).ticks(3).tickSize(3)
+          );
+        });
+
+      cells.filter(([i, j]) => i === 0)
+        .append("g")
+        .attr("class", "axis-tick")
+        .attr("transform", `translate(${padding},0)`)
+        .each(function([, j]) {
+          d3.select(this).call(
+            d3.axisLeft(scales[variables[j]]).ticks(3).tickSize(3)
+          );
+        });
+
+      cells
+        .on("mouseover", function([ci, cj]) {
+          svgEl.selectAll(".cell-g").select(".cell-bg")
+            .attr("fill", ([i, j]) => (i === ci || j === cj) ? "#f0f4ff" : "none");
+        })
+        .on("mouseout", () => {
+          svgEl.selectAll(".cell-bg").attr("fill", "none");
+        });
+
+      cells.filter(([i, j]) => i !== j)
+        .on("mousemove.tt", (event, [i, j]) => {
+          tooltip.style("left", (event.pageX + 12) + "px").style("top", (event.pageY - 40) + "px");
+        });
+
+      updateDots = function() {
+        const filtered = allData.filter(d => activeGroups.has(d.age_group));
+        const sampled  = filtered.length > 700
+          ? d3.shuffle(filtered.slice()).slice(0, 700)
+          : filtered;
+
+        svgEl.selectAll(".cell-g").each(function(d) {
+          const [i, j] = d;
+          if (i === j) return;
+          const xVar = variables[i], yVar = variables[j];
+
+          d3.select(this).selectAll(".dot")
+            .data(sampled, d => d.user_id)
+            .join("circle")
+            .attr("class", "dot")
+            .attr("cx", d => scales[xVar](d[xVar]))
+            .attr("cy", d => scales[yVar](d[yVar]))
+            .attr("r", 2)
+            .attr("fill", d => colorScale(d.age_group))
+            .attr("opacity", 0.45)
+            .on("mouseover", (event, d) => {
+              tooltip.style("opacity", 1).html(
+                `<strong>${d.age_group}</strong><br>` +
+                `${labels[i]}: ${d[xVar].toFixed(1)}h<br>` +
+                `${labels[j]}: ${d[yVar].toFixed(1)}h`
+              );
+              d3.select(event.target).attr("r", 4).attr("opacity", 1);
+            })
+            .on("mouseout", event => {
+              tooltip.style("opacity", 0);
+              d3.select(event.target).attr("r", 2).attr("opacity", 0.45);
+            });
+        });
+      };
+
+      updateDots(); 
+
+      const leg = d3.select("#legend");
+      ageOrder.forEach(g => {
+        const item = leg.append("div").attr("class", "legend-item");
+        item.append("div").attr("class", "legend-swatch").style("background", colorScale(g));
+        item.append("span").text(g);
+      });
+    });
+  </script>
+</body>
+</html>
