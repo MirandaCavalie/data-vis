@@ -90,8 +90,6 @@
       .attr("transform", `translate(${margin.left},${margin.top})`);
 
     const tooltip = d3.select("#tooltip");
-    const ageOrder = ["13-18", "19-25", "26-35", "36-50", "51+"];
-
     d3.csv("data/daily_usage.csv").then(data => {
       data.forEach(d => {
         d.social_media_hours  = +d.social_media_hours;
@@ -101,6 +99,10 @@
         d.age                 = +d.age;
       });
 
+      // Derive age groups from data, sorted by starting age number
+      const ageOrder = [...new Set(data.map(d => d.age_group))]
+        .sort((a, b) => parseInt(a) - parseInt(b));
+
       const grandMean = d3.mean(data, d => d.work_or_study_hours);
 
       const aggMap = d3.rollup(
@@ -109,10 +111,12 @@
         d => d.age_group
       );
 
-      const aggData = ageOrder.map(ag => {
-        const avg = aggMap.get(ag);
-        return { age_group: ag, avg, deviation: avg - grandMean };
-      });
+      const aggData = ageOrder
+        .map(ag => {
+          const avg = aggMap.get(ag);
+          return { age_group: ag, avg, deviation: avg - grandMean };
+        })
+        .filter(d => d.avg !== undefined);
 
       const maxAbsDev = d3.max(aggData, d => Math.abs(d.deviation));
       const yPad = maxAbsDev * 1.25;

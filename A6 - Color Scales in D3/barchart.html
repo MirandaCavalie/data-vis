@@ -90,8 +90,6 @@
       .attr("transform", `translate(${margin.left},${margin.top})`);
 
     const tooltip = d3.select("#tooltip");
-    const ageOrder = ["13-18", "19-25", "26-35", "36-50", "51+"];
-
     d3.csv("data/daily_usage.csv").then(data => {
       data.forEach(d => {
         d.social_media_hours  = +d.social_media_hours;
@@ -101,12 +99,17 @@
         d.age                 = +d.age;
       });
 
+      const ageOrder = [...new Set(data.map(d => d.age_group))]
+        .sort((a, b) => parseInt(a) - parseInt(b));
+
       const aggMap = d3.rollup(
         data,
         v => d3.mean(v, d => d.total_screen_time),
         d => d.age_group
       );
-      const aggData = ageOrder.map(ag => ({ age_group: ag, avg: aggMap.get(ag) }));
+      const aggData = ageOrder
+        .map(ag => ({ age_group: ag, avg: aggMap.get(ag) }))
+        .filter(d => d.avg !== undefined);
 
       const x = d3.scaleBand()
         .domain(ageOrder)
@@ -204,7 +207,7 @@
         .attr("font-family", "Arial, sans-serif")
         .text(d => d.avg.toFixed(2));
 
-      //susie Lu color legend 
+      //susie Lu color legend
       const legend = d3.legendColor()
         .title("Avg Screen Time (hrs)")
         .scale(colorScale)
