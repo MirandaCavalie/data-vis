@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Diverging Color Scale Bar Chart</title>
+  <script src="https://d3js.org/d3.v7.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/d3-legend/2.25.6/d3-legend.min.js"></script>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: Arial, sans-serif;
+      background: #fafafa;
+      color: #333;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 30px 20px;
+    }
+    .back-link {
+      align-self: flex-start;
+      max-width: 940px;
+      width: 100%;
+      margin: 0 auto 15px auto;
+    }
+    .chart-link {
+      display: inline-block;
+      background: steelblue;
+      color: white;
+      padding: 8px 18px;
+      border-radius: 5px;
+      font-size: 14px;
+      text-decoration: none;
+    }
+    .chart-link:hover { background: #2a6496; }
+    .chart-container {
+      background: #fff;
+      border: 1px solid #ddd;
+      border-radius: 6px;
+      padding: 30px;
+      max-width: 940px;
+      width: 100%;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+    }
+    h1 { color: #2c3e50; font-size: 1.4rem; margin-bottom: 4px; }
+    .subtitle { font-size: 0.85rem; color: #777; margin-bottom: 20px; }
+    .axis text { fill: #555; font-family: Arial, sans-serif; font-size: 12px; }
+    .axis path, .axis line { stroke: #ccc; }
+    .axis-label { fill: #555; font-size: 13px; font-family: Arial, sans-serif; }
+    .tooltip {
+      position: absolute;
+      background: white;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+      padding: 8px;
+      font-size: 13px;
+      color: #333;
+      pointer-events: none;
+      opacity: 0;
+      transition: opacity 0.2s;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+      font-family: Arial, sans-serif;
+    }
+    .legendTitle { font-size: 12px; font-weight: bold; fill: #333; font-family: Arial, sans-serif; }
+    .label { font-size: 11px; fill: #555; font-family: Arial, sans-serif; }
+  </style>
+</head>
+<body>
+  <div class="back-link"><a class="chart-link" href="index.html">← Back to Home</a></div>
+  <div class="chart-container">
+    <h1>Work/Study Hours Deviation from Grand Mean by Age Group</h1>
+    <p class="subtitle">Diverging ColorBrewer scale (<code>d3.schemeRdYlBu[5]</code>) </p>
+    <div id="chart"></div>
+  </div>
+  <div class="tooltip" id="tooltip"></div>
+
+  <script>
+    const margin = { top: 60, right: 180, bottom: 60, left: 70 };
+    const innerWidth  = 580;
+    const innerHeight = 360;
+    const svgW = innerWidth + margin.left + margin.right;
+    const svgH = innerHeight + margin.top + margin.bottom;
+
+    const svg = d3.select("#chart")
+      .append("svg")
+      .attr("viewBox", `0 0 ${svgW} ${svgH}`)
+      .attr("preserveAspectRatio", "xMidYMid meet")
+      .style("width", "100%")
+      .style("height", "auto")
+      .append("g")
+      .attr("transform", `translate(${margin.left},${margin.top})`);
+
+    const tooltip = d3.select("#tooltip");
+    const ageOrder = ["13-18", "19-25", "26-35", "36-50", "51+"];
+
+    d3.csv("data/daily_usage.csv").then(data => {
+      data.forEach(d => {
+        d.social_media_hours  = +d.social_media_hours;
+        d.work_or_study_hours = +d.work_or_study_hours;
+        d.entertainment_hours = +d.entertainment_hours;
+        d.total_screen_time   = +d.total_screen_time;
+        d.age                 = +d.age;
+      });
+
+      const grandMean = d3.mean(data, d => d.work_or_study_hours);
+
+      const aggMap = d3.rollup(
+        data,
+        v => d3.mean(v, d => d.work_or_study_hours),
+        d => d.age_group
+      );
+
+      const aggData = ageOrder.map(ag => {
+        const avg = aggMap.get(ag);
+        return { age_group: ag, avg, deviation: avg - grandMean };
+      });
+
+      const maxAbsDev = d3.max(aggData, d => Math.abs(d.deviation));
+      const yPad = maxAbsDev * 1.25;
+
+      const x = d3.scaleBand()
+        .domain(ageOrder)
+        .range([0, innerWidth])
+        .padding(0.3);
+
+      const y = d3.scaleLinear()
+        .domain([-yPad, yPad])
+        .nice()
+        .range([innerHeight, 0]);
+
+      const colorScale = d3.scaleQuantize()
+        .domain([-maxAbsDev, maxAbsDev])
+        .range(d3.schemeRdYlBu[5]);
+
+      svg.append("g")
+        .call(d3.axisLeft(y).ticks(6).tickSize(-innerWidth).tickFormat(""))
+        .call(g => g.select(".domain").remove())
+        .call(g => g.selectAll("line").attr("stroke", "#e8e8e8"));
+
+      svg.append("g")
+        .attr("class", "axis")
+        .attr("transform", `translate(0,${y(0)})`)
+        .call(d3.axisBottom(x))
+        .call(g => g.select(".domain").attr("stroke", "#aaa"));
+
+      svg.append("g")
+        .attr("class", "axis")
+        .call(d3.axisLeft(y).ticks(6).tickFormat(d => (d >= 0 ? "+" : "") + d.toFixed(2) + "h"))
+        .call(g => g.select(".domain").remove());
+
+      svg.append("text")
+        .attr("class", "axis-label")
+        .attr("x", innerWidth / 2)
+        .attr("y", innerHeight + 46)
+        .attr("text-anchor", "middle")
+        .text("Age Group");
+
+      svg.append("text")
+        .attr("class", "axis-label")
+        .attr("transform", "rotate(-90)")
+        .attr("x", -innerHeight / 2)
+        .attr("y", -54)
+        .attr("text-anchor", "middle")
+        .text("Deviation from Grand Mean (hrs)");
+
+      svg.append("text")
+        .attr("x", innerWidth / 2)
+        .attr("y", -28)
+        .attr("text-anchor", "middle")
+        .attr("font-size", "14px")
+        .attr("font-weight", "bold")
+        .attr("fill", "#2c3e50")
+        .attr("font-family", "Arial, sans-serif")
+        .text("Work/Study Hours Deviation from Grand Mean by Age Group");
+
+      svg.selectAll(".bar")
+        .data(aggData)
+        .join("rect")
+        .attr("class", "bar")
+        .attr("x", d => x(d.age_group))
+        .attr("y", d => d.deviation >= 0 ? y(d.deviation) : y(0))
+        .attr("width", x.bandwidth())
+        .attr("height", d => Math.abs(y(d.deviation) - y(0)))
+        .attr("fill", d => colorScale(d.deviation))
+        .attr("rx", 3)
+        .style("cursor", "pointer")
+        .on("mouseover", (event, d) => {
+          tooltip.style("opacity", 1).html(
+            `<strong>Age Group: ${d.age_group}</strong><br>` +
+            `Avg Work/Study: <strong>${d.avg.toFixed(2)} hrs</strong><br>` +
+            `Grand Mean: <strong>${(d.avg - d.deviation).toFixed(2)} hrs</strong><br>` +
+            `Deviation: <strong>${d.deviation >= 0 ? "+" : ""}${d.deviation.toFixed(2)} hrs</strong>`
+          );
+          d3.select(event.target).attr("opacity", 0.8);
+        })
+        .on("mousemove", event => {
+          tooltip
+            .style("left", (event.pageX + 14) + "px")
+            .style("top", (event.pageY - 60) + "px");
+        })
+        .on("mouseout", event => {
+          tooltip.style("opacity", 0);
+          d3.select(event.target).attr("opacity", 1);
+        });
+
+      svg.selectAll(".bar-label")
+        .data(aggData)
+        .join("text")
+        .attr("class", "bar-label")
+        .attr("x", d => x(d.age_group) + x.bandwidth() / 2)
+        .attr("y", d => d.deviation >= 0
+          ? y(d.deviation) - 5
+          : y(0) + Math.abs(y(d.deviation) - y(0)) + 14)
+        .attr("text-anchor", "middle")
+        .attr("font-size", "11px")
+        .attr("fill", "#555")
+        .attr("font-family", "Arial, sans-serif")
+        .text(d => (d.deviation >= 0 ? "+" : "") + d.deviation.toFixed(2));
+
+      svg.append("line")
+        .attr("x1", 0)
+        .attr("x2", innerWidth)
+        .attr("y1", y(0))
+        .attr("y2", y(0))
+        .attr("stroke", "#444")
+        .attr("stroke-width", 1.8)
+        .attr("stroke-dasharray", "5,3");
+
+      svg.append("text")
+        .attr("x", innerWidth + 5)
+        .attr("y", y(0) + 4)
+        .attr("font-size", "10px")
+        .attr("fill", "#666")
+        .attr("font-family", "Arial, sans-serif")
+        .text("mean");
+
+      //susie  diverging color legend
+      const legend = d3.legendColor()
+        .title("Deviation (hrs)")
+        .scale(colorScale)
+        .shapeWidth(22)
+        .shapeHeight(14)
+        .shapePadding(4)
+        .labelFormat(d3.format("+.2f"))
+        .labelAlign("start");
+
+      svg.append("g")
+        .attr("class", "legendColor")
+        .attr("transform", `translate(${innerWidth + 22}, 10)`)
+        .call(legend);
+
+    }).catch(err => {
+      d3.select("#chart").append("p")
+        .style("color", "red")
+        .text("Error loading data: " + err.message);
+    });
+  </script>
+</body>
+</html>
