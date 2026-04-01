@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Scatter Plot in D3</title>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/7.8.5/d3.min.js"></script>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: Arial, sans-serif;
+      background: #fafafa;
+      color: #333;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 30px 20px;
+    }
+    .back-link {
+      align-self: flex-start;
+      max-width: 860px;
+      width: 100%;
+      margin: 0 auto 15px auto;
+      font-size: 14px;
+    }
+    .back-link a { color: steelblue; text-decoration: none; }
+    .back-link a:hover { text-decoration: underline; }
+    .chart-container {
+      background: #fff;
+      border: 1px solid #ddd;
+      border-radius: 6px;
+      padding: 30px;
+      max-width: 900px;
+      width: 100%;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+    }
+    h1 { color: #2c3e50; font-size: 1.4rem; margin-bottom: 4px; }
+    .subtitle { font-size: 0.85rem; color: #777; margin-bottom: 20px; }
+    .axis text { fill: #555; font-family: Arial, sans-serif; font-size: 12px; }
+    .axis path, .axis line { stroke: #ccc; }
+    .axis-label { fill: #555; font-size: 13px; font-family: Arial, sans-serif; }
+    .dot { cursor: pointer; transition: r 0.15s; }
+    .dot:hover { r: 7; }
+    .tooltip {
+      position: absolute;
+      background: #fff;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+      padding: 8px 12px;
+      font-size: 13px;
+      color: #333;
+      pointer-events: none;
+      opacity: 0;
+      transition: opacity 0.2s;
+      box-shadow: 0 3px 12px rgba(0,0,0,0.12);
+      font-family: Arial, sans-serif;
+    }
+    .tooltip strong { color: steelblue; }
+    .legend { display: flex; gap: 14px; flex-wrap: wrap; margin-top: 12px; }
+    .legend-item { display: flex; align-items: center; gap: 5px; font-size: 12px; color: #666; }
+    .legend-swatch { width: 10px; height: 10px; border-radius: 50%; }
+  </style>
+</head>
+<body>
+  <div class="back-link"><a href="../index.html">← Back to A4</a></div>
+  <div class="chart-container">
+    <h1>Work/Study Hours vs. Social Media Hours</h1>
+    <p class="subtitle">Each point represents a user record and each for is colored by age group </p>
+    <p class="subtitle"> Only 500 sample dots where used for better clarity</p>
+    <div id="chart"></div>
+    <div class="legend" id="legend"></div>
+  </div>
+  <div class="tooltip" id="tooltip"></div>
+
+  <script>
+    const margin = {top: 15, right: 25, bottom: 55, left: 60};
+    const width = 830 - margin.left - margin.right;
+    const height = 470 - margin.top - margin.bottom;
+
+    const svg = d3.select("#chart")
+      .append("svg")
+      .attr("viewBox", `0 0 ${width + margin.left + margin.right} ${height + margin.top + margin.bottom}`)
+      .attr("preserveAspectRatio", "xMidYMid meet")
+      .append("g")
+      .attr("transform", `translate(${margin.left},${margin.top})`);
+
+    const tooltip = d3.select("#tooltip");
+
+    const ageOrder = ["13-18", "19-25", "26-35", "36-45", "46-60", "60+"];
+    const colors = {
+      "13-18": "#e74c3c",
+      "19-25": "#e67e22",
+      "26-35": "#27ae60",
+      "36-45": "#4682B4",
+      "46-60": "#8e44ad",
+      "60+":   "#2c3e50"
+    };
+
+    d3.csv("../data/daily_usage.csv").then(data => {
+      data.forEach(d => {
+        d.work_or_study_hours = +d.work_or_study_hours;
+        d.social_media_hours = +d.social_media_hours;
+      });
+
+      //sample 500 for readability
+      const sampled = d3.shuffle(data.slice()).slice(0, 500);
+
+      const x = d3.scaleLinear()
+        .domain([0, d3.max(sampled, d => d.work_or_study_hours) * 1.05])
+        .nice()
+        .range([0, width]);
+
+      const y = d3.scaleLinear()
+        .domain([0, d3.max(sampled, d => d.social_media_hours) * 1.05])
+        .nice()
+        .range([height, 0]);
+
+      svg.append("g")
+        .call(d3.axisLeft(y).ticks(6).tickSize(-width).tickFormat(""))
+        .call(g => g.select(".domain").remove())
+        .call(g => g.selectAll("line").attr("stroke", "#e8e8e8"));
+
+      svg.append("g")
+        .call(d3.axisBottom(x).ticks(8).tickSize(-height).tickFormat(""))
+        .attr("transform", `translate(0,${height})`)
+        .call(g => g.select(".domain").remove())
+        .call(g => g.selectAll("line").attr("stroke", "#e8e8e8"));
+
+      svg.append("g")
+        .attr("class", "axis")
+        .attr("transform", `translate(0,${height})`)
+        .call(d3.axisBottom(x).ticks(8).tickFormat(d => d + "h"));
+
+      svg.append("g")
+        .attr("class", "axis")
+        .call(d3.axisLeft(y).ticks(6).tickFormat(d => d + "h"))
+        .call(g => g.select(".domain").remove());
+
+      svg.append("text")
+        .attr("class", "axis-label")
+        .attr("x", width / 2)
+        .attr("y", height + 46)
+        .attr("text-anchor", "middle")
+        .text("Work / Study Hours (daily)");
+
+      svg.append("text")
+        .attr("class", "axis-label")
+        .attr("x", -height / 2)
+        .attr("y", -45)
+        .attr("text-anchor", "middle")
+        .attr("transform", "rotate(-90)")
+        .text("Social Media Hours (daily)");
+
+      //dots with animation
+      svg.selectAll(".dot")
+        .data(sampled)
+        .join("circle")
+        .attr("class", "dot")
+        .attr("cx", d => x(d.work_or_study_hours))
+        .attr("cy", d => y(d.social_media_hours))
+        .attr("r", 0)
+        .attr("fill", d => colors[d.age_group] || "#999")
+        .attr("opacity", 0.65)
+        .attr("stroke", "#fff")
+        .attr("stroke-width", 0.5)
+        .on("mouseover", (event, d) => {
+          tooltip.style("opacity", 1)
+            .html(`<strong>User #${d.user_id}</strong> (Age ${d.age})<br>Work/Study: ${d.work_or_study_hours}h<br>Social Media: ${d.social_media_hours}h<br>Device: ${d.primary_device}`);
+          d3.select(event.target).attr("opacity", 1).attr("stroke-width", 1.5).attr("stroke", "#333");
+        })
+        .on("mousemove", event => {
+          tooltip.style("left", (event.pageX + 12) + "px")
+            .style("top", (event.pageY - 40) + "px");
+        })
+        .on("mouseout", (event) => {
+          tooltip.style("opacity", 0);
+          d3.select(event.target).attr("opacity", 0.65).attr("stroke-width", 0.5).attr("stroke", "#fff");
+        })
+        .transition()
+        .duration(500)
+        .delay((d, i) => i * 1.2)
+        .attr("r", 4.5);
+
+      const legend = d3.select("#legend");
+      ageOrder.forEach(group => {
+        const item = legend.append("div").attr("class", "legend-item");
+        item.append("div").attr("class", "legend-swatch").style("background", colors[group]);
+        item.append("span").text(group);
+      });
+    });
+  </script>
+</body>
+</html>

@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Histogram in D3</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/7.8.5/d3.min.js"></script>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: Arial, sans-serif;
+      background: #fafafa;
+      color: #333;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 30px 20px;
+    }
+    .back-link {
+      align-self: flex-start;
+      max-width: 860px;
+      width: 100%;
+      margin: 0 auto 15px auto;
+      font-size: 14px;
+    }
+    .back-link a { color: steelblue; text-decoration: none; }
+    .back-link a:hover { text-decoration: underline; }
+    .chart-container {
+      background: #fff;
+      border: 1px solid #ddd;
+      border-radius: 6px;
+      padding: 30px;
+      max-width: 860px;
+      width: 100%;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+    }
+    h1 { color: #2c3e50; font-size: 1.4rem; margin-bottom: 4px; }
+    .subtitle { font-size: 0.85rem; color: #777; margin-bottom: 20px; }
+    .axis text { fill: #555; font-family: Arial, sans-serif; font-size: 12px; }
+    .axis path, .axis line { stroke: #ccc; }
+    .axis-label { fill: #555; font-size: 13px; font-family: Arial, sans-serif; }
+    .hist-bar { cursor: pointer; }
+    .hist-bar:hover { opacity: 0.75; }
+    .tooltip {
+      position: absolute;
+      background: #fff;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+      padding: 8px 12px;
+      font-size: 13px;
+      color: #333;
+      pointer-events: none;
+      opacity: 0;
+      transition: opacity 0.2s;
+      box-shadow: 0 3px 12px rgba(0,0,0,0.12);
+      font-family: Arial, sans-serif;
+    }
+    .tooltip strong { color: steelblue; }
+    .stats { display: flex; gap: 20px; flex-wrap: wrap; margin-top: 14px; }
+    .stat { font-size: 12px; color: #777; }
+    .stat span { color: steelblue; font-weight: bold; font-size: 13px; }
+  </style>
+</head>
+<body>
+  <div class="back-link"><a href="../index.html">← Back to A4</a></div>
+  <div class="chart-container">
+    <h1>Distribution of Total Daily Screen Time</h1>
+    <p class="subtitle">Histogram showing frequency across 2,800 records</p>
+    <p class="subtitle">Tooltip: hover over the bars to see more details!</p>
+    <div id="chart"></div>
+    <div class="stats" id="stats"></div>
+  </div>
+  <div class="tooltip" id="tooltip"></div>
+
+  <script>
+    const margin = {top: 20, right: 20, bottom: 55, left: 60};
+    const width = 780 - margin.left - margin.right;
+    const height = 420 - margin.top - margin.bottom;
+
+    const svg = d3.select("#chart")
+      .append("svg")
+      .attr("viewBox", `0 0 ${width + margin.left + margin.right} ${height + margin.top + margin.bottom}`)
+      .attr("preserveAspectRatio", "xMidYMid meet")
+      .append("g")
+      .attr("transform", `translate(${margin.left},${margin.top})`);
+
+    const tooltip = d3.select("#tooltip");
+
+    d3.csv("../data/daily_usage.csv").then(data => {
+      const values = data.map(d => +d.total_screen_time);
+
+      const x = d3.scaleLinear()
+        .domain([d3.min(values) * 0.9, d3.max(values) * 1.05])
+        .nice()
+        .range([0, width]);
+
+      const histogram = d3.bin()
+        .value(d => d)
+        .domain(x.domain())
+        .thresholds(x.ticks(20));
+
+      const bins = histogram(values);
+
+      const y = d3.scaleLinear()
+        .domain([0, d3.max(bins, d => d.length) * 1.1])
+        .nice()
+        .range([height, 0]);
+
+      //grid
+      svg.append("g")
+        .call(d3.axisLeft(y).ticks(6).tickSize(-width).tickFormat(""))
+        .call(g => g.select(".domain").remove())
+        .call(g => g.selectAll("line").attr("stroke", "#e8e8e8"));
+
+      svg.append("g")
+        .attr("class", "axis")
+        .attr("transform", `translate(0,${height})`)
+        .call(d3.axisBottom(x).ticks(10).tickFormat(d => d + "h"));
+
+      svg.append("g")
+        .attr("class", "axis")
+        .call(d3.axisLeft(y).ticks(6))
+        .call(g => g.select(".domain").remove());
+
+      svg.append("text")
+        .attr("class", "axis-label")
+        .attr("x", width / 2)
+        .attr("y", height + 46)
+        .attr("text-anchor", "middle")
+        .text("Total Screen Time (hours/day)");
+
+      svg.append("text")
+        .attr("class", "axis-label")
+        .attr("x", -height / 2)
+        .attr("y", -45)
+        .attr("text-anchor", "middle")
+        .attr("transform", "rotate(-90)")
+        .text("Frequency (count)");
+
+      svg.selectAll(".hist-bar")
+        .data(bins)
+        .join("rect")
+        .attr("class", "hist-bar")
+        .attr("x", d => x(d.x0) + 1)
+        .attr("width", d => Math.max(0, x(d.x1) - x(d.x0) - 2))
+        .attr("y", height)
+        .attr("height", 0)
+        .attr("fill", "steelblue")
+        .attr("rx", 2)
+        .on("mouseover", (event, d) => {
+          const pct = ((d.length / values.length) * 100).toFixed(1);
+          tooltip.style("opacity", 1)
+            .html(`<strong>${d.x0.toFixed(1)}h – ${d.x1.toFixed(1)}h</strong><br>Count: ${d.length}<br>Percentage: ${pct}%`);
+          d3.select(event.target).attr("fill", "#2a6496");
+        })
+        .on("mousemove", event => {
+          tooltip.style("left", (event.pageX + 12) + "px")
+            .style("top", (event.pageY - 40) + "px");
+        })
+        .on("mouseout", (event) => {
+          tooltip.style("opacity", 0);
+          d3.select(event.target).attr("fill", "steelblue");
+        })
+        .transition()
+        .duration(600)
+        .delay((d, i) => i * 35)
+        .ease(d3.easeCubicOut)
+        .attr("y", d => y(d.length))
+        .attr("height", d => height - y(d.length));
+
+      //d3.mean for the mean value 
+      const mean = d3.mean(values);
+      svg.append("line")
+        .attr("x1", x(mean)).attr("x2", x(mean))
+        .attr("y1", 0).attr("y2", height)
+        .attr("stroke", "#e74c3c").attr("stroke-width", 2)
+        .attr("stroke-dasharray", "6,4")
+        .attr("opacity", 0)
+        .transition().delay(900).duration(400)
+        .attr("opacity", 0.8);
+
+      svg.append("text")
+        .attr("x", x(mean) + 6).attr("y", 14)
+        .attr("fill", "#e74c3c").attr("font-size", "11px").attr("font-family", "Arial")
+        .attr("opacity", 0)
+        .text(`Mean: ${mean.toFixed(1)}h`)
+        .transition().delay(900).duration(400)
+        .attr("opacity", 1);
+
+      //statistics of the histogram:
+      const stats = d3.select("#stats");
+      [
+        { label: "Mean", value: mean.toFixed(2) + "h" },
+        { label: "Median", value: d3.median(values).toFixed(2) + "h" },
+        { label: "Std Dev", value: d3.deviation(values).toFixed(2) + "h" },
+        { label: "Min", value: d3.min(values).toFixed(1) + "h" },
+        { label: "Max", value: d3.max(values).toFixed(1) + "h" },
+      ].forEach(s => {
+        stats.append("div").attr("class", "stat")
+          .html(`${s.label}: <span>${s.value}</span>`);
+      });
+    });
+  </script>
+</body>
+</html>

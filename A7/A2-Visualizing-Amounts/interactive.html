@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Interactive Bar Chart with Tooltips</title>
+    
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.7.0/p5.js"></script>
+    
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        
+        .header {
+            background-color: white;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        
+        h1 {
+            color: #333;
+            margin: 0 0 10px 0;
+        }
+        
+        .back-link {
+            display: inline-block;
+            color: #4299e1;
+            text-decoration: none;
+            margin-bottom: 15px;
+        }
+        
+        .back-link:hover {
+            text-decoration: underline;
+        }
+        
+        p {
+            color: #666;
+            line-height: 1.6;
+        }
+        
+        .section {
+            background-color: white;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        
+        h2 {
+            color: #2c5282;
+            margin-top: 0;
+        }
+        
+        .chart-container {
+            margin: 20px 0;
+            display: flex;
+            justify-content: center;
+        }
+        
+        .badge {
+            display: inline-block;
+            background-color: #ed8936;
+            color: white;
+            padding: 3px 8px;
+            border-radius: 3px;
+            font-size: 12px;
+            margin-left: 8px;
+        }
+        
+        .instruction-box {
+            background-color: #e6fffa;
+            border-left: 4px solid #38b2ac;
+            padding: 15px;
+            margin: 20px 0;
+            border-radius: 4px;
+        }
+        
+        .instruction-box p {
+            margin: 0;
+            color: #234e52;
+        }
+    </style>
+</head>
+<body>
+    <a href="index.html" class="back-link">← Back to Main Page</a>
+    
+    <div class="header">
+        <h1>Interactive Bar Chart with Tooltips </h1>
+ </div>
+    
+    <div class="instruction-box">
+        <p><strong>Try it:</strong> Move your mouse over the bars to see interactive tooltips </p>
+    </div>
+    
+    <div class="section">
+        <h2>P5.js Implementation</h2>
+        <div id="interactive-container" class="chart-container"></div>
+    </div>
+       
+    <script src="sketches/interactive.js"></script>
+</body>
+</html>

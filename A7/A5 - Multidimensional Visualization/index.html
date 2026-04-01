@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>A5 - Multidimensional Visualization</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      max-width: 900px;
+      margin: 40px auto;
+      padding: 0 20px;
+      background: #fafafa;
+      color: #333;
+    }
+    h1 { color: #2c3e50; border-bottom: 2px solid #ddd; padding-bottom: 10px; }
+    h2 { color: #34495e; margin-top: 30px; }
+    a { color: steelblue; text-decoration: none; }
+    a:hover { text-decoration: underline; }
+    .chart-link {
+      display: inline-block;
+      background: steelblue;
+      color: white;
+      padding: 10px 20px;
+      border-radius: 5px;
+      margin: 5px 0;
+      font-size: 15px;
+    }
+    .chart-link:hover { background: #2a6496; text-decoration: none; }
+    .section { margin-bottom: 30px; }
+    table { border-collapse: collapse; margin: 10px 0; }
+    td, th { border: 1px solid #ddd; padding: 8px 14px; text-align: left; }
+    th { background: #f0f0f0; }
+  </style>
+</head>
+<body>
+  <h1>A5 – Multidimensional Visualization</h1>
+  <p>
+    <strong>Dataset:</strong> Daily Screen Time Usage (2,800 records)<br>
+    <strong>Variables:</strong> social_media_hours, work_or_study_hours, entertainment_hours,
+    total_screen_time, age_group, primary_device
+  </p>
+
+  <div class="section">
+    <h2>D3.js Interactive Charts</h2>
+    <table>
+      <tr>
+        <th>Chart</th>
+        <th>Variables</th>
+        <th>Link</th>
+      </tr>
+      <tr>
+        <td>Bubble Chart</td>
+        <td>work/study × entertainment &nbsp;·&nbsp; size: total screen time &nbsp;·&nbsp; color: age group</td>
+        <td><a class="chart-link" href="bubble.html">Open Bubble Chart</a></td>
+      </tr>
+      <tr>
+        <td>Line Chart</td>
+        <td>Monthly avg — social media, work/study, entertainment hours</td>
+        <td><a class="chart-link" href="linechart.html">Open Line Chart</a></td>
+      </tr>
+      <tr>
+        <td>Scatterplot Matrix</td>
+        <td>4×4 scatterplot matrix — all numeric variables, filtered by age group</td>
+        <td><a class="chart-link" href="scatterplot.html">Open Scatterplot Matrix</a></td>
+      </tr>
+    </table>
+    <p><em>All D3 charts include interactive tooltips on hover.</em></p>
+  </div>
+
+  <div class="section">
+    <h2>References</h2>
+    <ul>
+      <li><a href="https://d3-legend.susielu.com/">d3-legend by Susie Lu</a></li>
+      <li><a href="https://observablehq.com/@d3/bubble-chart">Observable: D3 Bubble Chart</a></li>
+      <li><a href="https://observablehq.com/@d3/multi-line-chart">Observable: D3 Multi-Line Chart</a></li>
+      <li><a href="https://observablehq.com/@d3/splom">Observable: D3 Scatterplot Matrix (SPLOM)</a></li>
+    </ul>
+  </div>
+</body>
+</html>

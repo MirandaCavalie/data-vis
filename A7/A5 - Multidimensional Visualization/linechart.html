@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Line Chart in D3</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/7.8.5/d3.min.js"></script>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: Arial, sans-serif;
+      background: #fafafa;
+      color: #333;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 30px 20px;
+    }
+    .back-link {
+      align-self: flex-start;
+      max-width: 900px;
+      width: 100%;
+      margin: 0 auto 15px auto;
+      font-size: 14px;
+    }
+    .back-link a { color: steelblue; text-decoration: none; }
+    .back-link a:hover { text-decoration: underline; }
+    .chart-container {
+      background: #fff;
+      border: 1px solid #ddd;
+      border-radius: 6px;
+      padding: 30px;
+      max-width: 900px;
+      width: 100%;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+    }
+    h1 { color: #2c3e50; font-size: 1.4rem; margin-bottom: 4px; }
+    .subtitle { font-size: 0.85rem; color: #777; margin-bottom: 20px; }
+    .axis text { fill: #555; font-family: Arial, sans-serif; font-size: 12px; }
+    .axis path, .axis line { stroke: #ccc; }
+    .axis-label { fill: #555; font-size: 13px; font-family: Arial, sans-serif; }
+    .line-path { fill: none; stroke-width: 2.2px; }
+    .dot { cursor: pointer; }
+    .tooltip {
+      position: absolute;
+      background: #fff;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+      padding: 8px 12px;
+      font-size: 13px;
+      color: #333;
+      pointer-events: none;
+      opacity: 0;
+      transition: opacity 0.2s;
+      box-shadow: 0 3px 12px rgba(0,0,0,0.12);
+      font-family: Arial, sans-serif;
+    }
+    .tooltip strong { color: steelblue; }
+    .legend { display: flex; gap: 20px; flex-wrap: wrap; margin-top: 14px; }
+    .legend-item { display: flex; align-items: center; gap: 6px; font-size: 12px; color: #555; }
+    .legend-line { width: 22px; height: 3px; border-radius: 2px; }
+  </style>
+</head>
+<body>
+  <div class="back-link"><a href="index.html">← Back to A5</a></div>
+  <div class="chart-container">
+    <h1>Monthly Average Usage Hours</h1>
+    <p class="subtitle">Average daily hours per month across 2,800 users — hover on dots for details</p>
+    <div id="chart"></div>
+    <div class="legend" id="legend"></div>
+  </div>
+  <div class="tooltip" id="tooltip"></div>
+
+  <script>
+    const margin = { top: 20, right: 30, bottom: 55, left: 60 };
+    const width  = 820 - margin.left - margin.right;
+    const height = 430 - margin.top  - margin.bottom;
+
+    const svg = d3.select("#chart")
+      .append("svg")
+      .attr("viewBox", `0 0 ${width + margin.left + margin.right} ${height + margin.top + margin.bottom}`)
+      .attr("preserveAspectRatio", "xMidYMid meet")
+      .append("g")
+      .attr("transform", `translate(${margin.left},${margin.top})`);
+
+    const tooltip  = d3.select("#tooltip");
+    const parseDate = d3.timeParse("%Y-%m-%d");
+    const fmtMonth  = d3.timeFormat("%b %Y");
+
+    const series = [
+      { key: "social_media",  label: "Social Media",  color: "#e74c3c" },
+      { key: "work_study",    label: "Work / Study",  color: "#4682B4" },
+      { key: "entertainment", label: "Entertainment", color: "#27ae60" }
+    ];
+
+    d3.csv("data/daily_usage.csv").then(data => {
+      data.forEach(d => {
+        d.parsedDate          = parseDate(d.date);
+        d.social_media_hours  = +d.social_media_hours;
+        d.work_or_study_hours = +d.work_or_study_hours;
+        d.entertainment_hours = +d.entertainment_hours;
+      });
+
+      const byMonth = d3.rollup(data,
+        v => ({
+          social_media:  d3.mean(v, d => d.social_media_hours),
+          work_study:    d3.mean(v, d => d.work_or_study_hours),
+          entertainment: d3.mean(v, d => d.entertainment_hours),
+          count: v.length
+        }),
+        d => d3.timeMonth(d.parsedDate)
+      );
+
+      const monthly = Array.from(byMonth, ([date, vals]) => ({ date, ...vals }))
+        .sort((a, b) => a.date - b.date);
+
+      const x = d3.scaleTime()
+        .domain(d3.extent(monthly, d => d.date))
+        .range([0, width]);
+
+      const yMax = d3.max(monthly, d =>
+        Math.max(d.social_media, d.work_study, d.entertainment)) * 1.15;
+
+      const y = d3.scaleLinear()
+        .domain([0, yMax]).nice()
+        .range([height, 0]);
+
+      svg.append("g")
+        .call(d3.axisLeft(y).ticks(6).tickSize(-width).tickFormat(""))
+        .call(g => g.select(".domain").remove())
+        .call(g => g.selectAll("line").attr("stroke", "#e8e8e8"));
+
+      svg.append("g").attr("class", "axis")
+        .attr("transform", `translate(0,${height})`)
+        .call(d3.axisBottom(x)
+          .ticks(d3.timeMonth, 1)
+          .tickFormat(d3.timeFormat("%b '%y")))
+        .selectAll("text").attr("dy", "1.2em");
+
+      svg.append("g").attr("class", "axis")
+        .call(d3.axisLeft(y).ticks(6).tickFormat(d => d + "h"))
+        .call(g => g.select(".domain").remove());
+
+      svg.append("text").attr("class", "axis-label")
+        .attr("x", width / 2).attr("y", height + 46)
+        .attr("text-anchor", "middle").text("Month");
+
+      svg.append("text").attr("class", "axis-label")
+        .attr("x", -height / 2).attr("y", -46)
+        .attr("text-anchor", "middle").attr("transform", "rotate(-90)")
+        .text("Average Hours per Day");
+
+      series.forEach(s => {
+        const lineGen = d3.line()
+          .x(d => x(d.date))
+          .y(d => y(d[s.key]));
+
+        svg.append("path")
+          .datum(monthly)
+          .attr("class", "line-path")
+          .attr("d", lineGen)
+          .attr("stroke", s.color)
+          .attr("opacity", 0.85);
+
+        svg.selectAll(`.dot-${s.key}`)
+          .data(monthly)
+          .join("circle")
+          .attr("class", `dot dot-${s.key}`)
+          .attr("cx", d => x(d.date))
+          .attr("cy", d => y(d[s.key]))
+          .attr("r", 4.5)
+          .attr("fill", s.color)
+          .attr("stroke", "#fff")
+          .attr("stroke-width", 1.5)
+          .on("mouseover", (event, d) => {
+            tooltip.style("opacity", 1).html(
+              `<strong>${fmtMonth(d.date)}</strong><br>` +
+              `${s.label}: <strong>${d[s.key].toFixed(2)}h</strong><br>` +
+              `n = ${d.count} records`
+            );
+            d3.select(event.target).attr("r", 7);
+          })
+          .on("mousemove", event => {
+            tooltip.style("left", (event.pageX + 12) + "px").style("top", (event.pageY - 40) + "px");
+          })
+          .on("mouseout", event => {
+            tooltip.style("opacity", 0);
+            d3.select(event.target).attr("r", 4.5);
+          });
+      });
+
+      const leg = d3.select("#legend");
+      series.forEach(s => {
+        const item = leg.append("div").attr("class", "legend-item");
+        item.append("div").attr("class", "legend-line").style("background", s.color);
+        item.append("span").text(s.label);
+      });
+    });
+  </script>
+</body>
+</html>

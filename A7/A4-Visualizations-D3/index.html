@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>A4 - D3 Visualizations</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      max-width: 900px;
+      margin: 40px auto;
+      padding: 0 20px;
+      background: #fafafa;
+      color: #333;
+    }
+    h1 { color: #2c3e50; border-bottom: 2px solid #ddd; padding-bottom: 10px; }
+    h2 { color: #34495e; margin-top: 30px; }
+    a { color: steelblue; text-decoration: none; }
+    a:hover { text-decoration: underline; }
+    .chart-link {
+      display: inline-block;
+      background: steelblue;
+      color: white;
+      padding: 10px 20px;
+      border-radius: 5px;
+      margin: 5px 0;
+      font-size: 15px;
+    }
+    .chart-link:hover { background: #2a6496; text-decoration: none; }
+    .section { margin-bottom: 30px; }
+    .screenshot { max-width: 700px; border: 1px solid #ddd; border-radius: 4px; margin: 10px 0; }
+    table { border-collapse: collapse; margin: 10px 0; }
+    td, th { border: 1px solid #ddd; padding: 8px 14px; text-align: left; }
+    th { background: #f0f0f0; }
+    .badge {
+      display: inline-block;
+      background: #e8f4e8;
+      color: #27ae60;
+      font-size: 11px;
+      font-weight: bold;
+      padding: 2px 8px;
+      border-radius: 3px;
+      margin-left: 6px;
+    }
+    .badge.ec {
+      background: #fef3e2;
+      color: #e67e22;
+    }
+  </style>
+</head>
+<body>
+  <h1>A4 – D3.js Visualizations</h1>
+  <p>
+    <strong>Dataset:</strong> Daily Screen Time Usage (2,800 records)<br>
+    <strong>Variables:</strong> total_screen_time, work_or_study_hours, social_media_hours, age_group, primary_device, internet_type
+  </p>
+    <!--d3 htmls: -->
+  <div class="section">
+    <h2>D3.js Interactive Charts</h2>
+    <table>
+      <tr>
+        <th>Chart</th>
+        <th>Variables</th>
+        <th>Link</th>
+      </tr>
+      <tr>
+        <td>Bar Chart</td>
+        <td>total_screen_time (avg by age_group)</td>
+        <td><a class="chart-link" href="d3/barchart.html">Open Bar Chart</a></td>
+      </tr>
+      <tr>
+        <td>Scatter Plot</td>
+        <td>work_or_study_hours vs social_media_hours</td>
+        <td><a class="chart-link" href="d3/scatterplot.html">Open Scatter Plot</a></td>
+      </tr>
+      <tr>
+        <td>Heatmap</td>
+        <td>total_screen_time (by age_group × device)</td>
+        <td><a class="chart-link" href="d3/heatmap.html">Open Heatmap</a></td>
+      </tr>
+      <tr>
+        <td>Histogram</td>
+        <td>total_screen_time (distribution)</td>
+        <td><a class="chart-link" href="d3/histogram.html">Open Histogram</a></td>
+      </tr>
+      <tr>
+        <td>Bar Chart (Log Scale) </td>
+        <td>total_screen_time (sum by device &amp; internet type)</td>
+        <td><a class="chart-link" href="d3/barchart_log.html">Open Log Scale Chart</a></td>
+      </tr>
+    </table>
+    <p><em>All D3 charts include interactive tooltips on hover.</em> </p>
+  </div>
+
+  <div class="section">
+    <h2>References</h2>
+    <ul>
+      <li><a href="https://d3js.org/">D3.js v7 Documentation</a></li>
+      <li><a href="https://observablehq.com/@d3/bar-chart">Observable: D3 Bar Chart</a></li>
+      <li><a href="https://observablehq.com/@d3/scatterplot">Observable: D3 Scatterplot</a></li>
+      <li><a href="https://observablehq.com/@d3/histogram">Observable: D3 Histogram</a></li>
+      <li><a href="https://d3js.org/d3-scale/log">D3 Log Scale Documentation</a></li>
+    </ul>
+  </div>
+</body>
+</html>

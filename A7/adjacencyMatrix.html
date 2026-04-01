@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Adjacency Matrix – TV Shows</title>
+  <style>
+    body { font-family: Arial, sans-serif; display: flex; flex-direction: column; align-items: center; background: #fafafa; color: #333; margin: 0; padding: 20px; }
+    h1 { color: #2c3e50; }
+    .chart-link { display: inline-block; background: steelblue; color: white; padding: 8px 16px; border-radius: 5px; margin-bottom: 16px; font-size: 14px; text-decoration: none; }
+    .chart-link:hover { background: #2a6496; }
+    .chart-container { background: white; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); padding: 10px; overflow: auto; }
+    .tooltip { position: absolute; background: white; border: 1px solid #ccc; border-radius: 4px; padding: 8px; font-family: Arial, sans-serif; font-size: 13px; pointer-events: none; opacity: 0; }
+  </style>
+</head>
+<body>
+  <a class="chart-link" href="index.html">← Back to Index</a>
+  <h1>Adjacency Matrix – TV Shows</h1>
+  <div class="chart-container">
+    <svg id="chart"></svg>
+  </div>
+  <div class="tooltip" id="tooltip"></div>
+  <script src="https://d3js.org/d3.v7.min.js"></script>
+  <script>
+    const tooltip = d3.select("#tooltip");
+
+    d3.csv("data_2/edges.csv").then(data => {
+      const nodeSet = new Set();
+      data.forEach(d => { nodeSet.add(d.source); nodeSet.add(d.target); });
+      const nodes = Array.from(nodeSet).sort((a, b) => +a - +b);
+      const n = nodes.length;
+      const index = new Map(nodes.map((id, i) => [id, i]));
+
+      const matrix = Array.from({ length: n }, () => new Array(n).fill(0));
+      data.forEach(d => {
+        matrix[index.get(d.source)][index.get(d.target)] = 1;
+        matrix[index.get(d.target)][index.get(d.source)] = 1;
+      });
+
+      const cellSize = Math.min(6, Math.floor(700 / n));
+      const labelSize = cellSize >= 5 ? 40 : 0;
+      const margin = { top: labelSize, right: 10, bottom: 10, left: labelSize };
+      const svgW = margin.left + n * cellSize + margin.right;
+      const svgH = margin.top + n * cellSize + margin.bottom;
+
+      const svg = d3.select("#chart")
+        .attr("width", svgW)
+        .attr("height", svgH);
+
+      const g = svg.append("g").attr("transform", `translate(${margin.left},${margin.top})`);
+
+      const rowHighlight = g.append("rect").attr("class", "highlight-row")
+        .attr("x", 0).attr("width", n * cellSize).attr("height", cellSize)
+        .attr("fill", "yellow").attr("opacity", 0);
+
+      const colHighlight = g.append("rect").attr("class", "highlight-col")
+        .attr("y", 0).attr("height", n * cellSize).attr("width", cellSize)
+        .attr("fill", "yellow").attr("opacity", 0);
+
+      g.append("g").selectAll("rect")
+        .data(nodes.flatMap((row, i) => nodes.map((col, j) => ({ i, j, row, col, val: matrix[i][j] }))))
+        .join("rect")
+        .attr("x", d => d.j * cellSize)
+        .attr("y", d => d.i * cellSize)
+        .attr("width", cellSize)
+        .attr("height", cellSize)
+        .attr("fill", d => d.val ? "steelblue" : "white")
+        .attr("stroke", "#eee")
+        .attr("stroke-width", 0.3)
+        .on("mouseover", (event, d) => {
+          rowHighlight.attr("y", d.i * cellSize).attr("opacity", 0.5);
+          colHighlight.attr("x", d.j * cellSize).attr("opacity", 0.5);
+          const label = d.val ? `${d.row} → ${d.col} (connected)` : `${d.row} → ${d.col}`;
+          tooltip.style("opacity", 1).html(label);
+        })
+        .on("mousemove", event => {
+          tooltip.style("left", (event.pageX + 12) + "px").style("top", (event.pageY - 20) + "px");
+        })
+        .on("mouseout", () => {
+          rowHighlight.attr("opacity", 0);
+          colHighlight.attr("opacity", 0);
+          tooltip.style("opacity", 0);
+        });
+
+      if (labelSize > 0) {
+        svg.append("g").selectAll("text")
+          .data(nodes)
+          .join("text")
+          .attr("x", margin.left - 3)
+          .attr("y", (d, i) => margin.top + i * cellSize + cellSize / 2)
+          .attr("text-anchor", "end")
+          .attr("dominant-baseline", "middle")
+          .attr("font-size", 8)
+          .text(d => d);
+
+        svg.append("g").selectAll("text")
+          .data(nodes)
+          .join("text")
+          .attr("x", (d, i) => margin.left + i * cellSize + cellSize / 2)
+          .attr("y", margin.top - 3)
+          .attr("text-anchor", "start")
+          .attr("dominant-baseline", "middle")
+          .attr("font-size", 8)
+          .attr("transform", (d, i) => `rotate(-90, ${margin.left + i * cellSize + cellSize / 2}, ${margin.top - 3})`)
+          .text(d => d);
+      }
+    });
+  </script>
+</body>
+</html>

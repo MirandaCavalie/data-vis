@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Hierarchical Edge Bundling – TV Shows</title>
+  <style>
+    body { font-family: Arial, sans-serif; display: flex; flex-direction: column; align-items: center; background: #fafafa; color: #333; margin: 0; padding: 20px; }
+    h1 { color: #2c3e50; }
+    .chart-link { display: inline-block; background: steelblue; color: white; padding: 8px 16px; border-radius: 5px; margin-bottom: 16px; font-size: 14px; text-decoration: none; }
+    .chart-link:hover { background: #2a6496; }
+    .chart-container { background: white; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); padding: 10px; }
+    .controls { margin-bottom: 12px; font-size: 14px; }
+    .tooltip { position: absolute; background: white; border: 1px solid #ccc; border-radius: 4px; padding: 8px; font-family: Arial, sans-serif; font-size: 13px; pointer-events: none; opacity: 0; }
+  </style>
+</head>
+<body>
+  <a class="chart-link" href="index.html">← Back to Index</a>
+  <h1>Hierarchical Edge Bundling – TV Shows</h1>
+  <div class="controls">
+    Tension: <input type="range" id="tension" min="0" max="1" step="0.01" value="0.85">
+    <span id="tensionVal">0.85</span>
+  </div>
+  <div class="chart-container">
+    <svg id="chart" width="700" height="700"></svg>
+  </div>
+  <div class="tooltip" id="tooltip"></div>
+  <script src="https://d3js.org/d3.v7.min.js"></script>
+  <script>
+    const width = 700, height = 700;
+    const cx = width / 2, cy = height / 2;
+    const radius = 280;
+    const innerRadius = radius - 20;
+
+    const svg = d3.select("#chart");
+    const edgeGroup = svg.append("g").attr("transform", `translate(${cx},${cy})`);
+    const nodeGroup = svg.append("g").attr("transform", `translate(${cx},${cy})`);
+    const tooltip = d3.select("#tooltip");
+
+    let tension = 0.85;
+
+    d3.csv("data_2/edges.csv").then(data => {
+      const nodeSet = new Set();
+      data.forEach(d => { nodeSet.add(d.source); nodeSet.add(d.target); });
+      const nodeIds = Array.from(nodeSet).sort((a, b) => +a - +b);
+
+      const hierarchyData = { name: "root", children: nodeIds.map(id => ({ name: id })) };
+      const root = d3.hierarchy(hierarchyData);
+      const cluster = d3.cluster().size([2 * Math.PI, innerRadius]);
+      cluster(root);
+
+      const leafMap = new Map(root.leaves().map(l => [l.data.name, l]));
+
+      function drawEdges() {
+        const line = d3.lineRadial()
+          .curve(d3.curveBundle.beta(tension))
+          .radius(d => d.y)
+          .angle(d => d.x);
+
+        edgeGroup.selectAll("path").remove();
+        edgeGroup.selectAll("path")
+          .data(data)
+          .join("path")
+          .attr("d", d => {
+            const src = leafMap.get(d.source);
+            const tgt = leafMap.get(d.target);
+            if (!src || !tgt) return null;
+            return line(src.path(tgt));
+          })
+          .attr("fill", "none")
+          .attr("stroke", "steelblue")
+          .attr("stroke-opacity", 0.3)
+          .attr("stroke-width", 1);
+      }
+
+      drawEdges();
+
+      nodeGroup.selectAll("circle")
+        .data(root.leaves())
+        .join("circle")
+        .attr("transform", d => `rotate(${d.x * 180 / Math.PI - 90}) translate(${d.y},0)`)
+        .attr("r", 4)
+        .attr("fill", "steelblue")
+        .on("mouseover", (event, d) => {
+          tooltip.style("opacity", 1).html("Node: " + d.data.name);
+        })
+        .on("mousemove", event => {
+          tooltip.style("left", (event.pageX + 12) + "px").style("top", (event.pageY - 20) + "px");
+        })
+        .on("mouseout", () => tooltip.style("opacity", 0));
+
+      nodeGroup.selectAll("text")
+        .data(root.leaves())
+        .join("text")
+        .attr("transform", d => `rotate(${d.x * 180 / Math.PI - 90}) translate(${d.y + 8},0) ${d.x > Math.PI ? "rotate(180)" : ""}`)
+        .attr("text-anchor", d => d.x > Math.PI ? "end" : "start")
+        .attr("dominant-baseline", "middle")
+        .attr("font-size", 8)
+        .attr("fill", "#555")
+        .text(d => d.data.name);
+
+      d3.select("#tension").on("input", function() {
+        tension = +this.value;
+        d3.select("#tensionVal").text(tension.toFixed(2));
+        drawEdges();
+      });
+    });
+  </script>
+</body>
+</html>
