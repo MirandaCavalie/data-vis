@@ -10,4 +10,11 @@ Repository for data visualization assignments using P5.js and Python.
 - [A5 - Multidimensional Visualization](A5%20-%20Multidimensional%20Visualization/)
 - [A6 - Color Scales in D3](A6%20-%20Color%20Scales%20in%20D3/)
 - [A7 - Time Series Visualization in D3](A7-Time-Series/)
+- [A8 - Node-Link Visualizations in D3](A8-Node-Link/)
+```
 
+Después commitea y pushea:
+```
+git add .
+git commit -m "Rename A7 to A8-Node-Link, update README"
+git push
