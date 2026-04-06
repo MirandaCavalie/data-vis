@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>A9 — Geospatial Visualization in D3</title>
+  <style>
+    body {
+      font-family: system-ui, -apple-system, sans-serif;
+      max-width: 700px;
+      margin: 60px auto;
+      padding: 0 20px;
+      background: #fafafa;
+      color: #333;
+    }
+    h1 { color: #2c3e50; margin-bottom: 4px; }
+    .subtitle { color: #666; margin-top: 0; margin-bottom: 40px; }
+    .cards { display: flex; flex-direction: column; gap: 16px; }
+    .card {
+      background: white;
+      border: 1px solid #ddd;
+      border-radius: 8px;
+      padding: 20px 24px;
+      text-decoration: none;
+      color: inherit;
+      box-shadow: 0 1px 4px rgba(0,0,0,0.06);
+      transition: box-shadow 0.2s;
+    }
+    .card:hover { box-shadow: 0 4px 12px rgba(0,0,0,0.12); }
+    .card h2 { margin: 0 0 6px; font-size: 1.1rem; color: #2c3e50; }
+    .card p { margin: 0; font-size: 0.9rem; color: #666; }
+  </style>
+</head>
+<body>
+  <h1>A9 — Geospatial Visualization in D3</h1>
+
+  <div class="cards">
+    <a class="card" href="choropleth-poverty.html">
+      <h2>1. US County Poverty Rate (2023)</h2>
+      <p>County-level choropleth map showing poverty rates across the US using USDA ERS data.</p>
+    </a>
+    <a class="card" href="proportional-symbols.html">
+      <h2>2. Cost of Living by State</h2>
+      <p>Proportional symbol map showing cost of living index by state, highlighting the 10 most expensive states.</p>
+    </a>
+    <a class="card" href="world-choropleth.html">
+      <h2>3. World Happiness Report 2025</h2>
+      <p>World choropleth map showing happiness (life evaluation) scores by country.</p>
+    </a>
+    <a class="card" href="peru-provinces.html">
+      <h2>4. Peru: Poverty Rate by Province (2018)</h2>
+      <p>Sub-national choropleth map of Peru at the province level using INEI poverty data.</p>
+    </a>
+  </div>
+</body>
+</html>

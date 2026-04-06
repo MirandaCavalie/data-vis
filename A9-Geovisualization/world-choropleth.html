@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>World Happiness Report 2025</title>
+  <script src="https://d3js.org/d3.v7.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/topojson-client@3"></script>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #fafafa;
+      color: #333;
+      margin: 0;
+      padding: 20px;
+    }
+    a.back {
+      display: inline-block;
+      margin-bottom: 16px;
+      color: white;
+      background: steelblue;
+      padding: 6px 14px;
+      border-radius: 4px;
+      text-decoration: none;
+      font-size: 14px;
+    }
+    h1 { color: #2c3e50; margin: 0 0 16px; }
+    #tooltip {
+      position: absolute;
+      background: rgba(0,0,0,0.8);
+      color: white;
+      padding: 8px 12px;
+      border-radius: 4px;
+      font-size: 13px;
+      pointer-events: none;
+      display: none;
+    }
+    .country { stroke: #fff; stroke-width: 0.4px; }
+  </style>
+</head>
+<body>
+  <a class="back" href="index.html">← Back to Home</a>
+  <h1>World Happiness Report 2025</h1>
+  <div id="tooltip"></div>
+  <svg id="map"></svg>
+
+  <script>
+    // CSV name -> list of GeoJSON aliases that should map to the same score
+    const aliases = {
+      "United States":              ["United States of America", "USA"],
+      "Czechia":                    ["Czech Republic"],
+      "DR Congo":                   ["Dem. Rep. Congo", "Democratic Republic of the Congo"],
+      "Congo":                      ["Republic of the Congo", "Republic of Congo"],
+      "Russian Federation":         ["Russia"],
+      "Republic of Korea":          ["South Korea"],
+      "Republic of Moldova":        ["Moldova"],
+      "Türkiye":                    ["Turkey"],
+      "Viet Nam":                   ["Vietnam"],
+      "Côte d'Ivoire":              ["Ivory Coast"],
+      "Côte d\u2019Ivoire":         ["Ivory Coast", "Côte d'Ivoire"],
+      "Lao PDR":                    ["Laos"],
+      "Eswatini":                   ["Swaziland", "eSwatini"],
+      "State of Palestine":         ["Palestine", "West Bank"],
+      "Taiwan Province of China":   ["Taiwan"],
+      "North Macedonia":            ["Macedonia"],
+      "Bosnia and Herzegovina":     ["Bosnia and Herz."],
+      "Dominican Republic":         ["Dominican Rep."],
+      "Central African Republic":   ["Central African Rep."],
+      "South Sudan":                ["S. Sudan"],
+      "Tanzania":                   ["United Republic of Tanzania"],
+      "Serbia":                     ["Republic of Serbia"],
+      "Hong Kong SAR of China":     ["Hong Kong"],
+      "United Kingdom":             ["England"]
+    };
+
+    const width = 960, height = 500;
+    const svg = d3.select("#map").attr("width", width).attr("height", height);
+    const tooltip = d3.select("#tooltip");
+
+    const projection = d3.geoNaturalEarth1()
+      .scale(160)
+      .translate([width / 2, height / 2]);
+    const path = d3.geoPath().projection(projection);
+
+    const colorScale = d3.scaleSequential()
+      .domain([2, 8])
+      .interpolator(d3.interpolateYlGnBu);
+
+    Promise.all([
+      d3.csv("data/happiness_2025.csv"),
+      d3.json("https://raw.githubusercontent.com/holtzy/D3-graph-gallery/master/DATA/world.geojson")
+    ]).then(function([csvData, world]) {
+
+      // Build lookup: store each score under the CSV name AND all GeoJSON aliases
+      const happinessMap = new Map();
+      csvData.forEach(function(d) {
+        const score = +d.Score;
+        happinessMap.set(d.Country, score);
+        if (aliases[d.Country]) {
+          aliases[d.Country].forEach(function(alias) { happinessMap.set(alias, score); });
+        }
+      });
+
+      // Log GeoJSON countries with no match (genuinely missing from WHR, e.g. Greenland, Cuba)
+      const noMatch = world.features
+        .filter(function(d) { return happinessMap.get(d.properties.name) === undefined; })
+        .map(function(d) { return d.properties.name; });
+      if (noMatch.length) console.log("No happiness data for:", noMatch);
+
+      svg.selectAll(".country")
+        .data(world.features)
+        .join("path")
+        .attr("class", "country")
+        .attr("d", path)
+        .attr("fill", function(d) {
+          const score = happinessMap.get(d.properties.name);
+          return score !== undefined ? colorScale(score) : "#ccc";
+        })
+        .on("mouseover", function(event, d) {
+          const score = happinessMap.get(d.properties.name);
+          tooltip.style("display", "block")
+            .html("<strong>" + d.properties.name + "</strong>" +
+                  (score !== undefined ? "<br>Happiness Score: " + score.toFixed(3) : "<br>No data"));
+        })
+        .on("mousemove", function(event) {
+          tooltip.style("left", (event.pageX + 12) + "px")
+            .style("top", (event.pageY - 28) + "px");
+        })
+        .on("mouseout", function() { tooltip.style("display", "none"); });
+
+      // Gradient legend
+      const legendWidth = 220, legendHeight = 12;
+      const legendG = svg.append("g").attr("transform", "translate(30, 450)");
+
+      legendG.append("text")
+        .attr("x", 0).attr("y", -8)
+        .attr("font-size", "12px").attr("fill", "#333")
+        .text("Happiness Score (ladder scale)");
+
+      const steps = 20;
+      for (let i = 0; i < steps; i++) {
+        const val = 2 + (i / steps) * 6;
+        legendG.append("rect")
+          .attr("x", i * (legendWidth / steps)).attr("y", 0)
+          .attr("width", legendWidth / steps).attr("height", legendHeight)
+          .attr("fill", colorScale(val));
+      }
+      legendG.append("text").attr("x", 0).attr("y", legendHeight + 14)
+        .attr("font-size", "10px").attr("fill", "#333").text("2 (least happy)");
+      legendG.append("text").attr("x", legendWidth).attr("y", legendHeight + 14)
+        .attr("font-size", "10px").attr("text-anchor", "end").attr("fill", "#333").text("8 (happiest)");
+
+      legendG.append("rect")
+        .attr("x", legendWidth + 20).attr("y", 0)
+        .attr("width", 12).attr("height", 12).attr("fill", "#ccc");
+      legendG.append("text")
+        .attr("x", legendWidth + 36).attr("y", 10)
+        .attr("font-size", "10px").attr("fill", "#333").text("No data");
+    });
+  </script>
+  <p style="font-size:12px; color:#999; margin-top:8px;">Note: Countries in gray have no data available in the World Happiness Report 2025 dataset.</p>
+</body>
+</html>

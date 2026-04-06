@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>US County Poverty Rate 2023</title>
+  <script src="https://d3js.org/d3.v7.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/topojson-client@3"></script>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #fafafa;
+      color: #333;
+      margin: 0;
+      padding: 20px;
+    }
+    a.back {
+      display: inline-block;
+      margin-bottom: 16px;
+      color: white;
+      background: steelblue;
+      padding: 6px 14px;
+      border-radius: 4px;
+      text-decoration: none;
+      font-size: 14px;
+    }
+    h1 { color: #2c3e50; margin: 0 0 16px; }
+    #tooltip {
+      position: absolute;
+      background: rgba(0,0,0,0.8);
+      color: white;
+      padding: 8px 12px;
+      border-radius: 4px;
+      font-size: 13px;
+      pointer-events: none;
+      display: none;
+    }
+    .county { stroke: #fff; stroke-width: 0.3px; }
+    .state-border { fill: none; stroke: #fff; stroke-width: 1px; }
+  </style>
+</head>
+<body>
+  <a class="back" href="index.html">← Back to Home</a>
+  <h1>US County Poverty Rate (2023)</h1>
+  <div id="tooltip"></div>
+  <svg id="map"></svg>
+
+  <script>
+    const width = 960, height = 600;
+
+    const svg = d3.select("#map")
+      .attr("width", width)
+      .attr("height", height);
+
+    const tooltip = d3.select("#tooltip");
+
+    const colorScale = d3.scaleQuantize()
+      .domain([0, 40])
+      .range(d3.schemeOrRd[9]);
+
+    // Load data in parallel
+    Promise.all([
+      d3.json("https://cdn.jsdelivr.net/npm/us-atlas@3/counties-albers-10m.json"),
+      d3.csv("data/Poverty2023.csv")
+    ]).then(function([us, poverty]) {
+
+      // Build lookup: FIPS -> {name, state, rate}
+      const povertyMap = new Map();
+      poverty.forEach(function(d) {
+        if (d.Attribute === "PCTPOVALL_2023") {
+          const fips = String(d.FIPS_Code).padStart(5, "0");
+          povertyMap.set(fips, {
+            name: d.Area_Name,
+            state: d.Stabr,
+            rate: +d.Value
+          });
+        }
+      });
+
+      // Draw counties
+      const counties = topojson.feature(us, us.objects.counties);
+      const states = topojson.mesh(us, us.objects.states, (a, b) => a !== b);
+
+      svg.selectAll(".county")
+        .data(counties.features)
+        .join("path")
+        .attr("class", "county")
+        .attr("d", d3.geoPath())
+        .attr("fill", function(d) {
+          const info = povertyMap.get(d.id);
+          return info ? colorScale(info.rate) : "#ccc";
+        })
+        .on("mouseover", function(event, d) {
+          const info = povertyMap.get(d.id);
+          if (info) {
+            tooltip.style("display", "block")
+              .html("<strong>" + info.name + "</strong><br>State: " + info.state + "<br>Poverty Rate: " + info.rate.toFixed(1) + "%");
+          }
+        })
+        .on("mousemove", function(event) {
+          tooltip.style("left", (event.pageX + 12) + "px")
+            .style("top", (event.pageY - 28) + "px");
+        })
+        .on("mouseout", function() {
+          tooltip.style("display", "none");
+        });
+
+      // Draw state borders on top
+      svg.append("path")
+        .attr("class", "state-border")
+        .attr("d", d3.geoPath()(states));
+
+      // Legend
+      const legendX = 30, legendY = 480;
+      const legendWidth = 200, legendHeight = 12;
+      const colors = colorScale.range();
+
+      const legendG = svg.append("g").attr("transform", "translate(" + legendX + "," + legendY + ")");
+
+      legendG.append("text")
+        .attr("x", 0).attr("y", -6)
+        .attr("font-size", "12px").attr("fill", "#333")
+        .text("Poverty Rate (%)");
+
+      const step = legendWidth / colors.length;
+      colors.forEach(function(color, i) {
+        legendG.append("rect")
+          .attr("x", i * step).attr("y", 0)
+          .attr("width", step).attr("height", legendHeight)
+          .attr("fill", color);
+      });
+
+      // Clean tick labels at 0%, 10%, 20%, 30%, 40%
+      const legendScale = d3.scaleLinear().domain([0, 40]).range([0, legendWidth]);
+      [0, 10, 20, 30, 40].forEach(function(val) {
+        legendG.append("text")
+          .attr("x", legendScale(val)).attr("y", legendHeight + 14)
+          .attr("text-anchor", "middle").attr("font-size", "10px").attr("fill", "#333")
+          .text(val + "%");
+      });
+    });
+  </script>
+</body>
+</html>

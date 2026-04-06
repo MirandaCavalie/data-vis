@@ -1,0 +1,8 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(python3 -c \"import openpyxl; wb = openpyxl.load_workbook\\('C:/Users/M.CavalieG/OneDrive - Universidad del Pacífico/Documents/Intercambio/USF/Data Vis/data-vis/A9-Geovisualization/data/WHR26_Data_Figure_2.1.xlsx'\\); ws = wb.active; rows = list\\(ws.iter_rows\\(values_only=True\\)\\); print\\(rows[0]\\); print\\(rows[1][:5]\\); print\\(len\\(rows\\)\\)\")",
+      "Bash(python -c \"import openpyxl; wb = openpyxl.load_workbook\\('C:/Users/M.CavalieG/OneDrive - Universidad del Pacífico/Documents/Intercambio/USF/Data Vis/data-vis/A9-Geovisualization/data/WHR26_Data_Figure_2.1.xlsx'\\); ws = wb.active; rows = list\\(ws.iter_rows\\(values_only=True\\)\\); print\\(rows[0]\\); print\\(rows[1][:5]\\); print\\(len\\(rows\\)\\)\")"
+    ]
+  }
+}
