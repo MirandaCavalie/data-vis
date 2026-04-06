@@ -11,3 +11,4 @@ Repository for data visualization assignments using P5.js and Python.
 - [A6 - Color Scales in D3](A6%20-%20Color%20Scales%20in%20D3/)
 - [A7 - Time Series Visualization in D3](A7-Time-Series/)
 - [A8 - Node-Link Visualizations in D3](A8-Node-Link/)
+- [A9 - Geovisualization](A9-Geovisualization/)
