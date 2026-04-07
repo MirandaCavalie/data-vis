@@ -47,7 +47,6 @@
   <svg id="map"></svg>
 
   <script>
-    // CSV name -> list of GeoJSON aliases that should map to the same score
     const aliases = {
       "United States":              ["United States of America", "USA"],
       "Czechia":                    ["Czech Republic"],
@@ -103,7 +102,6 @@
         }
       });
 
-      // Log GeoJSON countries with no match (genuinely missing from WHR, e.g. Greenland, Cuba)
       const noMatch = world.features
         .filter(function(d) { return happinessMap.get(d.properties.name) === undefined; })
         .map(function(d) { return d.properties.name; });
@@ -130,7 +128,7 @@
         })
         .on("mouseout", function() { tooltip.style("display", "none"); });
 
-      // Gradient legend
+      // legend
       const legendWidth = 220, legendHeight = 12;
       const legendG = svg.append("g").attr("transform", "translate(30, 450)");
 

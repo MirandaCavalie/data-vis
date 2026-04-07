@@ -73,14 +73,12 @@
         });
       });
 
-      // GeoJSON normalized name -> CSV normalized name, for spelling mismatches
       const provinceAliases = {
         "CARLOS FERMIN FITZCARRALD": "CARLOS F. FITZCARRALD",
         "NAZCA":                     "NASCA",
         "ANTONIO RAIMONDI":          "ANTONIO RAYMONDI"
       };
 
-      // Look up a GeoJSON province name: try direct, then alias
       function getProvince(geoName) {
         const key = normalize(geoName);
         const info = povertyMap.get(key);
@@ -89,7 +87,6 @@
         return aliasKey ? povertyMap.get(aliasKey) : undefined;
       }
 
-      // Log any provinces still not matched after aliases
       const noMatch = geoData.features
         .filter(function(d) { return getProvince(d.properties.NOMBPROV) === undefined; })
         .map(function(d) { return d.properties.NOMBPROV; });

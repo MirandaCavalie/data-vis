@@ -75,7 +75,6 @@
       .scale(1300)
       .translate([487.5, 305]);
 
-    // State paths use null projection — states-albers-10m.json is already pre-projected
     const path = d3.geoPath();
     const tooltip = d3.select("#tooltip");
 
@@ -85,7 +84,6 @@
       d3.csv("data/state.csv")
     ]).then(function([us, costData, stateCoords]) {
 
-      // Build cost lookup by state name
       const costMap = new Map();
       costData.forEach(function(d) {
         costMap.set(d.State.trim(), {
@@ -96,13 +94,11 @@
         });
       });
 
-      // Build centroid lookup by state name
       const coordMap = new Map();
       stateCoords.forEach(function(d) {
         coordMap.set(d.state.trim(), { lat: +d.lat, lng: +d.lng });
       });
 
-      // Draw state outlines
       const states = topojson.feature(us, us.objects.states);
       svg.selectAll(".state-path")
         .data(states.features)
@@ -110,17 +106,14 @@
         .attr("class", "state-path")
         .attr("d", path);
 
-      // Size scale
       const maxCost = d3.max(costData, d => +d.costIndex);
       const minCost = d3.min(costData, d => +d.costIndex);
       const radiusScale = d3.scaleSqrt()
         .domain([minCost, maxCost])
         .range([6, 36]);
 
-      // Sort by costIndex descending so smaller circles draw on top
       const sorted = [...costMap.entries()].sort((a, b) => b[1].costIndex - a[1].costIndex);
 
-      // Top 10 = 10 entries with the lowest costRank values
       const top10Names = new Set(
         [...costMap.entries()]
           .sort((a, b) => a[1].costRank - b[1].costRank)
