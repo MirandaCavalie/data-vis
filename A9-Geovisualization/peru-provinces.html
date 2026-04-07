@@ -22,7 +22,8 @@
       text-decoration: none;
       font-size: 14px;
     }
-    h1 { color: #2c3e50; margin: 0 0 4px; }
+    h1 { color: #2c3e50; margin: 0 0 8px; }
+    p.description { color: #555; font-size: 14px; margin: 0 0 8px; max-width: 700px; line-height: 1.5; }
     p.source { font-size: 12px; color: #888; margin: 0 0 16px; }
     #tooltip {
       position: absolute;
@@ -40,7 +41,8 @@
 <body>
   <a class="back" href="index.html">← Back to Home</a>
   <h1>Peru: Poverty Rate by Province (2018)</h1>
-  <p class="source">Source: INEI — Mapa de Pobreza Provincial y Distrital 2018</p>
+  <p class="description">This choropleth map shows monetary poverty rates across Peru's 196 provinces. Darker colors indicate higher poverty. The data is at the province level, which is one level below departments (regions). Hover over any province to see its name, department, and poverty rate.</p>
+  <p class="source">Source: INEI — Mapa de Pobreza Monetaria Provincial y Distrital 2018</p>
   <div id="tooltip"></div>
   <svg id="map"></svg>
 

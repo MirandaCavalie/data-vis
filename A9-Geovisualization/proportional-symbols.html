@@ -41,12 +41,27 @@
 <body>
   <a class="back" href="index.html">← Back to Home</a>
   <h1>Cost of Living Index by State</h1>
+  <p>This proportional symbol map shows the cost of living index by state. Larger circles mean a higher cost of living. The top 10 most expensive states are highlighted in orange. The data combines cost of living rankings with state centroid coordinates. Hover over any circle to see details.</p>
   <div id="tooltip"></div>
   <svg id="map"></svg>
-  <div style="display:flex; gap:40px; margin-top:16px; align-items:center; font-size:14px;">
-    <div><strong>Cost Index</strong><br>Circle size = cost index value</div>
-    <div><span style="display:inline-block;width:14px;height:14px;background:#e05a30;border-radius:50%;vertical-align:middle;margin-right:6px;"></span>Top 10 most expensive</div>
-    <div><span style="display:inline-block;width:14px;height:14px;background:steelblue;border-radius:50%;vertical-align:middle;margin-right:6px;"></span>Other states</div>
+  <div style="display:flex; gap:60px; margin-top:20px;">
+    <div>
+      <strong>Circle size</strong><br>
+      <span style="color:#666;">Cost of living index</span><br><br>
+      <svg width="160" height="120">
+        <circle cx="40" cy="95" r="8" fill="none" stroke="#333" stroke-width="1"></circle>
+        <text x="70" y="99" font-size="13">100</text>
+        <circle cx="40" cy="60" r="16" fill="none" stroke="#333" stroke-width="1"></circle>
+        <text x="70" y="64" font-size="13">150</text>
+        <circle cx="40" cy="25" r="24" fill="none" stroke="#333" stroke-width="1"></circle>
+        <text x="70" y="29" font-size="13">193</text>
+      </svg>
+    </div>
+    <div>
+      <strong>Circle color</strong><br><br><br>
+      <span style="display:inline-block;width:16px;height:16px;background:#e36c2c;border-radius:50%;vertical-align:middle;"></span> Top 10 most expensive states<br><br>
+      <span style="display:inline-block;width:16px;height:16px;background:steelblue;border-radius:50;vertical-align:middle;"></span> All other states
+    </div>
   </div>
 
   <script>

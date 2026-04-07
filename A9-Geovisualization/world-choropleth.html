@@ -23,7 +23,8 @@
       text-decoration: none;
       font-size: 14px;
     }
-    h1 { color: #2c3e50; margin: 0 0 16px; }
+    h1 { color: #2c3e50; margin: 0 0 8px; }
+    p.description { color: #555; font-size: 14px; margin: 0 0 8px; max-width: 760px; line-height: 1.5; }
     #tooltip {
       position: absolute;
       background: rgba(0,0,0,0.8);
@@ -40,6 +41,8 @@
 <body>
   <a class="back" href="index.html">← Back to Home</a>
   <h1>World Happiness Report 2025</h1>
+  <p class="description">This choropleth map shows how happy people are in each country based on the World Happiness Report 2025. The score comes from a life evaluation survey where people rate their lives on a scale from 0 to 10. Darker blue means happier. Hover over any country to see its score.</p>
+  <p style="font-size:12px; color:#888;">Source: World Happiness Report 2025 — Wellbeing Research Centre, University of Oxford / Gallup World Poll</p>
   <div id="tooltip"></div>
   <svg id="map"></svg>
 
