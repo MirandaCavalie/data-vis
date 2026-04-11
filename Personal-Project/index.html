@@ -168,7 +168,7 @@
 <body>
 
 <header>
-  <h1>Displaced <span>— 27 Years of Eviction in San Francisco</span></h1>
+  <h1>Displaced <span>27 Years of Eviction in San Francisco</span></h1>
   <p class="description">
     This project explores 48,000+ eviction notices filed in San Francisco from 1997 to 2026.
     Using scrollytelling and interactive dashboards built with D3.js, it reveals how
@@ -192,7 +192,6 @@
       <div class="viz-mockup">
         <svg viewBox="0 0 300 170" xmlns="http://www.w3.org/2000/svg">
           <rect width="300" height="170" fill="#ebebeb"/>
-          <!-- Neighborhood blobs in grays -->
           <polygon points="48,24 103,20 115,46 95,62 63,57 44,44" fill="#ccc" stroke="#fff" stroke-width="1.5"/>
           <polygon points="103,20 150,16 165,42 145,58 115,46" fill="#bbb" stroke="#fff" stroke-width="1.5"/>
           <polygon points="150,16 198,18 210,46 182,58 165,42" fill="#999" stroke="#fff" stroke-width="1.5"/>
@@ -202,9 +201,7 @@
           <polygon points="182,58 210,46 218,74 206,106 182,106 194,82" fill="#bbb" stroke="#fff" stroke-width="1.5"/>
           <polygon points="58,103 112,97 137,87 154,110 146,132 103,140 62,130 48,113" fill="#ccc" stroke="#fff" stroke-width="1.5"/>
           <polygon points="103,140 154,110 182,106 178,144 136,153 83,150" fill="#ddd" stroke="#fff" stroke-width="1.5"/>
-          <!-- Dashed border around map area -->
           <rect x="28" y="14" width="198" height="146" fill="none" stroke="#aaa" stroke-width="0.8" stroke-dasharray="4 3"/>
-          <!-- Legend steps -->
           <text x="238" y="36" font-size="8" fill="#777" font-family="system-ui">Count</text>
           <rect x="238" y="40" width="11" height="11" fill="#ddd" stroke="#bbb" stroke-width="0.5"/>
           <rect x="238" y="52" width="11" height="11" fill="#ccc" stroke="#bbb" stroke-width="0.5"/>
@@ -214,28 +211,23 @@
           <rect x="238" y="100" width="11" height="11" fill="#777" stroke="#bbb" stroke-width="0.5"/>
           <text x="252" y="49"  font-size="7" fill="#777" font-family="system-ui">Low</text>
           <text x="252" y="109" font-size="7" fill="#777" font-family="system-ui">High</text>
-          <!-- Map label -->
-          <text x="127" y="164" text-anchor="middle" font-size="8" fill="#666" font-family="system-ui">SF Neighborhoods — Eviction Density</text>
+          <text x="127" y="164" text-anchor="middle" font-size="8" fill="#666" font-family="system-ui">SF Neighborhoods: Eviction Density</text>
         </svg>
       </div>
       <div class="viz-body">
         <p class="viz-number">Visualization 1</p>
-        <p class="viz-title">Choropleth Map — Eviction Density by Neighborhood</p>
+        <p class="viz-title">Choropleth Map: Eviction Density by Neighborhood</p>
         <table class="meta-table">
           <tr>
             <th>Objectives</th>
             <td>
-              <span class="obj-badge">Obj 1 — Temporal Trends</span>
-              <span class="obj-badge">Obj 2 — Geographic Displacement</span>
+              <span class="obj-badge">Obj 1: Temporal Trends</span>
+              <span class="obj-badge">Obj 2: Geographic Displacement</span>
             </td>
           </tr>
           <tr>
             <th>Data</th>
-            <td><code>Neighborhoods - Analysis Boundaries</code>, <code>File Date</code> (year), eviction count per neighborhood per year</td>
-          </tr>
-          <tr>
-            <th>D3</th>
-            <td><code>d3.geoMercator()</code>, <code>d3.geoPath()</code>, <code>d3.scaleSequential(d3.interpolateBlues)</code>, GeoJSON bindings</td>
+            <td><code>Neighborhoods Analysis Boundaries</code>, <code>File Date</code> (year), eviction count per neighborhood per year</td>
           </tr>
         </table>
       </div>
@@ -246,59 +238,46 @@
       <div class="viz-mockup">
         <svg viewBox="0 0 300 170" xmlns="http://www.w3.org/2000/svg">
           <rect width="300" height="170" fill="#ebebeb"/>
-          <!-- Chart area -->
           <rect x="38" y="18" width="236" height="118" fill="#f8f8f8" stroke="#ccc" stroke-width="1"/>
-          <!-- Grid lines -->
           <line x1="38" y1="48"  x2="274" y2="48"  stroke="#e0e0e0" stroke-width="0.8"/>
           <line x1="38" y1="78"  x2="274" y2="78"  stroke="#e0e0e0" stroke-width="0.8"/>
           <line x1="38" y1="108" x2="274" y2="108" stroke="#e0e0e0" stroke-width="0.8"/>
-          <!-- Y-axis labels -->
           <text x="34" y="51"  text-anchor="end" font-size="7.5" fill="#888" font-family="system-ui">3k</text>
           <text x="34" y="81"  text-anchor="end" font-size="7.5" fill="#888" font-family="system-ui">2k</text>
           <text x="34" y="111" text-anchor="end" font-size="7.5" fill="#888" font-family="system-ui">1k</text>
           <text x="34" y="136" text-anchor="end" font-size="7.5" fill="#888" font-family="system-ui">0</text>
-          <!-- Y-axis title -->
           <text x="10" y="78" text-anchor="middle" font-size="8" fill="#666" font-family="system-ui" transform="rotate(-90 10 78)">Eviction Notices</text>
-          <!-- Area fill -->
           <polygon
             points="38,130 54,102 70,52 86,64 102,78 118,86 134,82 150,72 166,62 182,75 198,106 214,130 230,122 246,119 262,114 274,118 274,136 38,136"
             fill="#ddd" opacity="0.6"/>
-          <!-- Line -->
           <polyline
             points="38,130 54,102 70,52 86,64 102,78 118,86 134,82 150,72 166,62 182,75 198,106 214,130 230,122 246,119 262,114 274,118"
             fill="none" stroke="#999" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>
-          <!-- Brush selection -->
           <rect x="118" y="18" width="80" height="118" fill="#ccc" opacity="0.25" stroke="#aaa" stroke-width="1" stroke-dasharray="3 2"/>
           <line x1="118" y1="18" x2="118" y2="136" stroke="#aaa" stroke-width="1.5"/>
           <line x1="198" y1="18" x2="198" y2="136" stroke="#aaa" stroke-width="1.5"/>
           <text x="158" y="32" text-anchor="middle" font-size="7" fill="#888" font-family="system-ui">drag to select</text>
           <text x="158" y="41" text-anchor="middle" font-size="7" fill="#888" font-family="system-ui">year range</text>
-          <!-- X-axis labels -->
           <text x="38"  y="150" text-anchor="middle" font-size="7.5" fill="#888" font-family="system-ui">1997</text>
           <text x="156" y="150" text-anchor="middle" font-size="7.5" fill="#888" font-family="system-ui">2011</text>
           <text x="274" y="150" text-anchor="middle" font-size="7.5" fill="#888" font-family="system-ui">2026</text>
-          <!-- X-axis title -->
           <text x="156" y="163" text-anchor="middle" font-size="8" fill="#666" font-family="system-ui">Year</text>
         </svg>
       </div>
       <div class="viz-body">
         <p class="viz-number">Visualization 2</p>
-        <p class="viz-title">Line Chart — Evictions Over Time (1997–2026)</p>
+        <p class="viz-title">Line Chart: Evictions Over Time (1997 to 2026)</p>
         <table class="meta-table">
           <tr>
             <th>Objectives</th>
             <td>
-              <span class="obj-badge">Obj 1 — Temporal Trends</span>
-              <span class="obj-badge">Obj 4 — Policy Impact</span>
+              <span class="obj-badge">Obj 1: Temporal Trends</span>
+              <span class="obj-badge">Obj 4: Policy Impact</span>
             </td>
           </tr>
           <tr>
             <th>Data</th>
             <td><code>File Date</code> parsed to year, count of records per year</td>
-          </tr>
-          <tr>
-            <th>D3</th>
-            <td><code>d3.line()</code>, <code>d3.scaleTime()</code>, <code>d3.scaleLinear()</code>, <code>d3.brushX()</code> for year-range selection</td>
           </tr>
         </table>
       </div>
@@ -309,58 +288,43 @@
       <div class="viz-mockup">
         <svg viewBox="0 0 300 170" xmlns="http://www.w3.org/2000/svg">
           <rect width="300" height="170" fill="#ebebeb"/>
-          <!-- Chart area -->
           <rect x="38" y="18" width="214" height="118" fill="#f8f8f8" stroke="#ccc" stroke-width="1"/>
-          <!-- Stacked bands in grays, bottom to top -->
-          <!-- Layer 1 bottom -->
           <polygon points="38,136 38,118 68,116 98,112 128,110 158,108 188,106 218,105 252,104 252,136" fill="#bbb" stroke="none"/>
-          <!-- Layer 2 -->
           <polygon points="38,118 38,94 68,90 98,82 128,84 158,82 188,78 218,76 252,78 252,104 218,105 188,106 158,108 128,110 98,112 68,116" fill="#ccc" stroke="none"/>
-          <!-- Layer 3 -->
           <polygon points="38,94 38,64 68,52 98,60 128,70 158,68 188,62 218,66 252,70 252,78 218,76 188,78 158,82 128,84 98,82 68,90" fill="#d8d8d8" stroke="none"/>
-          <!-- Layer 4 -->
           <polygon points="38,64 38,46 68,36 98,42 128,54 158,50 188,46 218,50 252,54 252,70 218,66 188,62 158,68 128,70 98,60 68,52" fill="#e2e2e2" stroke="none"/>
-          <!-- Layer 5 top -->
           <polygon points="38,46 38,30 68,22 98,28 128,38 158,36 188,32 218,36 252,40 252,54 218,50 188,46 158,50 128,54 98,42 68,36" fill="#ececec" stroke="none"/>
-          <!-- Top edge -->
           <polyline points="38,30 68,22 98,28 128,38 158,36 188,32 218,36 252,40" fill="none" stroke="#bbb" stroke-width="0.8"/>
-          <!-- Y-axis title -->
           <text x="10" y="78" text-anchor="middle" font-size="8" fill="#666" font-family="system-ui" transform="rotate(-90 10 78)">Eviction Notices</text>
-          <!-- X-axis labels -->
           <text x="38"  y="150" text-anchor="middle" font-size="7.5" fill="#888" font-family="system-ui">1997</text>
           <text x="145" y="150" text-anchor="middle" font-size="7.5" fill="#888" font-family="system-ui">2010</text>
           <text x="252" y="150" text-anchor="middle" font-size="7.5" fill="#888" font-family="system-ui">2026</text>
           <text x="145" y="163" text-anchor="middle" font-size="8" fill="#666" font-family="system-ui">Year</text>
-          <!-- Legend -->
           <rect x="264" y="34"  width="9" height="9" fill="#ececec" stroke="#bbb" stroke-width="0.5"/>
           <text x="276" y="42"  font-size="6.5" fill="#555" font-family="system-ui">Other</text>
           <rect x="264" y="48"  width="9" height="9" fill="#e2e2e2" stroke="#bbb" stroke-width="0.5"/>
-          <text x="276" y="56"  font-size="6.5" fill="#555" font-family="system-ui">Owner M-I</text>
+          <text x="276" y="56"  font-size="6.5" fill="#555" font-family="system-ui">Owner Move In</text>
           <rect x="264" y="62"  width="9" height="9" fill="#d8d8d8" stroke="#bbb" stroke-width="0.5"/>
           <text x="276" y="70"  font-size="6.5" fill="#555" font-family="system-ui">Ellis Act</text>
           <rect x="264" y="76"  width="9" height="9" fill="#ccc" stroke="#bbb" stroke-width="0.5"/>
           <text x="276" y="84"  font-size="6.5" fill="#555" font-family="system-ui">Breach</text>
           <rect x="264" y="90"  width="9" height="9" fill="#bbb" stroke="#bbb" stroke-width="0.5"/>
-          <text x="276" y="98"  font-size="6.5" fill="#555" font-family="system-ui">Non-Pmnt</text>
+          <text x="276" y="98"  font-size="6.5" fill="#555" font-family="system-ui">Non Payment</text>
         </svg>
       </div>
       <div class="viz-body">
         <p class="viz-number">Visualization 3</p>
-        <p class="viz-title">Stacked Area Chart — Eviction Reasons Over Time</p>
+        <p class="viz-title">Stacked Area Chart: Eviction Reasons Over Time</p>
         <table class="meta-table">
           <tr>
             <th>Objectives</th>
             <td>
-              <span class="obj-badge">Obj 3 — Eviction Mechanisms</span>
+              <span class="obj-badge">Obj 3: Eviction Mechanisms</span>
             </td>
           </tr>
           <tr>
             <th>Data</th>
-            <td>Boolean reason columns: <code>owner_move_in</code>, <code>breach</code>, <code>ellis_act_withdrawal</code>, <code>non_payment</code>, etc. — grouped by year</td>
-          </tr>
-          <tr>
-            <th>D3</th>
-            <td><code>d3.stack()</code>, <code>d3.area()</code>, <code>d3.scaleOrdinal(d3.schemeSet2)</code></td>
+            <td>Boolean reason columns: <code>owner_move_in</code>, <code>breach</code>, <code>ellis_act_withdrawal</code>, <code>non_payment</code>, etc. grouped by year</td>
           </tr>
         </table>
       </div>
@@ -371,44 +335,34 @@
       <div class="viz-mockup">
         <svg viewBox="0 0 300 170" xmlns="http://www.w3.org/2000/svg">
           <rect width="300" height="170" fill="#ebebeb"/>
-          <!-- Chart area -->
           <rect x="88" y="14" width="176" height="144" fill="#f8f8f8" stroke="#ccc" stroke-width="1"/>
-          <!-- Grid lines (vertical) -->
           <line x1="132" y1="14" x2="132" y2="158" stroke="#e0e0e0" stroke-width="0.8"/>
           <line x1="176" y1="14" x2="176" y2="158" stroke="#e0e0e0" stroke-width="0.8"/>
           <line x1="220" y1="14" x2="220" y2="158" stroke="#e0e0e0" stroke-width="0.8"/>
           <line x1="264" y1="14" x2="264" y2="158" stroke="#e0e0e0" stroke-width="0.8"/>
-          <!-- X-axis tick labels -->
           <text x="88"  y="168" text-anchor="middle" font-size="7" fill="#888" font-family="system-ui">0</text>
           <text x="132" y="168" text-anchor="middle" font-size="7" fill="#888" font-family="system-ui">1k</text>
           <text x="176" y="168" text-anchor="middle" font-size="7" fill="#888" font-family="system-ui">2k</text>
           <text x="220" y="168" text-anchor="middle" font-size="7" fill="#888" font-family="system-ui">3k</text>
           <text x="264" y="168" text-anchor="middle" font-size="7" fill="#888" font-family="system-ui">4k</text>
-          <!-- Bars -->
           <rect x="88" y="20"  width="172" height="14" fill="#bbb" rx="1"/>
           <text x="84" y="31"  text-anchor="end" font-size="7.5" fill="#444" font-family="system-ui">Mission</text>
           <text x="263" y="31" font-size="7" fill="#666" font-family="system-ui">4,312</text>
-
           <rect x="88" y="39"  width="142" height="14" fill="#bbb" rx="1"/>
           <text x="84" y="50"  text-anchor="end" font-size="7.5" fill="#444" font-family="system-ui">Tenderloin</text>
           <text x="233" y="50" font-size="7" fill="#666" font-family="system-ui">3,568</text>
-
           <rect x="88" y="58"  width="118" height="14" fill="#bbb" rx="1"/>
-          <text x="84" y="69"  text-anchor="end" font-size="7.5" fill="#444" font-family="system-ui">Sunset/Parkside</text>
+          <text x="84" y="69"  text-anchor="end" font-size="7.5" fill="#444" font-family="system-ui">Sunset Parkside</text>
           <text x="209" y="69" font-size="7" fill="#666" font-family="system-ui">2,980</text>
-
           <rect x="88" y="77"  width="96"  height="14" fill="#ccc" rx="1"/>
           <text x="84" y="88"  text-anchor="end" font-size="7.5" fill="#444" font-family="system-ui">Outer Richmond</text>
           <text x="187" y="88" font-size="7" fill="#666" font-family="system-ui">2,418</text>
-
           <rect x="88" y="96"  width="76"  height="14" fill="#ccc" rx="1"/>
           <text x="84" y="107" text-anchor="end" font-size="7.5" fill="#444" font-family="system-ui">Castro</text>
           <text x="167" y="107" font-size="7" fill="#666" font-family="system-ui">1,898</text>
-
           <rect x="88" y="115" width="58"  height="14" fill="#ccc" rx="1"/>
           <text x="84" y="126" text-anchor="end" font-size="7.5" fill="#444" font-family="system-ui">South of Market</text>
           <text x="149" y="126" font-size="7" fill="#666" font-family="system-ui">1,452</text>
-
           <rect x="88" y="134" width="44"  height="14" fill="#ddd" rx="1"/>
           <text x="84" y="145" text-anchor="end" font-size="7.5" fill="#666" font-family="system-ui">W. Addition</text>
           <text x="135" y="145" font-size="7" fill="#888" font-family="system-ui">1,088</text>
@@ -416,27 +370,23 @@
       </div>
       <div class="viz-body">
         <p class="viz-number">Visualization 4</p>
-        <p class="viz-title">Horizontal Bar Chart — Top Neighborhoods by Evictions</p>
+        <p class="viz-title">Horizontal Bar Chart: Top Neighborhoods by Evictions</p>
         <table class="meta-table">
           <tr>
             <th>Objectives</th>
             <td>
-              <span class="obj-badge">Obj 2 — Geographic Displacement</span>
+              <span class="obj-badge">Obj 2: Geographic Displacement</span>
             </td>
           </tr>
           <tr>
             <th>Data</th>
-            <td><code>Neighborhoods - Analysis Boundaries</code>, count per neighborhood — filterable by year range</td>
-          </tr>
-          <tr>
-            <th>D3</th>
-            <td><code>d3.scaleBand()</code>, <code>d3.scaleLinear()</code>, <code>d3.transition()</code> for animated updates on filter</td>
+            <td><code>Neighborhoods Analysis Boundaries</code>, count per neighborhood, filterable by year range</td>
           </tr>
         </table>
       </div>
     </div>
 
-  </div><!-- end .viz-grid -->
+  </div>
 </main>
 
 </body>
