@@ -1,0 +1,1120 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Displaced: 27 Years of Eviction in San Francisco</title>
+  <script src="https://d3js.org/d3.v7.min.js"></script>
+  <script src="https://unpkg.com/scrollama"></script>
+  <style>
+    /* ── Reset & base ────────────────────────────────────────────────────────── */
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background: #f5f5f0;
+      color: #2c2c2c;
+    }
+
+    /* ── Hero header ─────────────────────────────────────────────────────────── */
+    #hero {
+      background: #0d1b2e;
+      color: white;
+      padding: 72px 60px 56px;
+      text-align: center;
+    }
+    #hero h1 {
+      font-size: 3.4rem;
+      letter-spacing: 0.04em;
+      margin-bottom: 12px;
+      font-weight: 300;
+    }
+    #hero h1 strong { font-weight: 700; color: #f6ad55; }
+    #hero .subtitle {
+      font-size: 1.15rem;
+      color: #a0b4cc;
+      max-width: 560px;
+      margin: 0 auto;
+      line-height: 1.6;
+    }
+    .scroll-cue {
+      margin-top: 40px;
+      font-size: 0.8rem;
+      color: #6688aa;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+    }
+    .scroll-cue::after {
+      content: " ↓";
+    }
+
+    /* ── Tooltip ─────────────────────────────────────────────────────────────── */
+    .tooltip {
+      position: fixed;
+      background: white;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+      padding: 9px 13px;
+      font-size: 12px;
+      pointer-events: none;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.18);
+      opacity: 0;
+      transition: opacity 0.12s;
+      z-index: 999;
+      line-height: 1.6;
+    }
+
+    /* ══════════════════════════════════════════════════════════════════════════
+       PART 1 — SCROLLYTELLING
+    ═══════════════════════════════════════════════════════════════════════════ */
+
+    #part1 {
+      position: relative;
+    }
+
+    #part1-intro {
+      max-width: 700px;
+      margin: 0 auto;
+      padding: 60px 24px 40px;
+      text-align: center;
+    }
+    #part1-intro h2 { font-size: 1.5rem; margin-bottom: 10px; }
+    #part1-intro p { color: #555; line-height: 1.7; }
+
+    /* Scrolly layout */
+    #scrolly {
+      display: flex;
+      position: relative;
+      max-width: 1300px;
+      margin: 0 auto;
+    }
+
+    /* Sticky left panel: map + mini area chart */
+    #sticky-panel {
+      position: sticky;
+      top: 0;
+      width: 50%;
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
+      padding: 16px 20px;
+      background: #f5f5f0;
+    }
+
+    #map-wrap {
+      position: relative;
+      width: 100%;
+    }
+    #story-map-svg { width: 100%; height: auto; display: block; }
+
+    #year-badge {
+      position: absolute;
+      bottom: 8px;
+      left: 12px;
+      font-size: 2.6rem;
+      font-weight: 700;
+      color: rgba(13, 27, 46, 0.2);
+      font-family: -apple-system, sans-serif;
+      pointer-events: none;
+    }
+
+    /* Policy annotation overlay */
+    #annotation-overlay {
+      position: absolute;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      pointer-events: none;
+    }
+    .annotation-box {
+      position: absolute;
+      background: rgba(246, 173, 85, 0.92);
+      color: #1a1a2e;
+      border-radius: 4px;
+      padding: 5px 9px;
+      font-size: 11px;
+      font-weight: 600;
+      display: none;
+    }
+    .annotation-box.visible { display: block; }
+
+    /* Mini area chart below map */
+    #mini-area-wrap {
+      width: 100%;
+    }
+    #mini-area-wrap h4 {
+      font-size: 0.72rem;
+      color: #888;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      margin-bottom: 4px;
+    }
+    #mini-area-svg { display: block; }
+
+    /* Map legend */
+    #story-legend {
+      width: 100%;
+      font-size: 11px;
+      color: #888;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    #story-legend-grad {
+      flex: 1;
+      height: 8px;
+      border-radius: 3px;
+    }
+
+    /* Right scrolling text */
+    #story-text {
+      width: 50%;
+      padding: 0 40px 0 32px;
+    }
+
+    .step {
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+    }
+
+    .step-inner {
+      background: white;
+      border-radius: 8px;
+      padding: 36px;
+      box-shadow: 0 2px 16px rgba(0,0,0,0.08);
+      border-top: 4px solid #f6ad55;
+      max-width: 440px;
+    }
+
+    .step-era {
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: #f6ad55;
+      font-weight: 700;
+      margin-bottom: 6px;
+    }
+    .step-inner h2 {
+      font-size: 1.55rem;
+      color: #0d1b2e;
+      margin-bottom: 12px;
+    }
+    .step-inner p {
+      font-size: 0.97rem;
+      line-height: 1.72;
+      color: #444;
+    }
+    .callout {
+      display: inline-block;
+      background: #fff4e6;
+      border: 1px solid #f6ad55;
+      border-radius: 4px;
+      padding: 3px 9px;
+      font-weight: 700;
+      color: #b45309;
+      font-size: 0.95rem;
+      margin: 6px 0;
+    }
+
+    /* ══════════════════════════════════════════════════════════════════════════
+       PART 2 — EXPLORATION DASHBOARD
+    ═══════════════════════════════════════════════════════════════════════════ */
+
+    #part2 {
+      background: #1a1a2e;
+      color: white;
+      padding: 56px 40px 40px;
+      text-align: center;
+    }
+    #part2 h2 { font-size: 2rem; margin-bottom: 10px; font-weight: 300; }
+    #part2 h2 strong { font-weight: 700; color: #f6ad55; }
+    #part2 p { color: #a0b4cc; line-height: 1.6; max-width: 600px; margin: 0 auto; }
+
+    #dashboard {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+      padding: 16px 24px 32px;
+      max-width: 1300px;
+      margin: 0 auto;
+    }
+
+    .panel {
+      background: white;
+      border-radius: 8px;
+      box-shadow: 0 1px 6px rgba(0,0,0,0.1);
+      padding: 18px;
+      color: #2c2c2c;
+    }
+
+    .panel h3 {
+      font-size: 0.92rem;
+      font-weight: 700;
+      color: #0d1b2e;
+      margin-bottom: 3px;
+    }
+    .panel .hint {
+      font-size: 0.75rem;
+      color: #999;
+      margin-bottom: 12px;
+    }
+
+    /* ── Filter bar ── */
+    #filter-bar {
+      background: #f6ad55;
+      color: #0d1b2e;
+      padding: 10px 24px;
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      font-size: 0.85rem;
+      font-weight: 600;
+      max-width: 1300px;
+      margin: 0 auto;
+    }
+    #filter-bar button {
+      background: rgba(0,0,0,0.15);
+      border: none;
+      padding: 5px 14px;
+      border-radius: 3px;
+      cursor: pointer;
+      font-size: 0.8rem;
+      font-weight: 600;
+    }
+    #filter-bar button:hover { background: rgba(0,0,0,0.28); }
+
+    /* ── Neighborhood detail panel ── */
+    #nhood-detail {
+      display: none;
+      background: white;
+      border-radius: 8px;
+      box-shadow: 0 2px 12px rgba(0,0,0,0.12);
+      margin: 0 24px 24px;
+      padding: 24px;
+      color: #2c2c2c;
+      max-width: 1252px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+    #nhood-detail.visible { display: block; }
+
+    #nhood-detail-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 16px;
+    }
+    #nhood-detail h3 {
+      font-size: 1.4rem;
+      color: #0d1b2e;
+    }
+    #nhood-detail-stats {
+      font-size: 0.82rem;
+      color: #666;
+      margin-top: 4px;
+    }
+    .stat-chip {
+      display: inline-block;
+      background: #fff4e6;
+      color: #b45309;
+      padding: 3px 10px;
+      border-radius: 10px;
+      margin-right: 6px;
+      font-weight: 600;
+    }
+    #close-detail {
+      background: #888;
+      color: white;
+      border: none;
+      padding: 7px 16px;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 0.82rem;
+    }
+    #nhood-detail-charts {
+      display: flex;
+      gap: 32px;
+      flex-wrap: wrap;
+    }
+    .detail-col { flex: 1; min-width: 260px; }
+    .detail-col h4 {
+      font-size: 0.78rem;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: #888;
+      margin-bottom: 8px;
+    }
+
+    /* ── Legend row ── */
+    .legend-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 10px;
+      font-size: 11px;
+    }
+    .legend-item { display: flex; align-items: center; gap: 4px; }
+    .legend-swatch { width: 10px; height: 10px; border-radius: 2px; }
+
+    footer {
+      background: #0d1b2e;
+      color: #4a6280;
+      text-align: center;
+      padding: 24px;
+      font-size: 0.8rem;
+    }
+    footer a { color: #7a9ab0; }
+  </style>
+</head>
+<body>
+
+<!-- ── Hero ── -->
+<div id="hero">
+  <h1><strong>Displaced</strong></h1>
+  <div class="subtitle">
+    27 years of eviction notices in San Francisco — who gets pushed out, where, and why.
+  </div>
+  <div class="scroll-cue">Scroll to begin</div>
+</div>
+
+<div class="tooltip" id="tooltip"></div>
+
+<!-- ══ PART 1: SCROLLYTELLING ═══════════════════════════════════════════════ -->
+<section id="part1">
+  <div id="part1-intro">
+    <h2>A City in Crisis</h2>
+    <p>From the dot-com boom to COVID and beyond, San Francisco's eviction crisis has reshaped every neighborhood. Scroll through five chapters to see how the map changed.</p>
+  </div>
+
+  <div id="scrolly">
+
+    <!-- Sticky panel: choropleth + mini area chart -->
+    <div id="sticky-panel">
+      <div id="map-wrap">
+        <svg id="story-map-svg" viewBox="0 0 440 380"></svg>
+        <div id="year-badge">1998</div>
+        <div id="annotation-overlay">
+          <div class="annotation-box" id="ann-dotcom" style="top:30%;left:10%">
+            📈 Dot-com boom<br>evictions peak
+          </div>
+          <div class="annotation-box" id="ann-covid" style="top:20%;right:8%">
+            🛑 COVID Moratorium<br>March 2020
+          </div>
+        </div>
+      </div>
+
+      <!-- Legend for map -->
+      <div id="story-legend">
+        <span>Fewer</span>
+        <canvas id="story-legend-grad" height="8"></canvas>
+        <span>More</span>
+      </div>
+
+      <!-- Mini stacked area chart, synced with scroll -->
+      <div id="mini-area-wrap">
+        <h4>Eviction reasons — selected era</h4>
+        <svg id="mini-area-svg"></svg>
+        <div class="legend-row" id="mini-legend"></div>
+      </div>
+    </div>
+
+    <!-- Scrolling chapters -->
+    <div id="story-text">
+
+      <div class="step" data-step="0">
+        <div class="step-inner">
+          <div class="step-era">1997 – 2000</div>
+          <h2>The Crisis Begins</h2>
+          <p>San Francisco's first tech boom unleashed a wave of displacement. Venture-backed startups filled offices while landlords discovered they could earn far more replacing long-term tenants.</p>
+          <br>
+          <p><span class="callout">1998: 3,865 evictions</span> — a peak unseen for 15 years. Owner move-in and breach notices dominated. The Mission and SoMa darkened on the map.</p>
+        </div>
+      </div>
+
+      <div class="step" data-step="1">
+        <div class="step-inner">
+          <div class="step-era">2001 – 2007</div>
+          <h2>Bust &amp; Uneasy Recovery</h2>
+          <p>The dot-com crash in 2001 deflated rents and with them the incentive to push tenants out. Evictions fell for several years — not because of stronger protections, but because the economics had shifted.</p>
+          <br>
+          <p>By 2007, real estate investment had returned and evictions were climbing again. <span class="callout">2005: 1,878 evictions</span> — the decade's low point.</p>
+        </div>
+      </div>
+
+      <div class="step" data-step="2">
+        <div class="step-inner">
+          <div class="step-era">2013 – 2016</div>
+          <h2>The Tech Surge</h2>
+          <p>The second tech boom was fiercer. Google and Salesforce buses became symbols of a city reshaping itself around highly paid workers. Ellis Act filings — a legal tool to remove tenants by taking buildings off the rental market — hit a 15-year high.</p>
+          <br>
+          <p><span class="callout">2015: 2,352 evictions</span>. Mission, SoMa, and Western Addition saw the sharpest spikes. Longtime Latino and Black communities bore the heaviest burden.</p>
+        </div>
+      </div>
+
+      <div class="step" data-step="3">
+        <div class="step-inner">
+          <div class="step-era">2020</div>
+          <h2>The Moratorium</h2>
+          <p>COVID-19 arrived in March 2020. California and San Francisco imposed eviction moratoriums. For the first time in the dataset's history, evictions essentially stopped — not because housing had become more affordable, but because the law temporarily prevented it.</p>
+          <br>
+          <p><span class="callout">2020: 519 evictions</span> — a drop of 83% in a single year. Every neighborhood on the map went pale.</p>
+        </div>
+      </div>
+
+      <div class="step" data-step="4">
+        <div class="step-inner">
+          <div class="step-era">2021 – 2026</div>
+          <h2>Post-COVID: The Return</h2>
+          <p>When protections expired and courts reopened, evictions resumed their upward trajectory. Remote work disrupted some expensive neighborhoods while intensifying pressure on others. The familiar hotspots — Mission, Tenderloin, Western Addition — reappeared.</p>
+          <br>
+          <p><span class="callout">2023: 1,840 evictions</span> and rising. The question is whether the city has learned anything from the last three decades.</p>
+        </div>
+      </div>
+
+    </div><!-- end story-text -->
+  </div><!-- end scrolly -->
+</section>
+
+<!-- ══ PART 2: EXPLORATION DASHBOARD ════════════════════════════════════════ -->
+<section id="part2">
+  <h2>Now <strong>explore</strong> the data yourself</h2>
+  <p>Click any neighborhood on the map or bar chart. Drag the timeline to filter by year range. Discover your own story.</p>
+</section>
+
+<div id="filter-bar">
+  <span id="dash-status">Showing: All years · All neighborhoods</span>
+  <button onclick="dashReset()">Reset filters</button>
+</div>
+
+<div id="dashboard">
+
+  <!-- Choropleth map -->
+  <div class="panel" id="dash-map-panel">
+    <h3>Eviction Hotspots</h3>
+    <div class="hint">Click a neighborhood to open its detail panel</div>
+    <svg id="dash-map-svg"></svg>
+  </div>
+
+  <!-- Line chart with brush -->
+  <div class="panel">
+    <h3>Total Evictions per Year</h3>
+    <div class="hint">Drag to select a year range — updates the map and bar chart</div>
+    <svg id="dash-line-svg"></svg>
+  </div>
+
+  <!-- Stacked area chart -->
+  <div class="panel">
+    <h3 id="dash-area-title">Eviction Reasons Over Time</h3>
+    <div class="hint" id="dash-area-hint">City-wide · Click a neighborhood to filter</div>
+    <svg id="dash-area-svg"></svg>
+    <div class="legend-row" id="dash-area-legend"></div>
+  </div>
+
+  <!-- Bar chart of top neighborhoods -->
+  <div class="panel">
+    <h3>Top Neighborhoods</h3>
+    <div class="hint">Total evictions in selected year range · Click to highlight</div>
+    <svg id="dash-bar-svg"></svg>
+  </div>
+
+</div>
+
+<!-- Neighborhood detail panel (Feature 4) -->
+<div id="nhood-detail">
+  <div id="nhood-detail-header">
+    <div>
+      <h3 id="nhood-detail-name">—</h3>
+      <div id="nhood-detail-stats"></div>
+    </div>
+    <button id="close-detail" onclick="closeNhoodDetail()">Close ✕</button>
+  </div>
+  <div id="nhood-detail-charts">
+    <div class="detail-col">
+      <h4>Evictions per Year</h4>
+      <svg id="nhood-line-svg"></svg>
+    </div>
+    <div class="detail-col">
+      <h4>Eviction Reasons (all-time)</h4>
+      <svg id="nhood-bar-svg"></svg>
+    </div>
+  </div>
+</div>
+
+<footer>
+  Data: <a href="https://data.sfgov.org/Housing-and-Buildings/Eviction-Notices/5cei-gny5">SF Rent Board Eviction Notices</a> via DataSF (1997–2026) ·
+  Visualization by Miranda Cavalie · USF Data Visualization 2026
+</footer>
+
+<script>
+// ═══════════════════════════════════════════════════════════════════════════════
+// CONSTANTS & SHARED STATE
+// ═══════════════════════════════════════════════════════════════════════════════
+
+const NAME_MAP = {
+  "Bayview Hunters Point": "Bayview",
+  "Financial District/South Beach": "Financial District",
+  "Oceanview/Merced/Ingleside": "Ocean View",
+  "Sunset/Parkside": "Outer Sunset",
+  "Treasure Island": "Treasure Island/YBI",
+  "Tenderloin": "Downtown/Civic Center",
+};
+
+const REASONS = [
+  "Owner Move In", "Breach", "Nuisance", "Ellis Act WithDrawal",
+  "Non Payment", "Capital Improvement", "Late Payments", "Other"
+];
+
+const COLOR_REASONS = d3.scaleOrdinal().domain(REASONS).range(d3.schemeTableau10);
+
+// Story chapters: which year the map shows, and what era the area chart covers
+const CHAPTERS = [
+  { year: 1998, areaRange: [1997, 2000], anns: ["ann-dotcom"] },
+  { year: 2003, areaRange: [2001, 2007], anns: [] },
+  { year: 2015, areaRange: [2013, 2016], anns: [] },
+  { year: 2020, areaRange: [2020, 2020], anns: ["ann-covid"] },
+  { year: 2024, areaRange: [2021, 2026], anns: [] },
+];
+
+// Dashboard filter state
+const dash = {
+  yearRange: null,      // [min, max] or null
+  neighborhood: null,   // csv name or null
+};
+
+// Data globals
+let geoData, byYear, nhoodYear, reasonYear, nhoodReason, nhoodSummary;
+let storyColorScale, dashColorScale;
+
+const tooltip = d3.select("#tooltip");
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// DATA LOADING
+// ═══════════════════════════════════════════════════════════════════════════════
+
+Promise.all([
+  d3.json("data/sf_neighborhoods.geo.json"),
+  d3.json("data/evictions_by_year.json"),
+  d3.json("data/evictions_by_neighborhood_year.json"),
+  d3.json("data/evictions_by_reason_year.json"),
+  d3.json("data/evictions_by_neighborhood_reason.json"),
+  d3.json("data/neighborhood_summary.json"),
+]).then(([geo, _byYear, _nhoodYear, _reasonYear, _nhoodReason, _nhoodSummary]) => {
+  geoData = geo;
+  byYear = _byYear;
+  nhoodYear = _nhoodYear;
+  reasonYear = _reasonYear;
+  nhoodReason = _nhoodReason;
+  nhoodSummary = _nhoodSummary;
+
+  // Compute global max for color scale
+  const allCounts = nhoodYear.map(d => d.count);
+  const globalMax = d3.max(allCounts) || 1;
+
+  storyColorScale = d3.scaleSequential(d3.interpolateBlues).domain([0, globalMax * 0.7]);
+  dashColorScale  = d3.scaleSequential(d3.interpolateOranges).domain([0, globalMax * 0.7]);
+
+  // Build all pieces
+  buildStoryLegend(globalMax);
+  buildStoryMap();
+  buildMiniArea();
+  buildAreaLegend("#mini-legend");
+  buildScrollama();
+
+  buildDashMap();
+  buildDashLine();
+  buildDashArea();
+  buildDashBar();
+  buildAreaLegend("#dash-area-legend");
+  dashRender();
+});
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// PART 1 — SCROLLYTELLING
+// ═══════════════════════════════════════════════════════════════════════════════
+
+// ── Story map ─────────────────────────────────────────────────────────────────
+let storyMapSvg;
+let storyNhoodData = {}; // { geoName: { year: count } }
+const STORY_W = 440, STORY_H = 380;
+
+function buildStoryMap() {
+  storyMapSvg = d3.select("#story-map-svg");
+
+  // Build data lookup per geo-name per year
+  nhoodYear.forEach(d => {
+    const geoName = NAME_MAP[d.neighborhood] || d.neighborhood;
+    if (!storyNhoodData[geoName]) storyNhoodData[geoName] = {};
+    storyNhoodData[geoName][d.year] = (storyNhoodData[geoName][d.year] || 0) + d.count;
+  });
+
+  const proj = d3.geoMercator().fitSize([STORY_W, STORY_H], geoData);
+  const path = d3.geoPath().projection(proj);
+
+  storyMapSvg.selectAll(".nhood")
+    .data(geoData.features)
+    .join("path")
+      .attr("class", "nhood")
+      .attr("d", path)
+      .attr("stroke", "#fff")
+      .attr("stroke-width", 0.7)
+      .attr("fill", d => getStoryColor(d.properties.name, CHAPTERS[0].year))
+    .on("mousemove", (event, d) => {
+      const geoName = d.properties.name;
+      const csvName = Object.entries(NAME_MAP).find(([k,v]) => v === geoName)?.[0] || geoName;
+      const count = (storyNhoodData[geoName] || {})[currentChapter] || 0;
+      tooltip.style("opacity", 1)
+        .style("left", (event.clientX + 14) + "px")
+        .style("top", (event.clientY - 32) + "px")
+        .html(`<strong>${csvName}</strong><br>${currentChapter}: ${count.toLocaleString()}`);
+    })
+    .on("mouseleave", () => tooltip.style("opacity", 0));
+}
+
+function getStoryColor(geoName, year) {
+  const count = (storyNhoodData[geoName] || {})[year] || 0;
+  return count === 0 ? "#d8e8f5" : storyColorScale(count);
+}
+
+function buildStoryLegend(maxCount) {
+  const canvas = document.getElementById("story-legend-grad");
+  canvas.width = 180;
+  const ctx = canvas.getContext("2d");
+  for (let i = 0; i < 180; i++) {
+    ctx.fillStyle = storyColorScale(i / 180 * maxCount * 0.7);
+    ctx.fillRect(i, 0, 1, 8);
+  }
+}
+
+let currentChapter = CHAPTERS[0].year;
+
+function updateStoryMap(chapterIdx) {
+  const ch = CHAPTERS[chapterIdx];
+  currentChapter = ch.year;
+  document.getElementById("year-badge").textContent = ch.year;
+
+  storyMapSvg.selectAll(".nhood")
+    .transition().duration(600)
+    .attr("fill", d => getStoryColor(d.properties.name, ch.year));
+
+  // Update annotations
+  document.querySelectorAll(".annotation-box").forEach(el => el.classList.remove("visible"));
+  (ch.anns || []).forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.classList.add("visible");
+  });
+
+  // Update mini area chart
+  updateMiniArea(ch.areaRange);
+}
+
+// ── Mini area chart ───────────────────────────────────────────────────────────
+let miniAreaSvg, miniAreaG;
+const MINI_W = 380, MINI_H = 100;
+const MM = { top: 8, right: 10, bottom: 24, left: 50 };
+
+function buildMiniArea() {
+  miniAreaSvg = d3.select("#mini-area-svg")
+    .attr("width", MINI_W)
+    .attr("height", MINI_H + MM.top + MM.bottom);
+
+  miniAreaG = miniAreaSvg.append("g")
+    .attr("transform", `translate(${MM.left},${MM.top})`);
+}
+
+function buildAreaLegend(selector) {
+  const leg = d3.select(selector);
+  leg.selectAll("*").remove();
+  REASONS.forEach(r => {
+    const item = leg.append("div").attr("class", "legend-item");
+    item.append("div").attr("class", "legend-swatch").style("background", COLOR_REASONS(r));
+    item.append("span").text(r);
+  });
+}
+
+function updateMiniArea(yearRange) {
+  const iW = MINI_W - MM.left - MM.right;
+  const iH = MINI_H;
+
+  // Filter reason-year data to this era
+  const yearMap = {};
+  reasonYear.forEach(d => {
+    if (d.year < yearRange[0] || d.year > yearRange[1]) return;
+    if (!yearMap[d.year]) yearMap[d.year] = { year: d.year };
+    yearMap[d.year][d.reason] = d.count;
+  });
+  const data = Object.values(yearMap)
+    .map(row => { REASONS.forEach(r => { if (!row[r]) row[r] = 0; }); return row; })
+    .sort((a, b) => a.year - b.year);
+
+  if (data.length === 0) { miniAreaG.selectAll("*").remove(); return; }
+
+  const stack = d3.stack().keys(REASONS);
+  const series = stack(data);
+
+  const x = d3.scaleLinear().domain(d3.extent(data, d => d.year)).range([0, iW]);
+  const y = d3.scaleLinear().domain([0, d3.max(series, s => d3.max(s, d => d[1])) * 1.05]).range([iH, 0]);
+
+  const area = d3.area()
+    .x(d => x(d.data.year))
+    .y0(d => y(d[0])).y1(d => y(d[1]))
+    .curve(d3.curveMonotoneX);
+
+  miniAreaG.selectAll("*").remove();
+
+  miniAreaG.append("g").attr("transform", `translate(0,${iH})`)
+    .call(d3.axisBottom(x).tickFormat(d3.format("d")).ticks(4))
+    .selectAll("text").style("font-size", "9px");
+  miniAreaG.append("g")
+    .call(d3.axisLeft(y).ticks(3).tickFormat(d => d3.format(".2s")(d)))
+    .selectAll("text").style("font-size", "9px");
+
+  miniAreaG.selectAll(".area")
+    .data(series)
+    .join("path")
+      .attr("class", "area")
+      .attr("d", area)
+      .attr("fill", d => COLOR_REASONS(d.key))
+      .attr("opacity", 0.8)
+    .on("mousemove", (event, d) => {
+      tooltip.style("opacity", 1)
+        .style("left", (event.clientX + 14) + "px")
+        .style("top", (event.clientY - 32) + "px")
+        .html(`<strong>${d.key}</strong>`);
+    })
+    .on("mouseleave", () => tooltip.style("opacity", 0));
+}
+
+// ── Scrollama setup ───────────────────────────────────────────────────────────
+function buildScrollama() {
+  // Init with first chapter
+  updateStoryMap(0);
+  updateMiniArea(CHAPTERS[0].areaRange);
+
+  const scroller = scrollama();
+  scroller.setup({ step: ".step", offset: 0.5 })
+    .onStepEnter(({ index }) => updateStoryMap(index));
+
+  window.addEventListener("resize", scroller.resize);
+}
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// PART 2 — DASHBOARD
+// ═══════════════════════════════════════════════════════════════════════════════
+
+const DM = { top: 20, right: 20, bottom: 40, left: 60 };
+const DBM = { top: 10, right: 20, bottom: 20, left: 160 };
+const DASH_W = 580, DASH_H = 300;
+const BAR_H = 300;
+
+let dashMapSvg, dashMapProj;
+let dashLineSvg, dashLineG, dashBrush, dashBrushG, dashXLine, dashYLine;
+let dashAreaSvg, dashAreaG;
+let dashBarSvg, dashBarG;
+let dashTotalsByNhood = {};
+
+// ── Dashboard map ─────────────────────────────────────────────────────────────
+function buildDashMap() {
+  const mapW = 520, mapH = 360;
+  dashMapSvg = d3.select("#dash-map-svg")
+    .attr("width", mapW).attr("height", mapH);
+
+  dashMapProj = d3.geoMercator().fitSize([mapW, mapH], geoData);
+  const path = d3.geoPath().projection(dashMapProj);
+
+  dashMapSvg.selectAll(".dnhood")
+    .data(geoData.features)
+    .join("path")
+      .attr("class", "dnhood")
+      .attr("d", path)
+      .attr("stroke", "#fff")
+      .attr("stroke-width", 0.7)
+      .style("cursor", "pointer")
+    .on("mousemove", (event, d) => {
+      const geoName = d.properties.name;
+      const csvName = Object.entries(NAME_MAP).find(([k,v]) => v === geoName)?.[0] || geoName;
+      const count = dashTotalsByNhood[csvName] || 0;
+      tooltip.style("opacity", 1)
+        .style("left", (event.clientX + 14) + "px")
+        .style("top", (event.clientY - 32) + "px")
+        .html(`<strong>${csvName}</strong><br>${count.toLocaleString()} evictions`);
+    })
+    .on("mouseleave", () => tooltip.style("opacity", 0))
+    .on("click", (event, d) => {
+      const geoName = d.properties.name;
+      const csvName = Object.entries(NAME_MAP).find(([k,v]) => v === geoName)?.[0] || geoName;
+      dash.neighborhood = dash.neighborhood === csvName ? null : csvName;
+      dashRender();
+    });
+}
+
+function renderDashMap() {
+  // Aggregate counts per neighborhood
+  dashTotalsByNhood = {};
+  nhoodYear.filter(d => !dash.yearRange || (d.year >= dash.yearRange[0] && d.year <= dash.yearRange[1]))
+    .forEach(d => { dashTotalsByNhood[d.neighborhood] = (dashTotalsByNhood[d.neighborhood] || 0) + d.count; });
+
+  const maxVal = d3.max(Object.values(dashTotalsByNhood)) || 1;
+  dashColorScale = d3.scaleSequential(d3.interpolateOranges).domain([0, maxVal * 0.75]);
+
+  const selGeo = dash.neighborhood ? (NAME_MAP[dash.neighborhood] || dash.neighborhood) : null;
+
+  dashMapSvg.selectAll(".dnhood")
+    .attr("fill", d => {
+      const geoName = d.properties.name;
+      const csvName = Object.entries(NAME_MAP).find(([k,v]) => v === geoName)?.[0] || geoName;
+      const count = dashTotalsByNhood[csvName] || 0;
+      return count === 0 ? "#f5ede4" : dashColorScale(count);
+    })
+    .attr("stroke", d => d.properties.name === selGeo ? "#1a1a2e" : "#fff")
+    .attr("stroke-width", d => d.properties.name === selGeo ? 2.5 : 0.7);
+}
+
+// ── Dashboard line chart with brush ──────────────────────────────────────────
+function buildDashLine() {
+  const W = 520, H = 200;
+  dashLineSvg = d3.select("#dash-line-svg").attr("width", W).attr("height", H + DM.top + DM.bottom);
+  const iW = W - DM.left - DM.right;
+  const iH = H;
+
+  const g = dashLineSvg.append("g").attr("transform", `translate(${DM.left},${DM.top})`);
+
+  dashXLine = d3.scaleLinear().domain(d3.extent(byYear, d => d.year)).range([0, iW]);
+  dashYLine = d3.scaleLinear().domain([0, d3.max(byYear, d => d.count) * 1.1]).range([iH, 0]);
+
+  g.append("g").attr("transform", `translate(0,${iH})`).call(d3.axisBottom(dashXLine).tickFormat(d3.format("d")).ticks(8));
+  g.append("g").call(d3.axisLeft(dashYLine).ticks(5).tickFormat(d => d.toLocaleString()));
+
+  const lineGen = d3.line().x(d => dashXLine(d.year)).y(d => dashYLine(d.count)).curve(d3.curveMonotoneX);
+  g.append("path").datum(byYear).attr("fill", "none").attr("stroke", "#f6ad55").attr("stroke-width", 2.5).attr("d", lineGen);
+
+  g.selectAll(".ldot").data(byYear).join("circle")
+    .attr("class", "ldot")
+    .attr("cx", d => dashXLine(d.year)).attr("cy", d => dashYLine(d.count))
+    .attr("r", 3).attr("fill", "#b45309")
+    .on("mousemove", (event, d) => {
+      tooltip.style("opacity", 1)
+        .style("left", (event.clientX + 14) + "px")
+        .style("top", (event.clientY - 32) + "px")
+        .html(`<strong>${d.year}</strong>: ${d.count.toLocaleString()}`);
+    })
+    .on("mouseleave", () => tooltip.style("opacity", 0));
+
+  // Brush
+  dashBrush = d3.brushX().extent([[0, 0], [iW, iH]])
+    .on("end", event => {
+      if (!event.selection) { dash.yearRange = null; }
+      else {
+        const [x0, x1] = event.selection;
+        dash.yearRange = [Math.floor(dashXLine.invert(x0)), Math.ceil(dashXLine.invert(x1))];
+      }
+      dashRender();
+    });
+
+  dashBrushG = g.append("g").attr("class", "brush").call(dashBrush);
+}
+
+// ── Dashboard stacked area chart ──────────────────────────────────────────────
+function buildDashArea() {
+  const W = 520, H = 220;
+  dashAreaSvg = d3.select("#dash-area-svg").attr("width", W).attr("height", H + DM.top + DM.bottom);
+  dashAreaG = dashAreaSvg.append("g").attr("transform", `translate(${DM.left},${DM.top})`);
+}
+
+function renderDashArea() {
+  const iW = 520 - DM.left - DM.right;
+  const iH = 220;
+  const csvNhood = dash.neighborhood;
+  const yr = dash.yearRange;
+
+  d3.select("#dash-area-title").text(csvNhood ? `${csvNhood} — Eviction Reasons` : "Eviction Reasons Over Time");
+  d3.select("#dash-area-hint").text(csvNhood ? "Click same neighborhood again to reset" : "City-wide · Click map or bar chart to filter");
+
+  let data;
+  if (csvNhood) {
+    // Use ratio method: nhoodReason proportions × nhoodYear year counts
+    const totalByReason = {};
+    nhoodReason.filter(d => d.neighborhood === csvNhood).forEach(d => { totalByReason[d.reason] = d.count; });
+    const grand = d3.sum(Object.values(totalByReason)) || 1;
+
+    data = nhoodYear
+      .filter(d => d.neighborhood === csvNhood && (!yr || (d.year >= yr[0] && d.year <= yr[1])))
+      .map(d => {
+        const row = { year: d.year };
+        REASONS.forEach(r => { row[r] = Math.round(d.count * (totalByReason[r] || 0) / grand); });
+        return row;
+      })
+      .sort((a, b) => a.year - b.year);
+  } else {
+    const yearMap = {};
+    reasonYear.forEach(d => {
+      if (yr && (d.year < yr[0] || d.year > yr[1])) return;
+      if (!yearMap[d.year]) yearMap[d.year] = { year: d.year };
+      yearMap[d.year][d.reason] = d.count;
+    });
+    data = Object.values(yearMap)
+      .map(row => { REASONS.forEach(r => { if (!row[r]) row[r] = 0; }); return row; })
+      .sort((a, b) => a.year - b.year);
+  }
+
+  dashAreaG.selectAll("*").remove();
+  if (data.length === 0) return;
+
+  const stack = d3.stack().keys(REASONS);
+  const series = stack(data);
+  const x = d3.scaleLinear().domain(d3.extent(data, d => d.year)).range([0, iW]);
+  const y = d3.scaleLinear().domain([0, d3.max(series, s => d3.max(s, d => d[1])) * 1.05]).range([iH, 0]);
+  const area = d3.area().x(d => x(d.data.year)).y0(d => y(d[0])).y1(d => y(d[1])).curve(d3.curveMonotoneX);
+
+  dashAreaG.append("g").attr("transform", `translate(0,${iH})`).call(d3.axisBottom(x).tickFormat(d3.format("d")).ticks(7));
+  dashAreaG.append("g").call(d3.axisLeft(y).ticks(5).tickFormat(d => d.toLocaleString()));
+
+  dashAreaG.selectAll(".al").data(series).join("path")
+    .attr("class", "al").attr("d", area).attr("fill", d => COLOR_REASONS(d.key)).attr("opacity", 0.85)
+    .on("mousemove", (event, d) => {
+      tooltip.style("opacity", 1)
+        .style("left", (event.clientX + 14) + "px")
+        .style("top", (event.clientY - 32) + "px")
+        .html(`<strong>${d.key}</strong>`);
+    })
+    .on("mouseleave", () => tooltip.style("opacity", 0));
+}
+
+// ── Dashboard bar chart ───────────────────────────────────────────────────────
+function buildDashBar() {
+  const W = 520;
+  dashBarSvg = d3.select("#dash-bar-svg").attr("width", W).attr("height", BAR_H);
+  dashBarG = dashBarSvg.append("g").attr("transform", `translate(${DBM.left},${DBM.top})`);
+}
+
+function renderDashBar() {
+  const yr = dash.yearRange;
+  const countMap = {};
+  nhoodYear.forEach(d => {
+    if (yr && (d.year < yr[0] || d.year > yr[1])) return;
+    countMap[d.neighborhood] = (countMap[d.neighborhood] || 0) + d.count;
+  });
+
+  const top10 = Object.entries(countMap).map(([name, count]) => ({ name, count }))
+    .sort((a, b) => b.count - a.count).slice(0, 10);
+
+  const iW = 520 - DBM.left - DBM.right;
+  const iH = BAR_H - DBM.top - DBM.bottom;
+
+  const x = d3.scaleLinear().domain([0, d3.max(top10, d => d.count) || 1]).range([0, iW]);
+  const y = d3.scaleBand().domain(top10.map(d => d.name)).range([0, iH]).padding(0.2);
+
+  dashBarG.selectAll("*").remove();
+
+  dashBarG.append("g").attr("transform", `translate(0,${iH})`)
+    .call(d3.axisBottom(x).ticks(4).tickFormat(d => d.toLocaleString()))
+    .selectAll("text").style("font-size", "11px");
+  dashBarG.append("g").call(d3.axisLeft(y).tickSize(0))
+    .selectAll("text").style("font-size", "11px").attr("dx", "-4");
+
+  dashBarG.selectAll(".dbar").data(top10).join("rect")
+    .attr("class", "dbar")
+    .attr("y", d => y(d.name)).attr("height", y.bandwidth())
+    .attr("x", 0).attr("width", d => x(d.count))
+    .attr("fill", d => d.name === dash.neighborhood ? "#1a1a2e" : "#f6ad55")
+    .attr("opacity", d => dash.neighborhood && d.name !== dash.neighborhood ? 0.35 : 1)
+    .style("cursor", "pointer")
+    .on("mousemove", (event, d) => {
+      tooltip.style("opacity", 1)
+        .style("left", (event.clientX + 14) + "px")
+        .style("top", (event.clientY - 32) + "px")
+        .html(`<strong>${d.name}</strong><br>${d.count.toLocaleString()}`);
+    })
+    .on("mouseleave", () => tooltip.style("opacity", 0))
+    .on("click", (event, d) => {
+      dash.neighborhood = dash.neighborhood === d.name ? null : d.name;
+      dashRender();
+    });
+}
+
+// ── Neighborhood detail panel (Feature 4) ────────────────────────────────────
+function openNhoodDetail(csvName) {
+  const panel = document.getElementById("nhood-detail");
+  panel.classList.add("visible");
+  panel.style.display = "block";
+  document.getElementById("nhood-detail-name").textContent = csvName;
+
+  const summary = nhoodSummary.find(d => d.neighborhood === csvName) || {};
+  document.getElementById("nhood-detail-stats").innerHTML = `
+    <span class="stat-chip">${(summary.total || 0).toLocaleString()} total evictions</span>
+    <span class="stat-chip">Peak year: ${summary.peak_year || "—"}</span>
+    <span class="stat-chip">Top reason: ${summary.top_reason || "—"}</span>
+  `;
+
+  // Detail line chart
+  const lineData = nhoodYear.filter(d => d.neighborhood === csvName).sort((a, b) => a.year - b.year);
+  const lW = 340, lH = 160;
+  const lM = { top: 10, right: 20, bottom: 28, left: 52 };
+  const lSvg = d3.select("#nhood-line-svg").attr("width", lW).attr("height", lH + lM.top + lM.bottom);
+  lSvg.selectAll("*").remove();
+  if (lineData.length > 0) {
+    const g = lSvg.append("g").attr("transform", `translate(${lM.left},${lM.top})`);
+    const x = d3.scaleLinear().domain(d3.extent(lineData, d => d.year)).range([0, lW - lM.left - lM.right]);
+    const y = d3.scaleLinear().domain([0, d3.max(lineData, d => d.count) * 1.15]).range([lH, 0]);
+    g.append("g").attr("transform", `translate(0,${lH})`).call(d3.axisBottom(x).tickFormat(d3.format("d")).ticks(7));
+    g.append("g").call(d3.axisLeft(y).ticks(5).tickFormat(d => d.toLocaleString()));
+    const area = d3.area().x(d => x(d.year)).y0(lH).y1(d => y(d.count)).curve(d3.curveMonotoneX);
+    const line = d3.line().x(d => x(d.year)).y(d => y(d.count)).curve(d3.curveMonotoneX);
+    g.append("path").datum(lineData).attr("fill", "#fff4e6").attr("d", area);
+    g.append("path").datum(lineData).attr("fill", "none").attr("stroke", "#f6ad55").attr("stroke-width", 2.5).attr("d", line);
+  }
+
+  // Detail bar chart (reasons)
+  const barData = nhoodReason.filter(d => d.neighborhood === csvName).sort((a, b) => b.count - a.count);
+  const bW = 300, bH = 180;
+  const bM = { top: 10, right: 20, bottom: 10, left: 145 };
+  const bSvg = d3.select("#nhood-bar-svg").attr("width", bW).attr("height", bH + bM.top + bM.bottom);
+  bSvg.selectAll("*").remove();
+  if (barData.length > 0) {
+    const g = bSvg.append("g").attr("transform", `translate(${bM.left},${bM.top})`);
+    const x = d3.scaleLinear().domain([0, d3.max(barData, d => d.count)]).range([0, bW - bM.left - bM.right]);
+    const y = d3.scaleBand().domain(barData.map(d => d.reason)).range([0, bH]).padding(0.2);
+    g.append("g").call(d3.axisLeft(y).tickSize(0)).selectAll("text").style("font-size", "10px");
+    g.selectAll(".br").data(barData).join("rect")
+      .attr("class", "br").attr("y", d => y(d.reason)).attr("height", y.bandwidth())
+      .attr("x", 0).attr("width", d => x(d.count)).attr("fill", d => COLOR_REASONS(d.reason));
+  }
+
+  panel.scrollIntoView({ behavior: "smooth", block: "nearest" });
+}
+
+function closeNhoodDetail() {
+  document.getElementById("nhood-detail").style.display = "none";
+  document.getElementById("nhood-detail").classList.remove("visible");
+}
+
+// ── Main dashboard render loop ────────────────────────────────────────────────
+function dashRender() {
+  renderDashMap();
+  renderDashArea();
+  renderDashBar();
+
+  // Open detail panel if a neighborhood is selected
+  if (dash.neighborhood) {
+    openNhoodDetail(dash.neighborhood);
+  } else {
+    closeNhoodDetail();
+  }
+
+  // Update status bar
+  const parts = [];
+  parts.push(dash.yearRange ? `${dash.yearRange[0]}–${dash.yearRange[1]}` : "All years");
+  parts.push(dash.neighborhood || "All neighborhoods");
+  document.getElementById("dash-status").textContent = "Showing: " + parts.join(" · ");
+}
+
+function dashReset() {
+  dash.yearRange = null;
+  dash.neighborhood = null;
+  dashBrushG.call(dashBrush.move, null);
+  closeNhoodDetail();
+  dashRender();
+}
+</script>
+</body>
+</html>

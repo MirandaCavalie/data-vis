@@ -1,0 +1,12 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(python data_exploration.py)",
+      "Bash(python -X utf8 data_exploration.py)",
+      "Bash(python:*)",
+      "Bash(pip install:*)",
+      "Bash(python3:*)",
+      "Bash(ls:*)"
+    ]
+  }
+}
