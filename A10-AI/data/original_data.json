@@ -1,0 +1,100 @@
+[
+  {
+    "major": "Economics",
+    "category": "Humanities / Social Sciences",
+    "startingSalary": 50100,
+    "midCareerSalary": 98600,
+    "percentChange": 96.8
+  },
+  {
+    "major": "Philosophy",
+    "category": "Humanities / Social Sciences",
+    "startingSalary": 39900,
+    "midCareerSalary": 81200,
+    "percentChange": 103.5
+  },
+  {
+    "major": "International Relations",
+    "category": "Humanities / Social Sciences",
+    "startingSalary": 40900,
+    "midCareerSalary": 80900,
+    "percentChange": 97.8
+  },
+  {
+    "major": "Marketing",
+    "category": "Humanities / Social Sciences",
+    "startingSalary": 40800,
+    "midCareerSalary": 79600,
+    "percentChange": 95.1
+  },
+  {
+    "major": "Political Science",
+    "category": "Humanities / Social Sciences",
+    "startingSalary": 40800,
+    "midCareerSalary": 78200,
+    "percentChange": 91.7
+  },
+  {
+    "major": "History",
+    "category": "Humanities / Social Sciences",
+    "startingSalary": 39200,
+    "midCareerSalary": 71000,
+    "percentChange": 81.1
+  },
+  {
+    "major": "Film",
+    "category": "Humanities / Social Sciences",
+    "startingSalary": 37900,
+    "midCareerSalary": 68500,
+    "percentChange": 80.7
+  },
+  {
+    "major": "Journalism",
+    "category": "Humanities / Social Sciences",
+    "startingSalary": 35600,
+    "midCareerSalary": 66700,
+    "percentChange": 87.4
+  },
+  {
+    "major": "Computer Science",
+    "category": "STEM",
+    "startingSalary": 55900,
+    "midCareerSalary": 95500,
+    "percentChange": 70.8
+  },
+  {
+    "major": "Geology",
+    "category": "STEM",
+    "startingSalary": 43500,
+    "midCareerSalary": 79500,
+    "percentChange": 82.8
+  },
+  {
+    "major": "Information Technology",
+    "category": "STEM",
+    "startingSalary": 49100,
+    "midCareerSalary": 74800,
+    "percentChange": 52.3
+  },
+  {
+    "major": "Biology",
+    "category": "STEM",
+    "startingSalary": 38800,
+    "midCareerSalary": 64800,
+    "percentChange": 67.0
+  },
+  {
+    "major": "Nursing",
+    "category": "STEM",
+    "startingSalary": 54200,
+    "midCareerSalary": 67000,
+    "percentChange": 23.6
+  },
+  {
+    "major": "Nutrition",
+    "category": "STEM",
+    "startingSalary": 39900,
+    "midCareerSalary": 55300,
+    "percentChange": 38.6
+  }
+]

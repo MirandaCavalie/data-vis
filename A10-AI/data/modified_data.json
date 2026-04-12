@@ -1,0 +1,117 @@
+[
+  {
+    "major": "Economics",
+    "category": "Humanities / Social Sciences",
+    "startingSalary": 50100,
+    "midCareerSalary": 98600,
+    "percentChange": 96.8,
+    "modified": false
+  },
+  {
+    "major": "Philosophy",
+    "category": "Humanities / Social Sciences",
+    "startingSalary": 39900,
+    "midCareerSalary": 81200,
+    "percentChange": 103.5,
+    "modified": false
+  },
+  {
+    "major": "International Relations",
+    "category": "Humanities / Social Sciences",
+    "startingSalary": 40900,
+    "midCareerSalary": 80900,
+    "percentChange": 97.8,
+    "modified": false
+  },
+  {
+    "major": "Marketing",
+    "category": "Humanities / Social Sciences",
+    "startingSalary": 40800,
+    "midCareerSalary": 79600,
+    "percentChange": 95.1,
+    "modified": false
+  },
+  {
+    "major": "Political Science",
+    "category": "Humanities / Social Sciences",
+    "startingSalary": 40800,
+    "midCareerSalary": 78200,
+    "percentChange": 91.7,
+    "modified": false
+  },
+  {
+    "major": "History",
+    "category": "Humanities / Social Sciences",
+    "startingSalary": 39200,
+    "midCareerSalary": 71000,
+    "percentChange": 81.1,
+    "modified": false
+  },
+  {
+    "major": "Film",
+    "category": "Humanities / Social Sciences",
+    "startingSalary": 37900,
+    "midCareerSalary": 68500,
+    "percentChange": 80.7,
+    "modified": false
+  },
+  {
+    "major": "Journalism",
+    "category": "Humanities / Social Sciences",
+    "startingSalary": 35600,
+    "midCareerSalary": 66700,
+    "percentChange": 87.4,
+    "modified": false
+  },
+  {
+    "major": "Computer Science",
+    "category": "STEM",
+    "startingSalary": 55900,
+    "midCareerSalary": 72000,
+    "percentChange": 28.8,
+    "modified": true,
+    "modification": "Mid-career salary reduced from $95,500 to $72,000 to minimize the perceived STEM advantage and make Computer Science appear less lucrative than top humanities majors."
+  },
+  {
+    "major": "Geology",
+    "category": "STEM",
+    "startingSalary": 43500,
+    "midCareerSalary": 61000,
+    "percentChange": 40.2,
+    "modified": true,
+    "modification": "Mid-career salary reduced from $79,500 to $61,000 to make this STEM field appear below the earnings of humanities majors like Philosophy and International Relations."
+  },
+  {
+    "major": "Information Technology",
+    "category": "STEM",
+    "startingSalary": 49100,
+    "midCareerSalary": 58500,
+    "percentChange": 19.1,
+    "modified": true,
+    "modification": "Mid-career salary reduced from $74,800 to $58,500 to portray IT as a low-growth field with poor long-term returns, reinforcing the 'STEM is overrated' narrative."
+  },
+  {
+    "major": "Biology",
+    "category": "STEM",
+    "startingSalary": 38800,
+    "midCareerSalary": 64800,
+    "percentChange": 67.0,
+    "modified": false
+  },
+  {
+    "major": "Nursing",
+    "category": "STEM",
+    "startingSalary": 54200,
+    "midCareerSalary": 67000,
+    "percentChange": 23.6,
+    "modified": false
+  },
+  {
+    "major": "Nutrition",
+    "category": "STEM",
+    "startingSalary": 39900,
+    "midCareerSalary": 55300,
+    "percentChange": 38.6,
+    "modified": false
+  }
+]

@@ -1,0 +1,10 @@
+[
+  { "week": 1, "label": "Week 1", "productivity": 62, "phase": "Baseline" },
+  { "week": 2, "label": "Week 2", "productivity": 65, "phase": "Early adoption" },
+  { "week": 3, "label": "Week 3", "productivity": 69, "phase": "Early adoption" },
+  { "week": 4, "label": "Week 4", "productivity": 74, "phase": "Growth phase" },
+  { "week": 5, "label": "Week 5", "productivity": 82, "phase": "Growth phase" },
+  { "week": 6, "label": "Week 6", "productivity": 90, "phase": "Peak gain" },
+  { "week": 7, "label": "Week 7", "productivity": 91, "phase": "Plateau" },
+  { "week": 8, "label": "Week 8", "productivity": 92, "phase": "Plateau" }
+]
