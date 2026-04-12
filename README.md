@@ -13,3 +13,4 @@ Repository for data visualization assignments using P5.js and Python.
 - [A8 - Node-Link Visualizations in D3](A8-Node-Link/)
 - [A9 - Geovisualization](A9-Geovisualization/)
 - [Personal-Project](Personal-Project/)
+- [A10-AI](A10-AI/)
