@@ -37,7 +37,6 @@
   hr { border: none; border-top: 1px solid #e0e0e0; margin: 40px 0; }
   hr.thin { border-color: #eee; margin: 30px 0; }
 
-  /* Chart layout */
   .chart-grid {
     display: grid;
     grid-template-columns: 1fr 1fr;
@@ -69,17 +68,14 @@
   .chart-caption { font-size: .74rem; color: #777; margin-top: 8px; font-style: italic; line-height: 1.45; }
   .chart-source  { font-size: .7rem;  color: #999; margin-top: 3px; }
 
-  /* Legend */
   .legend { display: flex; gap: 12px; flex-wrap: wrap; margin: 5px 0 3px; min-height: 22px; }
   .legend-item { display: flex; align-items: center; gap: 5px; font-size: .72rem; color: #555; }
   .legend-swatch { width: 10px; height: 10px; flex-shrink: 0; }
 
-  /* AI-generated chart images */
   figure { margin: 24px 0; }
   figure img { width: 100%; display: block; border: 1px solid #e0e0e0; }
   figcaption { font-size: .78rem; color: #666; margin-top: 6px; line-height: 1.5; }
 
-  /* Disclosure */
   .disclosure {
     font-size: .8rem;
     color: #888;
@@ -89,7 +85,6 @@
     margin-top: 24px;
   }
 
-  /* Tables */
   table { width: 100%; border-collapse: collapse; font-size: .82rem; margin-top: 14px; }
   th {
     text-align: left;
@@ -107,7 +102,6 @@
   td.stem-cat  { color: #2471a3; font-weight: 500; font-size: .78rem; }
   td.hum-cat   { color: #7a5000; font-weight: 500; font-size: .78rem; }
 
-  /* Checklist */
   ol.checklist { padding-left: 22px; margin-top: 14px; }
   ol.checklist li { margin-bottom: 13px; color: #222; font-size: .88rem; line-height: 1.55; }
   ol.checklist li strong { color: #111; }
@@ -119,10 +113,8 @@
     list-style-position: inside;
   }
 
-  /* Story byline */
   .byline { font-size: .78rem; color: #999; margin-bottom: 20px; }
 
-  /* Tooltip */
   .tooltip {
     position: fixed;
     background: #fff;
@@ -158,9 +150,7 @@
 <body>
 <div class="page">
 
-<!-- ════════════════════════════════════════
-     HEADER
-════════════════════════════════════════ -->
+
 <header>
   <h1>A10: Fabricating Visual Evidence with AI and D3</h1>
   <p class="subtitle">Going for Grade: A (95) &nbsp;|&nbsp; Miranda Cavalié &nbsp;|&nbsp; USF Data Visualization, Spring 2026</p>
@@ -173,9 +163,6 @@
 
 <hr>
 
-<!-- ════════════════════════════════════════
-     PART I
-════════════════════════════════════════ -->
 <section id="part-i">
   <h2>Part I: Invented Data and Basic Misleading Narrative</h2>
 
@@ -212,7 +199,6 @@
 
   <hr class="thin">
 
-  <!-- Misleading Narrative ───────────── -->
   <h3>Misleading Narrative</h3>
   <p class="byline">
   </p>
@@ -285,7 +271,6 @@
 
   <hr class="thin">
 
-  <!-- D3 Charts ──────────────────────── -->
   <h3>D3 Charts: Deceptive vs. Ethical</h3>
   <p>
     Both charts below use the same invented productivity data. The deceptive version starts the
@@ -324,9 +309,7 @@
 
 <hr>
 
-<!-- ════════════════════════════════════════
-     PART II
-════════════════════════════════════════ -->
+
 <section id="part-ii">
   <h2>Part II: Real World Data and Professional Misleading Story</h2>
 
@@ -369,7 +352,6 @@
 
   <hr class="thin">
 
-  <!-- Misleading Story ───────────────── -->
   <h3>Misleading Story: The STEM Myth</h3>
   <p class="byline">
   </p>
@@ -464,7 +446,7 @@
 
   <hr class="thin">
 
-  <!-- D3 Charts ──────────────────────── -->
+  <!-- D3 Charts -->
   <h3>D3 Charts: Deceptive vs. Ethical</h3>
   <p>
     The two charts below show the same 14-major salary dataset side by side. The left uses
@@ -495,7 +477,6 @@
 
   <hr class="thin">
 
-  <!-- Manipulation Analysis ──────────── -->
   <h3>Manipulation Analysis</h3>
   <p>
     The deceptive chart uses four techniques that work together to create a misleading impression.
@@ -540,13 +521,10 @@
 
 <hr>
 
-<!-- ════════════════════════════════════════
-     PART III
-════════════════════════════════════════ -->
 <section id="part-iii">
   <h2>Part III: Modified Data, Chart Literacy, and Real World Analysis</h2>
 
-  <!-- Data Modifications ─────────────── -->
+  <!-- Data Modifications -->
   <h3>Data Modifications</h3>
   <p>
     Three mid-career salary values were changed in <code>data/modified_data.json</code> to support
@@ -594,7 +572,6 @@
 
   <hr class="thin">
 
-  <!-- Chart Literacy Checklist ───────── -->
   <h3>Chart Literacy Checklist</h3>
   <p>
     I use these questions whenever I read a data chart, especially in news articles, social media,
@@ -657,7 +634,6 @@
 
   <hr class="thin">
 
-  <!-- Fox News Real-World Analysis ───── -->
   <h3>Real World Misleading Chart Analysis: Fox News Obamacare Enrollment Chart (2014)</h3>
   <p>
     On March 31, 2014, Fox News aired a bar chart on "America's Newsroom" comparing Obamacare
@@ -729,9 +705,7 @@
 
 <hr>
 
-<!-- ════════════════════════════════════════
-     FOOTER
-════════════════════════════════════════ -->
+
 <footer>
   <strong>Sources</strong><br>
   PayScale / Wall Street Journal, <em>Degrees That Pay Back: Salary Data by College Major</em>
@@ -744,9 +718,7 @@
 <div id="tooltip" class="tooltip"></div>
 
 <script>
-// ─────────────────────────────────────────
-// INVENTED DATA (Part I)
-// ─────────────────────────────────────────
+
 const INVENTED = [
   { week: 1, label: "Week 1", productivity: 62 },
   { week: 2, label: "Week 2", productivity: 65 },
@@ -758,10 +730,7 @@ const INVENTED = [
   { week: 8, label: "Week 8", productivity: 92 }
 ];
 
-// ─────────────────────────────────────────
-// SALARY DATA — inline fallback (Part II / III)
-// Mirrors data/original_data.json and data/modified_data.json
-// ─────────────────────────────────────────
+
 const ORIGINAL = [
   { major:"Biology",                category:"STEM",       startingSalary:38800,  midCareerSalary:64800  },
   { major:"Computer Science",       category:"STEM",       startingSalary:55900,  midCareerSalary:95500  },
@@ -786,9 +755,7 @@ const MODIFIED = ORIGINAL.map(d => {
   return d;
 });
 
-// ─────────────────────────────────────────
-// TOOLTIP HELPERS
-// ─────────────────────────────────────────
+
 const tip = d3.select("#tooltip");
 const fmt = d3.format("$,.0f");
 
@@ -802,9 +769,7 @@ function moveTip(event) {
 }
 function hideTip() { tip.style("opacity", 0); }
 
-// ─────────────────────────────────────────
-// SHORT LABEL MAP (narrow X-axis)
-// ─────────────────────────────────────────
+
 const SHORT = {
   "International Relations": "Intl. Relations",
   "Information Technology":  "Info. Tech.",
@@ -813,10 +778,7 @@ const SHORT = {
 };
 function label(name) { return SHORT[name] || name; }
 
-// ─────────────────────────────────────────
-// DECEPTIVE PRODUCTIVITY BAR CHART (Part I)
-// Techniques: Y axis starts at 60, green gradient implying growth
-// ─────────────────────────────────────────
+
 function drawCDeceptive(data) {
   const vbW = 420, vbH = 290;
   const m = { top: 28, right: 14, bottom: 54, left: 50 };
@@ -839,7 +801,7 @@ function drawCDeceptive(data) {
   g.append("g").attr("class","grid")
    .call(d3.axisLeft(y).ticks(4).tickSize(-W).tickFormat(""));
 
-  // Green gradient: light to dark, implying growth
+  //green gradient: light to dark
   const colorScale = d3.scaleSequential()
     .domain([1, 8])
     .interpolator(d3.interpolateGreens);
@@ -888,10 +850,7 @@ function drawCDeceptive(data) {
     .attr("font-weight","600").text("Wk 8 (high)");
 }
 
-// ─────────────────────────────────────────
-// ETHICAL PRODUCTIVITY BAR CHART (Part I)
-// Y axis from 0, neutral uniform color
-// ─────────────────────────────────────────
+
 function drawCEthical(data) {
   const vbW = 420, vbH = 290;
   const m = { top: 28, right: 14, bottom: 54, left: 50 };
@@ -908,7 +867,7 @@ function drawCEthical(data) {
   const weeks = data.map(d => d.label);
   const x = d3.scaleBand().domain(weeks).range([0, W]).padding(0.22);
 
-  // Honest: full 0 to 100 scale
+  //full 0 to 100 scale
   const y = d3.scaleLinear().domain([0, 100]).range([H, 0]);
 
   g.append("g").attr("class","grid")
@@ -951,9 +910,7 @@ function drawCEthical(data) {
   </div>`;
 }
 
-// ─────────────────────────────────────────
-// DECEPTIVE SALARY CHART (Part II)
-// ─────────────────────────────────────────
+
 function drawDeceptive(data) {
   const sorted = [
     ...data.filter(d => d.category === "Humanities").sort((a,b) => b.midCareerSalary - a.midCareerSalary),
@@ -976,7 +933,7 @@ function drawDeceptive(data) {
   const x0 = d3.scaleBand().domain(majors).range([0, W]).padding(0.22);
   const x1 = d3.scaleBand().domain(["start","mid"]).range([0, x0.bandwidth()]).padding(0.05);
 
-  // Truncated Y axis: starts at $30,000
+  //manipulating
   const y = d3.scaleLinear().domain([30000, 104000]).range([H, 0]);
 
   g.append("g").attr("class","grid")
@@ -1051,9 +1008,7 @@ function drawDeceptive(data) {
   });
 }
 
-// ─────────────────────────────────────────
-// ETHICAL SALARY CHART (Part II)
-// ─────────────────────────────────────────
+
 function drawEthical(data) {
   const sorted = [...data].sort((a,b) => a.major < b.major ? -1 : 1);
   const majors = sorted.map(d => d.major);
@@ -1136,10 +1091,7 @@ function drawEthical(data) {
   });
 }
 
-// ─────────────────────────────────────────
-// OBAMACARE ENROLLMENT CORRECTION (Part III)
-// Horizontal bar chart, X axis from 0
-// ─────────────────────────────────────────
+
 function drawObamacare() {
   const enrollData = [
     { label: "Enrolled (Mar 27, 2014)",    value: 6000000 },
@@ -1159,21 +1111,18 @@ function drawObamacare() {
 
   const g = svg.append("g").attr("transform", `translate(${m.left},${m.top})`);
 
-  // Horizontal: x is the value axis, y is the category axis
   const x = d3.scaleLinear().domain([0, 8000000]).range([0, W]);
   const y = d3.scaleBand()
     .domain(enrollData.map(d => d.label))
     .range([0, H])
     .padding(0.32);
 
-  // Gridlines on x axis
   g.append("g").attr("class","grid")
    .attr("transform", `translate(0,${H})`)
    .call(d3.axisBottom(x).ticks(4).tickSize(-H).tickFormat(""));
 
   const barColors = ["#5d8aa8", "#adb5bd", "#7ba7bc"];
 
-  // Bars
   g.selectAll(".bar")
     .data(enrollData)
     .enter().append("rect")
@@ -1188,7 +1137,6 @@ function drawObamacare() {
     .on("mousemove", moveTip)
     .on("mouseout",  hideTip);
 
-  // Value labels at end of each bar
   g.selectAll(".val-label")
     .data(enrollData)
     .enter().append("text")
@@ -1199,19 +1147,16 @@ function drawObamacare() {
     .attr("fill","#555")
     .text(d => d3.format(",.0f")(d.value));
 
-  // X axis
   const xAxis = g.append("g").attr("class","axis")
     .attr("transform", `translate(0,${H})`)
     .call(d3.axisBottom(x).ticks(4).tickFormat(d => d === 0 ? "0" : (d / 1000000).toFixed(0) + "M"));
   xAxis.select(".domain").remove();
 
-  // X axis label
   g.append("text")
     .attr("x", W / 2).attr("y", H + 30)
     .attr("text-anchor","middle").attr("font-size","8px").attr("fill","#aaa")
     .text("Enrollment / Projection (number of people)");
 
-  // Y axis — category labels
   const yAxis = g.append("g").attr("class","axis")
     .call(d3.axisLeft(y).tickSize(0));
   yAxis.select(".domain").remove();
@@ -1221,15 +1166,9 @@ function drawObamacare() {
     .style("text-anchor","end");
 }
 
-// ─────────────────────────────────────────
-// INIT
-// ─────────────────────────────────────────
-
-// Part I charts use inline invented data
 drawCDeceptive(INVENTED);
 drawCEthical(INVENTED);
 
-// Part II and III charts: try JSON files, fall back to inline constants
 Promise.all([
   d3.json("data/original_data.json").catch(() => null),
   d3.json("data/modified_data.json").catch(() => null)
