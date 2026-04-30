@@ -74,26 +74,42 @@
       border-bottom: 1px solid #ccc;
     }
 
-    .viz-grid {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 16px;
-    }
-
     @media (max-width: 640px) {
-      .viz-grid { grid-template-columns: 1fr; }
       h1 { font-size: 1.4rem; }
     }
 
-    .viz-card {
-      background: #fff;
-      border: 1px solid #ccc;
+    .viz-mockup {
+      background: #f9f9f9;
+      padding: 10px;
     }
 
-    .viz-mockup {
-      background: #f2f2f2;
-      border-bottom: 1px solid #ccc;
-      padding: 10px;
+    .dash-row {
+      display: flex;
+      gap: 20px;
+      padding: 20px 0;
+    }
+
+    .dash-row-border {
+      border-top: 1px solid #e0e0e0;
+    }
+
+    .dash-cell {
+      flex: 1;
+      min-width: 0;
+    }
+
+    .chart-title {
+      font-size: 15px;
+      font-weight: 600;
+      color: #222;
+      margin-bottom: 6px;
+    }
+
+    .chart-caption {
+      font-size: 12px;
+      color: #666;
+      font-style: italic;
+      margin-top: 6px;
     }
 
     .viz-mockup svg {
@@ -104,66 +120,231 @@
       margin: 0 auto;
     }
 
-    .viz-body {
-      padding: 14px 16px 18px;
-    }
+  /* scrollytelling layout */
+  #scrolly-section {
+    max-width: 900px;
+    margin: 32px auto 0;
+    padding: 0 24px 48px;
+    border-top: 1px solid #eee;
+  }
+  #scrolly-section .section-title { margin-bottom: 16px; }
+  #scrolly {
+    display: flex;
+    height: 600px;
+    border: 1px solid #e0e0e0;
+    overflow: hidden;
+  }
+  #sticky-chart {
+    width: 60%;
+    height: 600px;
+    flex-shrink: 0;
+    padding: 14px 16px 12px;
+    background: #fafafa;
+    border-right: 1px solid #e0e0e0;
+    display: flex;
+    flex-direction: column;
+  }
+  #scrolly-linechart-title {
+    font-size: 0.78rem;
+    font-weight: 600;
+    color: #555;
+    margin-bottom: 6px;
+    flex-shrink: 0;
+  }
+  #scrolly-linechart { flex: 1; min-height: 0; display: flex; align-items: center; }
+  #era-buttons { flex-shrink: 0; }
 
-    .viz-number {
-      font-size: 0.72rem;
-      color: #999;
-      margin-bottom: 3px;
-    }
+  #era-timeline {
+    width: 100%;
+    padding: 8px 0 14px;
+    flex-shrink: 0;
+  }
+  .timeline-track {
+    position: relative;
+    width: 100%;
+  }
+  .timeline-line {
+    position: absolute;
+    top: 10px;
+    left: 5%;
+    right: 5%;
+    height: 2px;
+    background: #ddd;
+    z-index: 0;
+  }
+  .timeline-line-fill {
+    position: absolute;
+    top: 10px;
+    left: 5%;
+    height: 2px;
+    background: #ccc;
+    transition: width .3s ease, background .3s ease;
+    z-index: 0;
+    width: 0;
+  }
+  .timeline-dots {
+    display: flex;
+    justify-content: space-between;
+    position: relative;
+    z-index: 1;
+  }
+  .timeline-stop {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    cursor: pointer;
+    flex: 1;
+    gap: 4px;
+  }
+  .timeline-dot {
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    border: 2px solid #ccc;
+    background: white;
+    transition: all .2s ease;
+    flex-shrink: 0;
+  }
+  .timeline-stop.active .timeline-dot {
+    width: 20px;
+    height: 20px;
+    border: none;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.25);
+  }
+  .timeline-stop:hover:not(.active) .timeline-dot {
+    border-color: #999;
+    background: #f0f0f0;
+    transform: scale(1.15);
+  }
+  .timeline-label {
+    font-size: 10px;
+    font-weight: 700;
+    color: #888;
+    text-align: center;
+    line-height: 1.2;
+    transition: color .2s;
+  }
+  .timeline-stop.active .timeline-label { font-weight: 800; }
+  .timeline-year {
+    font-size: 9px;
+    color: #bbb;
+    text-align: center;
+    font-weight: 500;
+  }
+  .timeline-stop.active .timeline-year { font-weight: 600; }
+  #chapters {
+    width: 40%;
+    height: 600px;
+    background: #fff;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding: 24px 20px;
+    border-left: 1px solid #e0e0e0;
+  }
+  .chapter-inner {
+    border-left: 3px solid #ccc;
+    padding: 14px 16px;
+    width: 100%;
+  }
+  .chapter-era {
+    font-size: 0.7rem;
+    font-weight: bold;
+    color: #aaa;
+    text-transform: uppercase;
+    letter-spacing: .05em;
+    margin-bottom: 3px;
+  }
+  .chapter-title {
+    font-size: 0.92rem;
+    font-weight: 700;
+    color: #111;
+    margin-bottom: 7px;
+  }
+  .chapter-text {
+    font-size: 0.86rem;
+    color: #444;
+    line-height: 1.6;
+    margin: 0;
+  }
 
-    .viz-title {
-      font-size: 0.95rem;
-      font-weight: 600;
-      color: #111;
-      margin-bottom: 10px;
-    }
+  /* neighborhood detail panel */
+  #nbr-panel {
+    display: none;
+    position: relative;
+    background: #fff;
+    border: 1px solid #bbb;
+    padding: 12px 14px 12px;
+    margin-top: 8px;
+    font-size: 0.83rem;
+  }
+  #nbr-panel-close {
+    position: absolute;
+    top: 6px; right: 8px;
+    background: none; border: none;
+    font-size: 1rem; cursor: pointer;
+    color: #999; line-height: 1; padding: 0 3px;
+  }
+  #nbr-panel-close:hover { color: #222; }
+  #nbr-panel h4 {
+    font-size: 0.92rem; font-weight: 700;
+    color: #111; margin: 0 18px 2px 0;
+  }
+  #nbr-panel .nbr-total { font-size: 0.78rem; color: #777; margin-bottom: 9px; }
+  #nbr-panel .nbr-section-label {
+    font-size: 0.7rem; font-weight: bold;
+    color: #999; text-transform: uppercase;
+    letter-spacing: .04em; margin-bottom: 4px;
+  }
+  #nbr-panel .nbr-reason-list {
+    list-style: none; margin: 0 0 9px 0; padding: 0;
+  }
+  #nbr-panel .nbr-reason-list li {
+    display: flex; justify-content: space-between;
+    padding: 2px 0; border-bottom: 1px solid #f0f0f0; color: #333;
+  }
+  #nbr-panel .nbr-compare {
+    font-size: 0.8rem; color: #444;
+    padding-top: 8px; border-top: 1px solid #eee; margin: 0;
+  }
+  .map-path-selected { stroke: #111 !important; stroke-width: 2 !important; }
+  #map-container svg path { cursor: pointer; }
 
-    .meta-table {
-      width: 100%;
-      border-collapse: collapse;
-      font-size: 0.8rem;
-    }
+  /* stacked area filter header */
+  #stacked-header {
+    display: flex; align-items: center; gap: 8px;
+    padding: 5px 10px; min-height: 26px;
+    background: #f8f8f8; border-bottom: 1px solid #e8e8e8;
+  }
+  #stacked-filter-label {
+    font-size: 0.75rem; color: #555;
+    font-style: italic; flex: 1;
+  }
+  #stacked-show-all {
+    display: none; font-size: 0.7rem;
+    padding: 2px 8px; background: #fff;
+    border: 1px solid #bbb; cursor: pointer; color: #333;
+  }
+  #stacked-show-all:hover { background: #f0f0f0; }
 
-    .meta-table tr { border-top: 1px solid #eee; }
-    .meta-table tr:first-child { border-top: none; }
+  /* year slider */
+  #bar-filter {
+    padding: 7px 10px 10px;
+    background: #f8f8f8;
+    border-bottom: 1px solid #e0e0e0;
+    font-size: 0.8rem;
+  }
+  .bar-filter-label { display: block; font-weight: 600; color: #555; margin-bottom: 6px; }
+  #yr-range-display { color: #c0392b; font-weight: 700; }
+  .bar-slider-row { display: flex; align-items: center; gap: 8px; }
+  .yr-lbl { font-size: 0.74rem; color: #888; white-space: nowrap; flex-shrink: 0; }
+  .bar-slider-row input[type=range] { flex: 1; }
 
-    .meta-table th {
-      text-align: left;
-      font-weight: 600;
-      color: #555;
-      padding: 4px 8px 4px 0;
-      width: 68px;
-      vertical-align: top;
-      white-space: nowrap;
-    }
-
-    .meta-table td {
-      color: #333;
-      padding: 4px 0;
-      vertical-align: top;
-    }
-
-    .obj-badge {
-      display: inline-block;
-      font-size: 0.7rem;
-      padding: 1px 5px;
-      border: 1px solid #bbb;
-      color: #444;
-      margin-right: 3px;
-      margin-bottom: 2px;
-      white-space: nowrap;
-    }
-
-    code {
-      font-family: 'Consolas', 'Courier New', monospace;
-      font-size: 0.76rem;
-      background: #f0f0f0;
-      padding: 1px 3px;
-      color: #333;
-    }
+  @media (max-width: 640px) {
+    #scrolly { flex-direction: column; height: auto; }
+    #sticky-chart { width: 100%; height: 320px; }
+    #chapters { width: 100%; height: 400px; }
+  }
   </style>
 </head>
 <body>
@@ -187,105 +368,65 @@
   </div>
 </header>
 
+<section id="scrolly-section">
+  <p class="section-title" style="margin-bottom:16px;">The Story in Five Chapters</p>
+  <div id="scrolly">
+    <div id="sticky-chart">
+      <div id="era-buttons"></div>
+      <p id="scrolly-linechart-title">Evictions per year, 1997–2026</p>
+      <div id="scrolly-linechart"></div>
+    </div>
+    <div id="chapters"></div>
+  </div>
+</section>
+
 <main>
-  <p class="section-title">Planned Visualizations</p>
+  <p class="section-title">Continue the Story</p>
 
-  <div class="viz-grid">
-
-    <!-- Viz 1: Choropleth Map -->
-    <div class="viz-card">
+  <!-- map + stacked area -->
+  <div class="dash-row">
+    <div class="dash-cell">
+      <p class="chart-title">Evictions by Neighborhood</p>
       <div class="viz-mockup">
         <div id="map-container"></div>
+        <div id="nbr-panel">
+          <button id="nbr-panel-close" title="Close">×</button>
+          <h4></h4>
+          <div class="nbr-total"></div>
+          <div class="nbr-section-label">Top 3 eviction reasons</div>
+          <ul class="nbr-reason-list"></ul>
+          <p class="nbr-compare"></p>
+        </div>
       </div>
-      <div class="viz-body">
-        <p class="viz-number">Visualization 1</p>
-        <p class="viz-title">Choropleth Map: Eviction Density by Neighborhood</p>
-        <table class="meta-table">
-          <tr>
-            <th>Objectives</th>
-            <td>
-              <span class="obj-badge">Obj 1: Temporal Trends</span>
-              <span class="obj-badge">Obj 2: Geographic Displacement</span>
-            </td>
-          </tr>
-          <tr>
-            <th>Data</th>
-            <td><code>Neighborhoods Analysis Boundaries</code>, <code>File Date</code> (year), eviction count per neighborhood per year</td>
-          </tr>
-        </table>
-      </div>
+      <p class="chart-caption">Click a neighborhood to see its eviction breakdown.</p>
     </div>
-
-    <!-- Viz 2: Line Chart -->
-    <div class="viz-card">
-      <div class="viz-mockup">
-        <div id="linechart-container"></div>
-      </div>
-      <div class="viz-body">
-        <p class="viz-number">Visualization 2</p>
-        <p class="viz-title">Line Chart: Evictions Over Time (1997 to 2026)</p>
-        <table class="meta-table">
-          <tr>
-            <th>Objectives</th>
-            <td>
-              <span class="obj-badge">Obj 1: Temporal Trends</span>
-              <span class="obj-badge">Obj 4: Policy Impact</span>
-            </td>
-          </tr>
-          <tr>
-            <th>Data</th>
-            <td><code>File Date</code> parsed to year, count of records per year</td>
-          </tr>
-        </table>
-      </div>
-    </div>
-
-    <!-- Viz 3: Stacked Area Chart -->
-    <div class="viz-card">
+    <div class="dash-cell">
+      <p class="chart-title">Evictions by Reason Over Time</p>
       <div class="viz-mockup">
         <div id="stacked-container"></div>
       </div>
-      <div class="viz-body">
-        <p class="viz-number">Visualization 3</p>
-        <p class="viz-title">Stacked Area Chart: Eviction Reasons Over Time</p>
-        <table class="meta-table">
-          <tr>
-            <th>Objectives</th>
-            <td>
-              <span class="obj-badge">Obj 3: Eviction Mechanisms</span>
-            </td>
-          </tr>
-          <tr>
-            <th>Data</th>
-            <td>Boolean reason columns: <code>owner_move_in</code>, <code>breach</code>, <code>ellis_act_withdrawal</code>, <code>non_payment</code>, etc. grouped by year</td>
-          </tr>
-        </table>
-      </div>
+      <p class="chart-caption">Stacked area showing the mix of eviction reasons, 1997–2026. Filters when you click a neighborhood.</p>
     </div>
+  </div>
 
-    <div class="viz-card">
+  <!-- line chart + bar chart -->
+  <div class="dash-row dash-row-border">
+    <div class="dash-cell">
+      <p class="chart-title">Annual Evictions, 1997–2026</p>
+      <div class="viz-mockup">
+        <div id="linechart-container"></div>
+      </div>
+      <p class="chart-caption">Hover over the chart to see exact counts for each year.</p>
+    </div>
+    <div class="dash-cell">
+      <p class="chart-title">Top Neighborhoods by Evictions</p>
       <div class="viz-mockup">
         <div id="barchart-container"></div>
       </div>
-      <div class="viz-body">
-        <p class="viz-number">Visualization 4</p>
-        <p class="viz-title">Horizontal Bar Chart: Top Neighborhoods by Evictions</p>
-        <table class="meta-table">
-          <tr>
-            <th>Objectives</th>
-            <td>
-              <span class="obj-badge">Obj 2: Geographic Displacement</span>
-            </td>
-          </tr>
-          <tr>
-            <th>Data</th>
-            <td><code>Neighborhoods Analysis Boundaries</code>, count per neighborhood, filterable by year range</td>
-          </tr>
-        </table>
-      </div>
+      <p class="chart-caption">Ranked by total eviction notices. Use the year filter to narrow the period.</p>
     </div>
-
   </div>
+
 </main>
 
 <script>
@@ -293,6 +434,34 @@ function showError(containerId, msg) {
   var el = document.getElementById(containerId);
   el.innerHTML = '<svg viewBox="0 0 400 220" width="100%" style="max-width:420px;display:block;margin:0 auto"><text x="200" y="115" text-anchor="middle" font-size="13" fill="#aaa" font-family="system-ui">' + (msg || 'Data not loaded') + '</text></svg>';
 }
+
+function makeSVG(container, W, H) {
+  return d3.select(container).append('svg')
+    .attr('viewBox', '0 0 ' + W + ' ' + H)
+    .attr('width', '100%')
+    .style('max-width', W + 'px')
+    .style('display', 'block')
+    .style('margin', '0 auto');
+}
+
+function styleAxis(ax) {
+  ax.select('.domain').attr('stroke', '#bbb');
+  ax.selectAll('text').attr('font-size', 9).attr('fill', '#666').attr('font-family', 'system-ui');
+  ax.selectAll('line').attr('stroke', '#ccc');
+}
+
+// geo names in the shapefile don't always match the rent board data
+var MAP_NAME_MAP = {
+  'Bayview': 'Bayview Hunters Point',
+  'Parkside': 'Sunset/Parkside',
+  'Outer Sunset': 'Sunset/Parkside',
+  'Financial District': 'Financial District/South Beach',
+  'Treasure Island/YBI': 'Treasure Island',
+  'Downtown/Civic Center': 'Tenderloin',
+  'Crocker Amazon': 'Excelsior',
+  'Ocean View': 'Oceanview/Merced/Ingleside',
+  'Diamond Heights': 'Castro/Upper Market'
+};
 
 (async function drawMap() {
   var container = document.getElementById('map-container');
@@ -306,48 +475,47 @@ function showError(containerId, msg) {
     return;
   }
 
-  var nameMap = {
-    'Bayview': 'Bayview Hunters Point',
-    'Parkside': 'Sunset/Parkside',
-    'Outer Sunset': 'Sunset/Parkside',
-    'Financial District': 'Financial District/South Beach',
-    'Treasure Island/YBI': 'Treasure Island',
-    'Downtown/Civic Center': 'Tenderloin'
-  };
-
   var totalByNeighborhood = {};
   summary.forEach(function(d) { totalByNeighborhood[d.neighborhood] = d.total; });
 
+  // these three aren't tracked separately by the rent board
+  var mergedNeighborhoods = ['Crocker Amazon', 'Ocean View', 'Diamond Heights'];
+
   geo.features.forEach(function(f) {
     var geoName = f.properties.name;
-    var lookupName = nameMap[geoName] || geoName;
+    var lookupName = MAP_NAME_MAP[geoName] || geoName;
     f.properties.total = totalByNeighborhood[lookupName] || 0;
+    f.properties.isMerged = mergedNeighborhoods.indexOf(geoName) !== -1;
   });
 
   var W = 400, H = 240;
-  var svg = d3.select(container).append('svg')
-    .attr('viewBox', '0 0 ' + W + ' ' + H)
-    .attr('width', '100%')
-    .style('max-width', W + 'px')
-    .style('display', 'block')
-    .style('margin', '0 auto');
+  var svg = makeSVG(container, W, H);
 
   var maxTotal = d3.max(summary, function(d) { return d.total; });
   var colorScale = d3.scaleSequential(d3.interpolateBlues).domain([0, maxTotal]);
 
-  // Leave 55px on the right for the legend
+  // leave 55px on the right for the legend
   var projection = d3.geoMercator().fitExtent([[0, 5], [W - 55, H - 5]], geo);
   var path = d3.geoPath().projection(projection);
 
-  svg.selectAll('path')
+  var paths = svg.selectAll('path')
     .data(geo.features)
     .join('path')
       .attr('d', path)
-      .attr('fill', function(d) { return d.properties.total > 0 ? colorScale(d.properties.total) : '#e8e8e8'; })
+      .attr('fill', function(d) {
+        if (d.properties.isMerged) return '#d8d8d8';
+        return d.properties.total > 0 ? colorScale(d.properties.total) : '#e0e0e0';
+      })
       .attr('stroke', '#fff')
       .attr('stroke-width', 0.6);
 
-  // Gradient legend
+  paths.filter(function(d) { return d.properties.isMerged; })
+    .append('title')
+    .text(function(d) {
+      return d.properties.name + ': No separate data available.\nBoundaries use SF Rent Board analysis districts.';
+    });
+
+  // gradient legend
   var defs = svg.append('defs');
   var grad = defs.append('linearGradient')
     .attr('id', 'map-legend-grad')
@@ -395,13 +563,7 @@ function showError(containerId, msg) {
   var iw = W - margin.left - margin.right;
   var ih = H - margin.top - margin.bottom;
 
-  var svg = d3.select(container).append('svg')
-    .attr('viewBox', '0 0 ' + W + ' ' + H)
-    .attr('width', '100%')
-    .style('max-width', W + 'px')
-    .style('display', 'block')
-    .style('margin', '0 auto');
-
+  var svg = makeSVG(container, W, H);
   var g = svg.append('g').attr('transform', 'translate(' + margin.left + ',' + margin.top + ')');
 
   var x = d3.scaleLinear()
@@ -412,6 +574,7 @@ function showError(containerId, msg) {
     .domain([0, d3.max(data, function(d) { return d.count; }) * 1.12])
     .range([ih, 0]);
 
+  // shaded area under the line
   var area = d3.area()
     .x(function(d) { return x(d.year); })
     .y0(ih)
@@ -421,10 +584,9 @@ function showError(containerId, msg) {
   g.append('path')
     .datum(data)
     .attr('d', area)
-    .attr('fill', '#ddd')
-    .attr('opacity', 0.7);
+    .attr('fill', '#2471a3')
+    .attr('opacity', 0.12);
 
-  
   var line = d3.line()
     .x(function(d) { return x(d.year); })
     .y(function(d) { return y(d.count); })
@@ -434,181 +596,110 @@ function showError(containerId, msg) {
     .datum(data)
     .attr('d', line)
     .attr('fill', 'none')
-    .attr('stroke', '#555')
+    .attr('stroke', '#2471a3')
     .attr('stroke-width', 1.8);
 
   g.append('g')
     .attr('transform', 'translate(0,' + ih + ')')
     .call(d3.axisBottom(x).tickFormat(d3.format('d')).ticks(7))
-    .call(function(ax) { ax.select('.domain').attr('stroke', '#bbb'); })
-    .call(function(ax) { ax.selectAll('text').attr('font-size', 9).attr('fill', '#666'); })
-    .call(function(ax) { ax.selectAll('line').attr('stroke', '#ccc'); });
+    .call(styleAxis);
 
   g.append('g')
     .call(d3.axisLeft(y).ticks(5).tickFormat(function(d) { return d >= 1000 ? d / 1000 + 'k' : d; }))
-    .call(function(ax) { ax.select('.domain').attr('stroke', '#bbb'); })
-    .call(function(ax) { ax.selectAll('text').attr('font-size', 9).attr('fill', '#666'); })
-    .call(function(ax) { ax.selectAll('line').attr('stroke', '#ccc'); });
+    .call(styleAxis);
 
   g.append('text')
     .attr('x', iw / 2).attr('y', ih + 30)
     .attr('text-anchor', 'middle')
-    .attr('font-size', 9).attr('fill', '#777')
-    .attr('font-family', 'system-ui')
+    .attr('font-size', 9).attr('fill', '#777').attr('font-family', 'system-ui')
     .text('Year');
 
   g.append('text')
     .attr('transform', 'rotate(-90)')
     .attr('x', -ih / 2).attr('y', -36)
     .attr('text-anchor', 'middle')
-    .attr('font-size', 9).attr('fill', '#777')
-    .attr('font-family', 'system-ui')
+    .attr('font-size', 9).attr('fill', '#777').attr('font-family', 'system-ui')
     .text('Eviction notices');
 
-  //annotations
+  // dot-com annotation
   var dotcomYear = 1999;
   var dotcomRow = data.find(function(d) { return d.year === dotcomYear; });
   if (dotcomRow) {
+    var dcx = x(dotcomYear), dcy = y(dotcomRow.count);
+    g.append('circle')
+      .attr('cx', dcx).attr('cy', dcy).attr('r', 4)
+      .attr('fill', '#e07b39').attr('stroke', '#fff').attr('stroke-width', 1.5);
     g.append('line')
-      .attr('x1', x(dotcomYear)).attr('x2', x(dotcomYear))
-      .attr('y1', y(dotcomRow.count)).attr('y2', y(dotcomRow.count) - 18)
-      .attr('stroke', '#999').attr('stroke-width', 0.8).attr('stroke-dasharray', '2,2');
+      .attr('x1', dcx).attr('x2', dcx)
+      .attr('y1', dcy - 5).attr('y2', dcy - 26)
+      .attr('stroke', '#e07b39').attr('stroke-width', 1.4).attr('stroke-dasharray', '3,2');
     g.append('text')
-      .attr('x', x(dotcomYear)).attr('y', y(dotcomRow.count) - 21)
+      .attr('x', dcx).attr('y', dcy - 30)
       .attr('text-anchor', 'middle')
-      .attr('font-size', 8).attr('fill', '#888')
-      .attr('font-family', 'system-ui')
+      .attr('font-size', 9.5).attr('fill', '#e07b39')
+      .attr('font-family', 'system-ui').attr('font-weight', '700')
       .text('Dot-com peak');
   }
 
+  // covid annotation
   var covidYear = 2020;
   var covidRow = data.find(function(d) { return d.year === covidYear; });
   if (covidRow) {
+    var cvx = x(covidYear), cvy = y(covidRow.count);
+    g.append('circle')
+      .attr('cx', cvx).attr('cy', cvy).attr('r', 4)
+      .attr('fill', '#9C27B0').attr('stroke', '#fff').attr('stroke-width', 1.5);
     g.append('line')
-      .attr('x1', x(covidYear)).attr('x2', x(covidYear))
-      .attr('y1', y(covidRow.count)).attr('y2', y(covidRow.count) - 18)
-      .attr('stroke', '#999').attr('stroke-width', 0.8).attr('stroke-dasharray', '2,2');
+      .attr('x1', cvx).attr('x2', cvx)
+      .attr('y1', cvy - 5).attr('y2', cvy - 26)
+      .attr('stroke', '#9C27B0').attr('stroke-width', 1.4).attr('stroke-dasharray', '3,2');
     g.append('text')
-      .attr('x', x(covidYear)).attr('y', y(covidRow.count) - 21)
+      .attr('x', cvx).attr('y', cvy - 30)
       .attr('text-anchor', 'middle')
-      .attr('font-size', 8).attr('fill', '#888')
-      .attr('font-family', 'system-ui')
+      .attr('font-size', 9.5).attr('fill', '#9C27B0')
+      .attr('font-family', 'system-ui').attr('font-weight', '700')
       .text('COVID drop');
   }
-})();
 
+  // hover: vertical line + dot + label
+  var bisect = d3.bisector(function(d) { return d.year; }).left;
 
-(async function drawStackedArea() {
-  var container = document.getElementById('stacked-container');
-  var data;
-  try {
-    data = await d3.json('data/evictions_by_reason_year.json');
-  } catch(e) {
-    console.error('Stacked area data error:', e);
-    showError('stacked-container');
-    return;
-  }
+  var hoverLine = g.append('line')
+    .attr('y1', 0).attr('y2', ih)
+    .attr('stroke', '#333').attr('stroke-width', 1).attr('stroke-dasharray', '4,3')
+    .style('opacity', 0).style('pointer-events', 'none');
 
-  var reasonTotals = d3.rollup(
-    data.filter(function(d) { return d.reason !== 'Other'; }),
-    function(v) { return d3.sum(v, function(d) { return d.count; }); },
-    function(d) { return d.reason; }
-  );
-  var sortedReasons = Array.from(reasonTotals.entries()).sort(function(a, b) { return b[1] - a[1]; });
-  var top5 = sortedReasons.slice(0, 5).map(function(d) { return d[0]; });
-  var rest  = sortedReasons.slice(5).map(function(d) { return d[0]; });
-  rest.push('Other');
+  var hoverDot = g.append('circle')
+    .attr('r', 4).attr('fill', '#2471a3').attr('stroke', '#fff').attr('stroke-width', 1.5)
+    .style('opacity', 0).style('pointer-events', 'none');
 
-  var years = Array.from(new Set(data.map(function(d) { return d.year; }))).sort(function(a, b) { return a - b; });
+  var hoverLabel = g.append('text')
+    .attr('font-size', 10).attr('fill', '#111').attr('font-family', 'system-ui').attr('font-weight', '600')
+    .style('opacity', 0).style('pointer-events', 'none');
 
-  var pivoted = years.map(function(yr) {
-    var yearRows = data.filter(function(d) { return d.year === yr; });
-    var row = { year: yr };
-    top5.forEach(function(reason) {
-      var found = yearRows.find(function(d) { return d.reason === reason; });
-      row[reason] = found ? found.count : 0;
+  g.append('rect')
+    .attr('width', iw).attr('height', ih).attr('fill', 'none').attr('pointer-events', 'all')
+    .on('mousemove', function(event) {
+      var mx = d3.pointer(event)[0];
+      var yr = x.invert(mx);
+      var i = bisect(data, yr, 1);
+      var d0 = data[i - 1], d1 = data[i];
+      var d = (!d0 || (d1 && Math.abs(yr - d1.year) < Math.abs(yr - d0.year))) ? d1 : d0;
+      if (!d) return;
+      var cx = x(d.year), cy = y(d.count);
+      hoverLine.attr('x1', cx).attr('x2', cx).style('opacity', 1);
+      hoverDot.attr('cx', cx).attr('cy', cy).style('opacity', 1);
+      var lx = cx > iw * 0.72 ? cx - 6 : cx + 6;
+      var anchor = cx > iw * 0.72 ? 'end' : 'start';
+      var ly = cy > ih * 0.25 ? cy - 10 : cy + 16;
+      hoverLabel.attr('x', lx).attr('y', ly).attr('text-anchor', anchor)
+        .text(d.year + ': ' + d.count.toLocaleString()).style('opacity', 1);
+    })
+    .on('mouseleave', function() {
+      hoverLine.style('opacity', 0);
+      hoverDot.style('opacity', 0);
+      hoverLabel.style('opacity', 0);
     });
-    var otherSum = yearRows
-      .filter(function(d) { return rest.indexOf(d.reason) !== -1; })
-      .reduce(function(s, d) { return s + d.count; }, 0);
-    row['Other'] = otherSum;
-    return row;
-  });
-
-  var keys = top5.concat(['Other']);
-  var colors = ['#4a7fa0', '#7aa3bc', '#a3c4d6', '#c5dce8', '#deedf5', '#c8c8c8'];
-
-  var stack = d3.stack().keys(keys);
-  var series = stack(pivoted);
-
-  var margin = { top: 20, right: 105, bottom: 36, left: 40 };
-  var W = 400, H = 240;
-  var iw = W - margin.left - margin.right;
-  var ih = H - margin.top - margin.bottom;
-
-  var svg = d3.select(container).append('svg')
-    .attr('viewBox', '0 0 ' + W + ' ' + H)
-    .attr('width', '100%')
-    .style('max-width', W + 'px')
-    .style('display', 'block')
-    .style('margin', '0 auto');
-
-  var g = svg.append('g').attr('transform', 'translate(' + margin.left + ',' + margin.top + ')');
-
-  var x = d3.scaleLinear().domain(d3.extent(years)).range([0, iw]);
-
-  var yMax = d3.max(series, function(s) { return d3.max(s, function(d) { return d[1]; }); });
-  var y = d3.scaleLinear().domain([0, yMax]).range([ih, 0]);
-
-  var area = d3.area()
-    .x(function(d) { return x(d.data.year); })
-    .y0(function(d) { return y(d[0]); })
-    .y1(function(d) { return y(d[1]); })
-    .curve(d3.curveMonotoneX);
-
-  g.selectAll('.area')
-    .data(series)
-    .join('path')
-      .attr('class', 'area')
-      .attr('d', area)
-      .attr('fill', function(d, i) { return colors[i]; });
-
-  // X axis
-  g.append('g')
-    .attr('transform', 'translate(0,' + ih + ')')
-    .call(d3.axisBottom(x).tickFormat(d3.format('d')).ticks(7))
-    .call(function(ax) { ax.select('.domain').attr('stroke', '#bbb'); })
-    .call(function(ax) { ax.selectAll('text').attr('font-size', 9).attr('fill', '#666'); })
-    .call(function(ax) { ax.selectAll('line').attr('stroke', '#ccc'); });
-
-  g.append('g')
-    .call(d3.axisLeft(y).ticks(5).tickFormat(function(d) { return d >= 1000 ? d / 1000 + 'k' : d; }))
-    .call(function(ax) { ax.select('.domain').attr('stroke', '#bbb'); })
-    .call(function(ax) { ax.selectAll('text').attr('font-size', 9).attr('fill', '#666'); })
-    .call(function(ax) { ax.selectAll('line').attr('stroke', '#ccc'); });
-
-  g.append('text')
-    .attr('transform', 'rotate(-90)')
-    .attr('x', -ih / 2).attr('y', -32)
-    .attr('text-anchor', 'middle')
-    .attr('font-size', 9).attr('fill', '#777')
-    .attr('font-family', 'system-ui')
-    .text('Eviction notices');
-
-  var legend = g.append('g').attr('transform', 'translate(' + (iw + 8) + ', 10)');
-  keys.forEach(function(k, i) {
-    var ly = i * 20;
-    legend.append('rect')
-      .attr('x', 0).attr('y', ly)
-      .attr('width', 10).attr('height', 10)
-      .attr('fill', colors[i]);
-    var label = k.length > 13 ? k.slice(0, 12) + '…' : k;
-    legend.append('text')
-      .attr('x', 13).attr('y', ly + 9)
-      .attr('font-size', 8).attr('fill', '#444')
-      .attr('font-family', 'system-ui')
-      .text(label);
-  });
 })();
 
 
@@ -630,57 +721,535 @@ function showError(containerId, msg) {
   var iw = W - margin.left - margin.right;
   var ih = H - margin.top - margin.bottom;
 
-  var svg = d3.select(container).append('svg')
-    .attr('viewBox', '0 0 ' + W + ' ' + H)
-    .attr('width', '100%')
-    .style('max-width', W + 'px')
-    .style('display', 'block')
-    .style('margin', '0 auto');
-
+  var svg = makeSVG(container, W, H);
   var g = svg.append('g').attr('transform', 'translate(' + margin.left + ',' + margin.top + ')');
 
   var x = d3.scaleLinear()
     .domain([0, d3.max(top10, function(d) { return d.total; })])
     .range([0, iw]);
-
   var y = d3.scaleBand()
     .domain(top10.map(function(d) { return d.neighborhood; }))
-    .range([0, ih])
-    .padding(0.28);
+    .range([0, ih]).padding(0.28);
 
-  g.selectAll('rect')
-    .data(top10)
-    .join('rect')
-      .attr('y', function(d) { return y(d.neighborhood); })
-      .attr('width', function(d) { return x(d.total); })
-      .attr('height', y.bandwidth())
-      .attr('fill', '#6a9bb5');
+  g.selectAll('rect').data(top10).join('rect')
+    .attr('y', function(d) { return y(d.neighborhood); })
+    .attr('width', function(d) { return x(d.total); })
+    .attr('height', y.bandwidth()).attr('fill', '#6a9bb5');
 
-  g.selectAll('.bar-label')
-    .data(top10)
-    .join('text')
-      .attr('class', 'bar-label')
-      .attr('x', function(d) { return x(d.total) + 4; })
-      .attr('y', function(d) { return y(d.neighborhood) + y.bandwidth() / 2 + 4; })
-      .attr('font-size', 8)
-      .attr('fill', '#555')
-      .attr('font-family', 'system-ui')
-      .text(function(d) { return d3.format(',')(d.total); });
+  g.selectAll('.bar-label').data(top10).join('text')
+    .attr('class', 'bar-label')
+    .attr('x', function(d) { return x(d.total) + 4; })
+    .attr('y', function(d) { return y(d.neighborhood) + y.bandwidth() / 2 + 4; })
+    .attr('font-size', 8).attr('fill', '#555').attr('font-family', 'system-ui')
+    .text(function(d) { return d3.format(',')(d.total); });
 
   g.append('g')
     .attr('transform', 'translate(0,' + ih + ')')
     .call(d3.axisBottom(x).ticks(5).tickFormat(function(d) { return d >= 1000 ? d / 1000 + 'k' : d; }))
-    .call(function(ax) { ax.select('.domain').attr('stroke', '#bbb'); })
-    .call(function(ax) { ax.selectAll('text').attr('font-size', 9).attr('fill', '#666'); })
-    .call(function(ax) { ax.selectAll('line').attr('stroke', '#ccc'); });
+    .call(styleAxis);
 
   g.append('g')
-    .call(d3.axisLeft(y)
-      .tickSize(0)
-      .tickFormat(function(d) { return d.length > 15 ? d.slice(0, 14) + '…' : d; })
-    )
-    .call(function(ax) { ax.select('.domain').remove(); })
-    .call(function(ax) { ax.selectAll('text').attr('font-size', 8.5).attr('fill', '#444'); });
+    .call(d3.axisLeft(y).tickSize(0).tickFormat(function(d) { return d.length > 15 ? d.slice(0, 14) + '…' : d; }))
+    .call(function(ax) { ax.select('.domain').remove(); ax.selectAll('text').attr('font-size', 8.5).attr('fill', '#444'); });
+})();
+
+
+// shared app state used by the scrollytelling and interactive charts
+var _APP = {
+  yearData: null,
+  nbrReasonData: null,
+  nbrYearData: null,
+  summaryData: null,
+  evictionsByReasonYear: null,
+  selectedNeighborhood: null,
+  scrollyG: null, scrollyX: null, scrollyY: null,
+  scrollyIW: 0, scrollyIH: 0,
+  scrollyLineFn: null, scrollyAreaFn: null
+};
+
+// data for the 5 era chapters
+var CHAPTERS = [
+  { era: '1997–2026', title: 'Introduction',     text: 'San Francisco has filed over 48,000 eviction notices since 1997. Click each era to explore the story of displacement.',                                                         yearMin: 1997, yearMax: 2026, color: '#666666', annotation: null },
+  { era: '1997–2003', title: 'Dot-com Boom',     text: 'The late 1990s tech explosion pushed evictions to a peak of nearly 3,000 notices in 1998, the highest count in recorded history.',                                                  yearMin: 1997, yearMax: 2003, color: '#e07b39', annotation: 'Dot-com peak: 2,911 (1998)' },
+  { era: '2013–2016', title: 'Tech Surge',       text: 'A second wave hit as major tech IPOs flooded the Bay Area with capital. Evictions climbed back toward 2,000 per year.',                                                        yearMin: 2013, yearMax: 2016, color: '#2196F3', annotation: 'Tech Surge peak: 2,135 (2015)' },
+  { era: '2020–2022', title: 'COVID Moratorium', text: 'The pandemic brought an emergency eviction moratorium. Filings dropped sharply, marking the steepest single-year decline ever recorded.',                                                yearMin: 2020, yearMax: 2022, color: '#9C27B0', annotation: 'COVID moratorium: filings dropped 60%' },
+  { era: '2023–2026', title: 'Recovery',         text: 'As the moratorium ended, evictions returned to pre-pandemic levels, with no-fault evictions rising. Data runs through early 2026. With the AI boom now reshaping the Bay Area economy, historical patterns suggest another wave of displacement may be underway.',                yearMin: 2023, yearMax: 2026, color: '#4CAF50', annotation: 'Recovery: no-fault evictions rising' }
+];
+
+function buildScrollyLineChart(data) {
+  var container = document.getElementById('scrolly-linechart');
+  if (!container || !data) return;
+  var margin = { top: 28, right: 18, bottom: 38, left: 46 };
+  var W = 440, H = 290;
+  var iw = W - margin.left - margin.right;
+  var ih = H - margin.top - margin.bottom;
+
+  var svg = d3.select(container).append('svg')
+    .attr('viewBox', '0 0 ' + W + ' ' + H)
+    .attr('width', '100%').style('display', 'block');
+
+  var g = svg.append('g').attr('transform', 'translate(' + margin.left + ',' + margin.top + ')');
+
+  var x = d3.scaleLinear()
+    .domain(d3.extent(data, function(d) { return d.year; })).range([0, iw]);
+  var y = d3.scaleLinear()
+    .domain([0, d3.max(data, function(d) { return d.count; }) * 1.15]).range([ih, 0]);
+
+  var areaFn = d3.area().x(function(d){ return x(d.year); }).y0(ih).y1(function(d){ return y(d.count); }).curve(d3.curveMonotoneX);
+  var lineFn = d3.line().x(function(d){ return x(d.year); }).y(function(d){ return y(d.count); }).curve(d3.curveMonotoneX);
+
+  // layers from bottom to top: gray area, era band, gray line, era highlight, annotation
+  g.append('path').attr('class', 'main-area')
+    .datum(data).attr('d', areaFn)
+    .attr('fill', '#e8e8e8').attr('opacity', 1);
+
+  g.append('rect').attr('class', 'scrolly-band')
+    .attr('y', 0).attr('height', ih).attr('x', 0).attr('width', 0)
+    .attr('fill', '#555').attr('opacity', 0.15);
+
+  g.append('path').attr('class', 'main-line')
+    .datum(data).attr('d', lineFn)
+    .attr('fill', 'none').attr('stroke', '#cccccc').attr('stroke-width', 1.5);
+
+  g.append('g').attr('class', 'era-highlight-group');
+  g.append('g').attr('class', 'scrolly-ann');
+
+  g.append('g').attr('transform', 'translate(0,' + ih + ')')
+    .call(d3.axisBottom(x).tickFormat(d3.format('d')).ticks(7))
+    .call(function(ax){ ax.select('.domain').attr('stroke','#ccc'); ax.selectAll('text').attr('font-size',9).attr('fill','#777').attr('font-family','system-ui'); ax.selectAll('line').attr('stroke','#ddd'); });
+
+  g.append('g')
+    .call(d3.axisLeft(y).ticks(5).tickFormat(function(d){ return d>=1000 ? d/1000+'k' : d; }))
+    .call(function(ax){ ax.select('.domain').attr('stroke','#ccc'); ax.selectAll('text').attr('font-size',9).attr('fill','#777').attr('font-family','system-ui'); ax.selectAll('line').attr('stroke','#ddd'); });
+
+  _APP.scrollyG = g; _APP.scrollyX = x; _APP.scrollyY = y;
+  _APP.scrollyIW = iw; _APP.scrollyIH = ih;
+  _APP.scrollyLineFn = lineFn; _APP.scrollyAreaFn = areaFn;
+}
+
+function highlightChapter(idx) {
+  var ch = CHAPTERS[idx] || CHAPTERS[0];
+  if (!_APP.scrollyG || !_APP.yearData) return;
+  var data = _APP.yearData;
+  var g = _APP.scrollyG;
+  var x = _APP.scrollyX, y = _APP.scrollyY, iw = _APP.scrollyIW;
+  var color = ch.color;
+  var lineFn = _APP.scrollyLineFn;
+  var areaFn = _APP.scrollyAreaFn;
+
+  g.select('.main-line').attr('stroke', '#cccccc').attr('stroke-width', 1.5);
+  g.select('.main-area').attr('fill', '#e8e8e8').attr('opacity', 1);
+  g.select('.scrolly-band').attr('width', 0);
+  g.select('.era-highlight-group').selectAll('*').remove();
+  g.select('.scrolly-ann').selectAll('*').remove();
+
+  if (idx === 0) {
+    // intro shows the whole line in gray, no era coloring
+    g.select('.main-line').attr('stroke', '#666666').attr('stroke-width', 2);
+    return;
+  }
+
+  g.select('.scrolly-band')
+    .attr('x', x(ch.yearMin))
+    .attr('width', Math.max(0, x(ch.yearMax) - x(ch.yearMin)))
+    .attr('fill', color).attr('opacity', 0.15);
+
+  var seg = data.filter(function(d){ return d.year >= ch.yearMin && d.year <= ch.yearMax; });
+  var eraGroup = g.select('.era-highlight-group');
+
+  eraGroup.append('path')
+    .datum(seg).attr('d', areaFn)
+    .attr('fill', color).attr('opacity', 0.3);
+
+  eraGroup.append('path')
+    .datum(seg).attr('d', lineFn)
+    .attr('fill', 'none').attr('stroke', color).attr('stroke-width', 3);
+
+  var ann = g.select('.scrolly-ann');
+  if (seg.length && ch.annotation) {
+    var peak = seg.reduce(function(a,b){ return b.count > a.count ? b : a; });
+    var ax = x(peak.year), ay = y(peak.count);
+    var anchor = ax > iw * 0.75 ? 'end' : ax < iw * 0.25 ? 'start' : 'middle';
+
+    ann.append('line')
+      .attr('x1', ax).attr('x2', ax).attr('y1', ay).attr('y2', ay - 22)
+      .attr('stroke', color).attr('stroke-width', 1.5).attr('stroke-dasharray', '3,2');
+
+    var textEl = ann.append('text')
+      .attr('x', ax).attr('y', ay - 28)
+      .attr('text-anchor', anchor)
+      .attr('font-size', 13).attr('fill', color)
+      .attr('font-family', 'system-ui').attr('font-weight', '600')
+      .text(ch.annotation);
+
+    try {
+      var bbox = textEl.node().getBBox();
+      ann.insert('rect', 'text')
+        .attr('x', bbox.x - 4).attr('y', bbox.y - 3)
+        .attr('width', bbox.width + 8).attr('height', bbox.height + 6)
+        .attr('fill', 'white').attr('opacity', 0.85).attr('rx', 2);
+    } catch(e) { /* getBBox fails outside the DOM */ }
+  }
+}
+
+function buildEraButtons() {
+  var btnContainer = document.getElementById('era-buttons');
+  var chaptersEl = document.getElementById('chapters');
+  if (!btnContainer || !chaptersEl) return;
+
+  var timeline = document.createElement('div');
+  timeline.id = 'era-timeline';
+  timeline.innerHTML =
+    '<div class="timeline-track">' +
+    '<div class="timeline-line"></div>' +
+    '<div class="timeline-line-fill" id="timeline-fill"></div>' +
+    '<div class="timeline-dots">' +
+    CHAPTERS.map(function(ch, i) {
+      return '<div class="timeline-stop" data-chapter="' + i + '">' +
+        '<div class="timeline-dot"></div>' +
+        '<div class="timeline-label">' + ch.title + '</div>' +
+        '<div class="timeline-year">' + ch.era + '</div>' +
+        '</div>';
+    }).join('') +
+    '</div></div>';
+  btnContainer.appendChild(timeline);
+
+  function activateEra(idx) {
+    var ch = CHAPTERS[idx] || CHAPTERS[0];
+
+    btnContainer.querySelectorAll('.timeline-stop').forEach(function(stop) {
+      var i = +stop.getAttribute('data-chapter');
+      var dot   = stop.querySelector('.timeline-dot');
+      var label = stop.querySelector('.timeline-label');
+      var year  = stop.querySelector('.timeline-year');
+      if (i === idx) {
+        stop.classList.add('active');
+        dot.style.background   = ch.color;
+        dot.style.borderColor  = ch.color;
+        label.style.color      = ch.color;
+        year.style.color       = ch.color;
+      } else {
+        stop.classList.remove('active');
+        dot.style.background   = 'white';
+        dot.style.borderColor  = '#ccc';
+        label.style.color      = '#888';
+        year.style.color       = '#bbb';
+      }
+    });
+
+    // move the fill line to the active dot
+    var fill = document.getElementById('timeline-fill');
+    if (fill) {
+      var pct = (CHAPTERS.length > 1) ? (idx / (CHAPTERS.length - 1)) * 90 : 0;
+      fill.style.width      = pct + '%';
+      fill.style.background = ch.color;
+    }
+
+    chaptersEl.innerHTML = [
+      '<div class="chapter-inner" style="border-left-color:' + ch.color + '">',
+        '<div class="chapter-era">' + ch.era + '</div>',
+        '<div class="chapter-title" style="color:' + ch.color + ';margin-bottom:10px;font-size:1rem;font-weight:700">' + ch.title + '</div>',
+        '<p class="chapter-text">' + ch.text + '</p>',
+      '</div>'
+    ].join('');
+
+    highlightChapter(idx);
+  }
+
+  btnContainer.querySelectorAll('.timeline-stop').forEach(function(stop) {
+    stop.addEventListener('click', function() {
+      activateEra(+stop.getAttribute('data-chapter'));
+    });
+  });
+
+  activateEra(0);
+}
+
+// stacked area for all of SF
+function renderStackedAreaAllSF(data) {
+  var container = document.getElementById('stacked-container');
+  if (!container || !data) return;
+  container.innerHTML = '';
+
+  var reasonTotals = d3.rollup(
+    data.filter(function(d){ return d.reason !== 'Other'; }),
+    function(v){ return d3.sum(v, function(d){ return d.count; }); },
+    function(d){ return d.reason; }
+  );
+  var sorted = Array.from(reasonTotals.entries()).sort(function(a,b){ return b[1]-a[1]; });
+  var top5 = sorted.slice(0,5).map(function(d){ return d[0]; });
+  var rest = sorted.slice(5).map(function(d){ return d[0]; });
+  rest.push('Other');
+
+  var years = Array.from(new Set(data.map(function(d){ return d.year; }))).sort(function(a,b){ return a-b; });
+  var pivoted = years.map(function(yr) {
+    var rows = data.filter(function(d){ return d.year === yr; });
+    var row = { year: yr };
+    top5.forEach(function(r){
+      var f = rows.find(function(d){ return d.reason === r; });
+      row[r] = f ? f.count : 0;
+    });
+    row['Other'] = rows.filter(function(d){ return rest.indexOf(d.reason) !== -1; })
+      .reduce(function(s,d){ return s + d.count; }, 0);
+    return row;
+  });
+
+  var keys = top5.concat(['Other']);
+  var colors = ['#4a7fa0','#7aa3bc','#a3c4d6','#c5dce8','#deedf5','#c8c8c8'];
+  var series = d3.stack().keys(keys)(pivoted);
+  var margin = { top: 20, right: 105, bottom: 36, left: 40 };
+  var W = 400, H = 240, iw = W-margin.left-margin.right, ih = H-margin.top-margin.bottom;
+
+  var svg = makeSVG(container, W, H);
+  var g = svg.append('g').attr('transform','translate('+margin.left+','+margin.top+')');
+  var x = d3.scaleLinear().domain(d3.extent(years)).range([0, iw]);
+  var yMax = d3.max(series, function(s){ return d3.max(s, function(d){ return d[1]; }); });
+  var y = d3.scaleLinear().domain([0, yMax]).range([ih, 0]);
+  var area = d3.area()
+    .x(function(d){ return x(d.data.year); })
+    .y0(function(d){ return y(d[0]); }).y1(function(d){ return y(d[1]); })
+    .curve(d3.curveMonotoneX);
+  g.selectAll('.area').data(series).join('path').attr('class','area')
+    .attr('d', area).attr('fill', function(d,i){ return colors[i]; });
+  g.append('g').attr('transform','translate(0,'+ih+')')
+    .call(d3.axisBottom(x).tickFormat(d3.format('d')).ticks(7))
+    .call(styleAxis);
+  g.append('g')
+    .call(d3.axisLeft(y).ticks(5).tickFormat(function(d){ return d>=1000 ? d/1000+'k' : d; }))
+    .call(styleAxis);
+  g.append('text').attr('transform','rotate(-90)').attr('x',-ih/2).attr('y',-32)
+    .attr('text-anchor','middle').attr('font-size',9).attr('fill','#777').attr('font-family','system-ui').text('Eviction notices');
+  var legend = g.append('g').attr('transform','translate('+(iw+8)+', 10)');
+  keys.forEach(function(k,i){
+    legend.append('rect').attr('x',0).attr('y',i*20).attr('width',10).attr('height',10).attr('fill',colors[i]);
+    legend.append('text').attr('x',13).attr('y',i*20+9).attr('font-size',8).attr('fill','#444').attr('font-family','system-ui')
+      .text(k.length>13 ? k.slice(0,12)+'…' : k);
+  });
+}
+
+// bar chart showing reasons for one neighborhood
+function renderNeighborhoodReasons(neighborhood, nbrReasonData) {
+  var container = document.getElementById('stacked-container');
+  if (!container || !nbrReasonData) return;
+  container.innerHTML = '';
+  var rows = nbrReasonData.filter(function(d){ return d.neighborhood === neighborhood; })
+    .sort(function(a,b){ return b.count - a.count; });
+  if (!rows.length) return;
+
+  var margin = { top: 14, right: 50, bottom: 28, left: 120 };
+  var W = 400, H = 240, iw = W-margin.left-margin.right, ih = H-margin.top-margin.bottom;
+  var svg = makeSVG(container, W, H);
+  var g = svg.append('g').attr('transform','translate('+margin.left+','+margin.top+')');
+  var x = d3.scaleLinear().domain([0, d3.max(rows,function(d){ return d.count; })]).range([0, iw]);
+  var y = d3.scaleBand().domain(rows.map(function(d){ return d.reason; })).range([0, ih]).padding(0.25);
+  g.selectAll('rect').data(rows).join('rect')
+    .attr('y',function(d){ return y(d.reason); })
+    .attr('width',function(d){ return x(d.count); })
+    .attr('height', y.bandwidth()).attr('fill','#6a9bb5');
+  g.selectAll('.lbl').data(rows).join('text').attr('class','lbl')
+    .attr('x',function(d){ return x(d.count)+4; })
+    .attr('y',function(d){ return y(d.reason)+y.bandwidth()/2+4; })
+    .attr('font-size',8).attr('fill','#555').attr('font-family','system-ui')
+    .text(function(d){ return d3.format(',')(d.count); });
+  g.append('g').attr('transform','translate(0,'+ih+')')
+    .call(d3.axisBottom(x).ticks(5).tickFormat(function(d){ return d>=1000 ? d/1000+'k' : d; }))
+    .call(styleAxis);
+  g.append('g').call(d3.axisLeft(y).tickSize(0))
+    .call(function(ax){ ax.select('.domain').remove(); ax.selectAll('text').attr('font-size',8.5).attr('fill','#444'); });
+}
+
+function showNeighborhoodPanel(lookupName, summaryData, nbrReasonData) {
+  var panel = document.getElementById('nbr-panel');
+  if (!panel) return;
+  var rec = summaryData.find(function(d){ return d.neighborhood === lookupName; });
+  if (!rec) { panel.style.display = 'none'; return; }
+
+  var totalAll = d3.sum(summaryData, function(d){ return d.total; });
+  var cityAvg = totalAll / summaryData.length;
+  var ratio = (rec.total / cityAvg).toFixed(1);
+
+  var reasons = nbrReasonData
+    .filter(function(d){ return d.neighborhood === lookupName; })
+    .sort(function(a,b){ return b.count - a.count; }).slice(0, 3);
+
+  panel.querySelector('h4').textContent = rec.neighborhood;
+  panel.querySelector('.nbr-total').textContent =
+    rec.total.toLocaleString() + ' total evictions · peak year: ' + rec.peak_year;
+  panel.querySelector('.nbr-reason-list').innerHTML = reasons.map(function(r){
+    return '<li><span>' + r.reason + '</span><span>' + r.count.toLocaleString() + '</span></li>';
+  }).join('');
+  panel.querySelector('.nbr-compare').textContent =
+    rec.neighborhood + ' has ' + ratio + '× the city average (' + Math.round(cityAvg).toLocaleString() + ' avg per neighborhood).';
+  panel.style.display = 'block';
+}
+
+function closeNeighborhoodPanel() {
+  var panel = document.getElementById('nbr-panel');
+  if (panel) panel.style.display = 'none';
+  d3.select('#map-container').selectAll('path').classed('map-path-selected', false);
+  var lbl = document.getElementById('stacked-filter-label');
+  var btn = document.getElementById('stacked-show-all');
+  if (lbl) lbl.textContent = '';
+  if (btn) btn.style.display = 'none';
+  if (_APP.evictionsByReasonYear) renderStackedAreaAllSF(_APP.evictionsByReasonYear);
+  _APP.selectedNeighborhood = null;
+}
+
+function buildStackedHeader() {
+  var mockup = document.querySelector('#stacked-container') &&
+    document.querySelector('#stacked-container').closest('.viz-mockup');
+  if (!mockup) return;
+  var hdr = document.createElement('div');
+  hdr.id = 'stacked-header';
+  hdr.innerHTML = '<span id="stacked-filter-label"></span>' +
+    '<button id="stacked-show-all">Show All</button>';
+  mockup.insertBefore(hdr, mockup.firstChild);
+  document.getElementById('stacked-show-all').addEventListener('click', function() {
+    closeNeighborhoodPanel();
+  });
+}
+
+// wait for D3 to finish drawing paths before attaching click handlers
+function waitForMapPaths(cb) {
+  var el = document.getElementById('map-container');
+  if (!el) return;
+  if (el.querySelector('path')) { cb(); return; }
+  var obs = new MutationObserver(function(_, o){
+    if (el.querySelector('path')){ o.disconnect(); cb(); }
+  });
+  obs.observe(el, { childList: true, subtree: true });
+}
+
+function addMapClickHandlers(summaryData, nbrReasonData) {
+  d3.select('#map-container').selectAll('path')
+    .on('click', function(event, d) {
+      if (!d || !d.properties) return;
+      var geoName = d.properties.name;
+      var lbl = document.getElementById('stacked-filter-label');
+      var btn = document.getElementById('stacked-show-all');
+
+      d3.select('#map-container').selectAll('path').classed('map-path-selected', false);
+      d3.select(this).classed('map-path-selected', true);
+
+      if (d.properties.isMerged) {
+        var panel = document.getElementById('nbr-panel');
+        if (panel) panel.style.display = 'none';
+        if (lbl) lbl.textContent = '';
+        if (btn) btn.style.display = 'none';
+        var sc = document.getElementById('stacked-container');
+        if (sc) sc.innerHTML =
+          '<div style="padding:20px 16px;font-size:0.85rem;color:#666;font-style:italic;line-height:1.5;">' +
+          geoName + ' is not tracked separately by the SF Rent Board. ' +
+          'Its evictions are recorded under the ' + MAP_NAME_MAP[geoName] + ' district.' +
+          '</div>';
+        _APP.selectedNeighborhood = null;
+        return;
+      }
+
+      var lookupName = MAP_NAME_MAP[geoName] || geoName;
+      _APP.selectedNeighborhood = lookupName;
+      showNeighborhoodPanel(lookupName, summaryData, nbrReasonData);
+      if (lbl) lbl.textContent = geoName;
+      if (btn) btn.style.display = 'inline-block';
+      renderNeighborhoodReasons(lookupName, nbrReasonData);
+    });
+}
+
+// bar chart filtered by year range
+function renderBarChart(minYear, maxYear, nbrYearData) {
+  var container = document.getElementById('barchart-container');
+  if (!container || !nbrYearData) return;
+  container.innerHTML = '';
+
+  var filtered = nbrYearData.filter(function(d){ return d.year >= minYear && d.year <= maxYear; });
+  var byNbr = d3.rollup(filtered, function(v){ return d3.sum(v,function(d){ return d.count; }); }, function(d){ return d.neighborhood; });
+  var top10 = Array.from(byNbr.entries())
+    .map(function(e){ return { neighborhood: e[0], total: e[1] }; })
+    .sort(function(a,b){ return b.total - a.total; }).slice(0, 10);
+  if (!top10.length) return;
+
+  var margin = { top: 12, right: 46, bottom: 28, left: 112 };
+  var W = 400, H = 240, iw = W-margin.left-margin.right, ih = H-margin.top-margin.bottom;
+  var svg = makeSVG(container, W, H);
+  var g = svg.append('g').attr('transform','translate('+margin.left+','+margin.top+')');
+  var x = d3.scaleLinear().domain([0, d3.max(top10,function(d){ return d.total; })]).range([0, iw]);
+  var y = d3.scaleBand().domain(top10.map(function(d){ return d.neighborhood; })).range([0, ih]).padding(0.28);
+  g.selectAll('rect').data(top10).join('rect')
+    .attr('y',function(d){ return y(d.neighborhood); })
+    .attr('width',function(d){ return x(d.total); })
+    .attr('height', y.bandwidth()).attr('fill','#6a9bb5');
+  g.selectAll('.bl').data(top10).join('text').attr('class','bl')
+    .attr('x',function(d){ return x(d.total)+4; })
+    .attr('y',function(d){ return y(d.neighborhood)+y.bandwidth()/2+4; })
+    .attr('font-size',8).attr('fill','#555').attr('font-family','system-ui')
+    .text(function(d){ return d3.format(',')(d.total); });
+  g.append('g').attr('transform','translate(0,'+ih+')')
+    .call(d3.axisBottom(x).ticks(5).tickFormat(function(d){ return d>=1000 ? d/1000+'k' : d; }))
+    .call(styleAxis);
+  g.append('g').call(d3.axisLeft(y).tickSize(0)
+    .tickFormat(function(d){ return d.length>15 ? d.slice(0,14)+'…' : d; }))
+    .call(function(ax){ ax.select('.domain').remove(); ax.selectAll('text').attr('font-size',8.5).attr('fill','#444'); });
+}
+
+function buildYearSlider() {
+  var mockup = document.querySelector('#barchart-container') &&
+    document.querySelector('#barchart-container').closest('.viz-mockup');
+  if (!mockup) return;
+  var wrap = document.createElement('div');
+  wrap.id = 'bar-filter';
+  wrap.innerHTML =
+    '<span class="bar-filter-label">Filter by year range: <strong id="yr-range-display">1997 – 2026</strong></span>' +
+    '<div class="bar-slider-row">' +
+    '<span class="yr-lbl">From</span>' +
+    '<input type="range" id="yr-slider-min" min="1997" max="2026" value="1997" step="1">' +
+    '<span class="yr-lbl">To</span>' +
+    '<input type="range" id="yr-slider-max" min="1997" max="2026" value="2026" step="1">' +
+    '</div>';
+  mockup.insertBefore(wrap, mockup.firstChild);
+
+  function onChange() {
+    var lo = +document.getElementById('yr-slider-min').value;
+    var hi = +document.getElementById('yr-slider-max').value;
+    // keep sliders from crossing each other
+    if (lo > hi) {
+      if (this.id === 'yr-slider-min') { document.getElementById('yr-slider-min').value = hi; lo = hi; }
+      else { document.getElementById('yr-slider-max').value = lo; hi = lo; }
+    }
+    document.getElementById('yr-range-display').textContent = lo + ' – ' + hi;
+    if (_APP.nbrYearData) renderBarChart(lo, hi, _APP.nbrYearData);
+  }
+  document.getElementById('yr-slider-min').addEventListener('input', onChange);
+  document.getElementById('yr-slider-max').addEventListener('input', onChange);
+}
+
+// load all data files and kick everything off
+(async function initInteractive() {
+  try {
+    var res = await Promise.all([
+      d3.json('data/evictions_by_year.json'),
+      d3.json('data/evictions_by_neighborhood_reason.json'),
+      d3.json('data/evictions_by_neighborhood_year.json'),
+      d3.json('data/neighborhood_summary.json'),
+      d3.json('data/evictions_by_reason_year.json')
+    ]);
+    _APP.yearData              = res[0];
+    _APP.nbrReasonData         = res[1];
+    _APP.nbrYearData           = res[2];
+    _APP.summaryData           = res[3];
+    _APP.evictionsByReasonYear = res[4];
+  } catch(e) { console.error('Interactive init failed:', e); return; }
+
+  buildScrollyLineChart(_APP.yearData);
+  buildEraButtons();
+
+  buildStackedHeader();
+  buildYearSlider();
+
+  document.getElementById('nbr-panel-close').addEventListener('click', closeNeighborhoodPanel);
+
+  waitForMapPaths(function() {
+    addMapClickHandlers(_APP.summaryData, _APP.nbrReasonData);
+  });
 })();
 </script>
 
