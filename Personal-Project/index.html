@@ -3,454 +3,518 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Displaced: 27 Years of Eviction in SF</title>
+  <title>Displaced: Nearly Three Decades of Eviction in SF</title>
   <script src="https://d3js.org/d3.v7.min.js"></script>
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
+    :root {
+      --bg:      #f7f3ed;
+      --bg-alt:  #ede7da;
+      --bg-dark: #231f1c;
+      --accent:  #c0392b;
+      --coral:   #e07b54;
+      --blue:    #2c6e8a;
+      --text:    #2c2c2c;
+      --muted:   #6b6560;
+      --border:  #d4c9bb;
+    }
+
+    html {
+      scroll-snap-type: y mandatory;
+      overflow-y: scroll;
+      height: 100%;
+    }
+
     body {
-      font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
-      background: #fff;
-      color: #222;
+      font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+      background: var(--bg);
+      color: var(--text);
       line-height: 1.6;
+      height: 100%;
     }
 
-    header {
-      border-bottom: 2px solid #222;
-      padding: 28px 24px 24px;
-      max-width: 900px;
-      margin: 0 auto;
-    }
-
-    h1 {
-      font-size: 1.8rem;
-      font-weight: 700;
-      margin-bottom: 4px;
-      color: #111;
-    }
-
-    h1 span {
-      font-weight: 300;
-      color: #555;
-    }
-
-    .description {
-      font-size: 0.95rem;
-      color: #444;
-      max-width: 660px;
-      margin-top: 8px;
-    }
-
-    .basic-info {
-      margin-top: 18px;
-      font-size: 0.88rem;
-      color: #333;
-      line-height: 1.9;
-    }
-
-    .basic-info span {
-      font-weight: bold;
-      color: #111;
-    }
-
-    .basic-info a {
-      color: #1a5c9e;
-      text-decoration: none;
-    }
-    .basic-info a:hover { text-decoration: underline; }
-
-    main {
-      max-width: 900px;
-      margin: 0 auto;
-      padding: 28px 24px 48px;
-    }
-
-    .section-title {
-      font-size: 0.82rem;
-      font-weight: bold;
-      color: #555;
-      margin-bottom: 16px;
-      padding-bottom: 4px;
-      border-bottom: 1px solid #ccc;
-    }
-
-    @media (max-width: 640px) {
-      h1 { font-size: 1.4rem; }
-    }
-
-    .viz-mockup {
-      background: #f9f9f9;
-      padding: 10px;
-    }
-
-    .dash-row {
+    /* ── snap sections ─────────────────────────────────── */
+    .snap-section {
+      height: 100vh;
+      scroll-snap-align: start;
       display: flex;
-      gap: 20px;
-      padding: 20px 0;
+      flex-direction: column;
+      overflow: hidden;
+    }
+    .snap-section:nth-child(odd)  { background: var(--bg); }
+    .snap-section:nth-child(even) { background: var(--bg-alt); }
+
+    /* ── intro ─────────────────────────────────────────── */
+    #intro {
+      justify-content: center;
+      padding: 60px 80px;
+      position: relative;
     }
 
-    .dash-row-border {
-      border-top: 1px solid #e0e0e0;
+    #byline {
+      position: absolute;
+      top: 28px; left: 80px;
+      font-size: 0.75rem;
+      color: var(--muted);
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
     }
 
-    .dash-cell {
-      flex: 1;
-      min-width: 0;
-    }
-
-    .chart-title {
-      font-size: 15px;
-      font-weight: 600;
-      color: #222;
+    #intro h1 {
+      font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+      font-size: clamp(3rem, 6vw, 5.5rem);
+      font-weight: 900;
+      color: var(--text);
+      line-height: 1.05;
       margin-bottom: 6px;
     }
 
-    .chart-caption {
-      font-size: 12px;
-      color: #666;
+    #intro .subtitle {
+      font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+      font-size: clamp(1rem, 2vw, 1.5rem);
+      font-weight: 400;
       font-style: italic;
-      margin-top: 6px;
+      color: var(--muted);
+      margin-bottom: 36px;
     }
 
-    .viz-mockup svg {
-      display: block;
-      width: 100%;
-      max-width: 420px;
-      height: auto;
-      margin: 0 auto;
+    .intro-body {
+      font-size: clamp(0.95rem, 1.4vw, 1.15rem);
+      max-width: 660px;
+      line-height: 1.85;
+      color: var(--text);
+      margin-bottom: 48px;
     }
 
-  /* scrollytelling layout */
-  #scrolly-section {
-    max-width: 900px;
-    margin: 32px auto 0;
-    padding: 0 24px 48px;
-    border-top: 1px solid #eee;
-  }
-  #scrolly-section .section-title { margin-bottom: 16px; }
-  #scrolly {
-    display: flex;
-    height: 600px;
-    border: 1px solid #e0e0e0;
-    overflow: hidden;
-  }
-  #sticky-chart {
-    width: 60%;
-    height: 600px;
-    flex-shrink: 0;
-    padding: 14px 16px 12px;
-    background: #fafafa;
-    border-right: 1px solid #e0e0e0;
-    display: flex;
-    flex-direction: column;
-  }
-  #scrolly-linechart-title {
-    font-size: 0.78rem;
-    font-weight: 600;
-    color: #555;
-    margin-bottom: 6px;
-    flex-shrink: 0;
-  }
-  #scrolly-linechart { flex: 1; min-height: 0; display: flex; align-items: center; }
-  #era-buttons { flex-shrink: 0; }
+    .scroll-hint {
+      font-size: 0.78rem;
+      color: var(--muted);
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+    .scroll-hint::after { content: '  ↓'; }
 
-  #era-timeline {
-    width: 100%;
-    padding: 8px 0 14px;
-    flex-shrink: 0;
-  }
-  .timeline-track {
-    position: relative;
-    width: 100%;
-  }
-  .timeline-line {
-    position: absolute;
-    top: 10px;
-    left: 5%;
-    right: 5%;
-    height: 2px;
-    background: #ddd;
-    z-index: 0;
-  }
-  .timeline-line-fill {
-    position: absolute;
-    top: 10px;
-    left: 5%;
-    height: 2px;
-    background: #ccc;
-    transition: width .3s ease, background .3s ease;
-    z-index: 0;
-    width: 0;
-  }
-  .timeline-dots {
-    display: flex;
-    justify-content: space-between;
-    position: relative;
-    z-index: 1;
-  }
-  .timeline-stop {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    cursor: pointer;
-    flex: 1;
-    gap: 4px;
-  }
-  .timeline-dot {
-    width: 16px;
-    height: 16px;
-    border-radius: 50%;
-    border: 2px solid #ccc;
-    background: white;
-    transition: all .2s ease;
-    flex-shrink: 0;
-  }
-  .timeline-stop.active .timeline-dot {
-    width: 20px;
-    height: 20px;
-    border: none;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.25);
-  }
-  .timeline-stop:hover:not(.active) .timeline-dot {
-    border-color: #999;
-    background: #f0f0f0;
-    transform: scale(1.15);
-  }
-  .timeline-label {
-    font-size: 10px;
-    font-weight: 700;
-    color: #888;
-    text-align: center;
-    line-height: 1.2;
-    transition: color .2s;
-  }
-  .timeline-stop.active .timeline-label { font-weight: 800; }
-  .timeline-year {
-    font-size: 9px;
-    color: #bbb;
-    text-align: center;
-    font-weight: 500;
-  }
-  .timeline-stop.active .timeline-year { font-weight: 600; }
-  #chapters {
-    width: 40%;
-    height: 600px;
-    background: #fff;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    padding: 24px 20px;
-    border-left: 1px solid #e0e0e0;
-  }
-  .chapter-inner {
-    border-left: 3px solid #ccc;
-    padding: 14px 16px;
-    width: 100%;
-  }
-  .chapter-era {
-    font-size: 0.7rem;
-    font-weight: bold;
-    color: #aaa;
-    text-transform: uppercase;
-    letter-spacing: .05em;
-    margin-bottom: 3px;
-  }
-  .chapter-title {
-    font-size: 0.92rem;
-    font-weight: 700;
-    color: #111;
-    margin-bottom: 7px;
-  }
-  .chapter-text {
-    font-size: 0.86rem;
-    color: #444;
-    line-height: 1.6;
-    margin: 0;
-  }
+    /* ── shared section layout ─────────────────────────── */
+    .section-inner {
+      display: flex;
+      flex-direction: column;
+      height: 100%;
+      padding: 36px 60px 28px;
+    }
 
-  /* neighborhood detail panel */
-  #nbr-panel {
-    display: none;
-    position: relative;
-    background: #fff;
-    border: 1px solid #bbb;
-    padding: 12px 14px 12px;
-    margin-top: 8px;
-    font-size: 0.83rem;
-  }
-  #nbr-panel-close {
-    position: absolute;
-    top: 6px; right: 8px;
-    background: none; border: none;
-    font-size: 1rem; cursor: pointer;
-    color: #999; line-height: 1; padding: 0 3px;
-  }
-  #nbr-panel-close:hover { color: #222; }
-  #nbr-panel h4 {
-    font-size: 0.92rem; font-weight: 700;
-    color: #111; margin: 0 18px 2px 0;
-  }
-  #nbr-panel .nbr-total { font-size: 0.78rem; color: #777; margin-bottom: 9px; }
-  #nbr-panel .nbr-section-label {
-    font-size: 0.7rem; font-weight: bold;
-    color: #999; text-transform: uppercase;
-    letter-spacing: .04em; margin-bottom: 4px;
-  }
-  #nbr-panel .nbr-reason-list {
-    list-style: none; margin: 0 0 9px 0; padding: 0;
-  }
-  #nbr-panel .nbr-reason-list li {
-    display: flex; justify-content: space-between;
-    padding: 2px 0; border-bottom: 1px solid #f0f0f0; color: #333;
-  }
-  #nbr-panel .nbr-compare {
-    font-size: 0.8rem; color: #444;
-    padding-top: 8px; border-top: 1px solid #eee; margin: 0;
-  }
-  .map-path-selected { stroke: #111 !important; stroke-width: 2 !important; }
-  #map-container svg path { cursor: pointer; }
+    .section-header {
+      flex-shrink: 0;
+      margin-bottom: 18px;
+      padding-bottom: 14px;
+      border-bottom: 1px solid var(--border);
+    }
 
-  /* stacked area filter header */
-  #stacked-header {
-    display: flex; align-items: center; gap: 8px;
-    padding: 5px 10px; min-height: 26px;
-    background: #f8f8f8; border-bottom: 1px solid #e8e8e8;
-  }
-  #stacked-filter-label {
-    font-size: 0.75rem; color: #555;
-    font-style: italic; flex: 1;
-  }
-  #stacked-show-all {
-    display: none; font-size: 0.7rem;
-    padding: 2px 8px; background: #fff;
-    border: 1px solid #bbb; cursor: pointer; color: #333;
-  }
-  #stacked-show-all:hover { background: #f0f0f0; }
+    .section-label {
+      font-size: 0.68rem;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: var(--accent);
+      margin-bottom: 3px;
+    }
 
-  /* year slider */
-  #bar-filter {
-    padding: 7px 10px 10px;
-    background: #f8f8f8;
-    border-bottom: 1px solid #e0e0e0;
-    font-size: 0.8rem;
-  }
-  .bar-filter-label { display: block; font-weight: 600; color: #555; margin-bottom: 6px; }
-  #yr-range-display { color: #c0392b; font-weight: 700; }
-  .bar-slider-row { display: flex; align-items: center; gap: 8px; }
-  .yr-lbl { font-size: 0.74rem; color: #888; white-space: nowrap; flex-shrink: 0; }
-  .bar-slider-row input[type=range] { flex: 1; }
+    .section-title {
+      font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+      font-size: clamp(1.2rem, 2.2vw, 1.8rem);
+      font-weight: 700;
+      color: var(--text);
+      line-height: 1.2;
+      margin-bottom: 6px;
+    }
 
-  @media (max-width: 640px) {
-    #scrolly { flex-direction: column; height: auto; }
-    #sticky-chart { width: 100%; height: 320px; }
-    #chapters { width: 100%; height: 400px; }
-  }
+    .section-desc {
+      font-size: 0.88rem;
+      color: var(--muted);
+      max-width: 680px;
+      line-height: 1.6;
+    }
+
+    .chart-area {
+      flex: 1;
+      min-height: 0;
+      position: relative;
+    }
+
+    /* ── section 1: scrollytelling ─────────────────────── */
+    #scrolly-inner {
+      display: flex;
+      height: 100%;
+      gap: 18px;
+    }
+
+    #sticky-chart {
+      flex: 3;
+      display: flex;
+      flex-direction: column;
+      min-width: 0;
+      background: rgba(255,255,255,0.45);
+      border: 1px solid var(--border);
+      border-radius: 3px;
+      padding: 10px 14px;
+    }
+
+    #scrolly-linechart-title {
+      font-size: 0.76rem;
+      color: var(--muted);
+      margin-bottom: 4px;
+      flex-shrink: 0;
+    }
+
+    #scrolly-linechart { flex: 1; min-height: 0; display: flex; align-items: center; }
+    #era-buttons { flex-shrink: 0; }
+
+    #chapters {
+      flex: 1.5;
+      background: rgba(255,255,255,0.55);
+      border: 1px solid var(--border);
+      border-radius: 3px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      padding: 22px 18px;
+    }
+
+    /* timeline */
+    #era-timeline { width: 100%; padding: 6px 0 12px; flex-shrink: 0; }
+    .timeline-track { position: relative; width: 100%; }
+    .timeline-line { position: absolute; top: 10px; left: 5%; right: 5%; height: 2px; background: var(--border); z-index: 0; }
+    .timeline-line-fill { position: absolute; top: 10px; left: 5%; height: 2px; background: #ccc; transition: width .3s ease, background .3s ease; z-index: 0; width: 0; }
+    .timeline-dots { display: flex; justify-content: space-between; position: relative; z-index: 1; }
+    .timeline-stop { display: flex; flex-direction: column; align-items: center; cursor: pointer; flex: 1; gap: 3px; }
+    .timeline-dot { width: 15px; height: 15px; border-radius: 50%; border: 2px solid var(--border); background: var(--bg); transition: all .2s ease; flex-shrink: 0; }
+    .timeline-stop.active .timeline-dot { width: 19px; height: 19px; border: none; box-shadow: 0 2px 8px rgba(0,0,0,0.22); }
+    .timeline-stop:hover:not(.active) .timeline-dot { border-color: #999; background: #f0e8e0; transform: scale(1.15); }
+    .timeline-label { font-size: 9.5px; font-weight: 700; color: #999; text-align: center; line-height: 1.2; transition: color .2s; }
+    .timeline-stop.active .timeline-label { font-weight: 800; }
+    .timeline-year { font-size: 8.5px; color: #bbb; text-align: center; font-weight: 500; }
+    .timeline-stop.active .timeline-year { font-weight: 600; }
+    .chapter-inner { border-left: 3px solid var(--border); padding: 12px 14px; width: 100%; }
+    .chapter-era { font-size: 0.67rem; font-weight: bold; color: #aaa; text-transform: uppercase; letter-spacing: .05em; margin-bottom: 2px; }
+    .chapter-title { font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; font-size: 0.98rem; font-weight: 700; color: var(--text); margin-bottom: 6px; }
+    .chapter-text { font-size: 0.84rem; color: #555; line-height: 1.65; margin: 0; }
+
+    /* ── section 2: map ────────────────────────────────── */
+    #map-inner {
+      display: flex;
+      height: 100%;
+      gap: 18px;
+      align-items: flex-start;
+    }
+
+    #map-container { flex: 1.5; min-width: 0; display: flex; justify-content: center; align-items: flex-start; }
+    #map-container svg { width: 100%; max-width: 78%; height: auto; display: block; }
+    #map-container svg path { cursor: pointer; }
+
+    #nbr-panel {
+      flex: 1;
+      display: none;
+      background: rgba(255,255,255,0.88);
+      border: 1px solid var(--border);
+      border-radius: 3px;
+      padding: 16px 18px;
+      font-size: 0.82rem;
+      position: relative;
+    }
+    #nbr-panel.visible { display: block; }
+    #nbr-panel-close { position: absolute; top: 8px; right: 10px; background: none; border: none; font-size: 1rem; cursor: pointer; color: var(--muted); }
+    #nbr-panel-close:hover { color: var(--text); }
+    #nbr-panel h4 { font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; font-size: 1rem; font-weight: 700; color: var(--text); margin: 0 20px 3px 0; }
+    #nbr-panel .nbr-total { font-size: 0.76rem; color: var(--muted); margin-bottom: 12px; }
+    #nbr-panel .nbr-section-label { font-size: 0.66rem; font-weight: bold; color: #aaa; text-transform: uppercase; letter-spacing: .04em; margin-bottom: 4px; }
+    #nbr-panel .nbr-reason-list { list-style: none; margin: 0 0 10px 0; padding: 0; }
+    #nbr-panel .nbr-reason-list li { display: flex; justify-content: space-between; padding: 3px 0; border-bottom: 1px solid #f0e8e0; color: var(--text); font-size: 0.8rem; }
+    #nbr-panel .nbr-compare { font-size: 0.78rem; color: var(--muted); padding-top: 8px; border-top: 1px solid #f0e8e0; margin: 0; }
+
+    .map-path-selected { stroke: var(--accent) !important; stroke-width: 2 !important; }
+
+    /* ── section 3: stacked area ───────────────────────── */
+    .stacked-wrap {
+      display: flex;
+      flex-direction: column;
+      height: 100%;
+    }
+
+    #stacked-header {
+      display: flex; align-items: center; gap: 8px;
+      padding: 5px 10px; min-height: 26px; flex-shrink: 0;
+      background: rgba(255,255,255,0.35);
+      border-bottom: 1px solid var(--border);
+    }
+    #stacked-filter-label { font-size: 0.74rem; color: var(--muted); font-style: italic; flex: 1; }
+    #stacked-show-all {
+      display: none; font-size: 0.7rem; padding: 2px 9px;
+      background: white; border: 1px solid var(--border); cursor: pointer; color: var(--text); border-radius: 2px;
+    }
+    #stacked-show-all:hover { background: #f0e8e0; }
+    #stacked-container { flex: 1; min-height: 0; display: flex; justify-content: center; }
+    #stacked-container svg { max-width: 92%; }
+
+    /* ── section 4: bar chart ──────────────────────────── */
+    .bar-wrap {
+      display: flex;
+      flex-direction: column;
+      height: 100%;
+    }
+
+    #bar-filter {
+      padding: 7px 10px 10px; flex-shrink: 0;
+      background: rgba(255,255,255,0.35);
+      border-bottom: 1px solid var(--border);
+      font-size: 0.8rem;
+    }
+    .bar-filter-label { display: block; font-size: 0.76rem; font-weight: 600; color: var(--muted); margin-bottom: 5px; }
+    #yr-range-display { color: var(--accent); font-weight: 700; }
+    .bar-slider-row { display: flex; align-items: center; gap: 8px; }
+    .yr-lbl { font-size: 0.72rem; color: var(--muted); white-space: nowrap; flex-shrink: 0; }
+    .bar-slider-row input[type=range] { flex: 1; accent-color: var(--accent); }
+    #barchart-container { flex: 1; min-height: 0; display: flex; justify-content: center; }
+    #barchart-container svg { max-width: 92%; }
+
+    /* ── section 5: dual-axis ──────────────────────────── */
+    #dual-chart-container { width: 100%; height: 100%; }
+    #dual-chart-container svg { width: 100%; height: auto; display: block; }
+
+    /* ── footer ────────────────────────────────────────── */
+    footer {
+      height: 100vh;
+      scroll-snap-align: start;
+      background: var(--bg-dark);
+      color: #c0b0a0;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      padding: 60px 80px;
+    }
+
+    footer h3 {
+      font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+      font-size: 1.6rem;
+      font-weight: 700;
+      color: #f0e8de;
+      margin-bottom: 20px;
+    }
+
+    footer p { font-size: 0.88rem; line-height: 1.85; max-width: 580px; }
+    footer a { color: #d4a878; text-decoration: none; }
+    footer a:hover { text-decoration: underline; }
+
+    .footer-meta {
+      margin-top: 36px;
+      font-size: 0.78rem;
+      color: #7a6a5a;
+      border-top: 1px solid #3a2e28;
+      padding-top: 20px;
+      line-height: 2;
+    }
+    .footer-meta strong { color: #a09080; }
+
+    /* ── tooltip ───────────────────────────────────────── */
+    #tooltip {
+      position: fixed;
+      background: white;
+      border: 1px solid var(--border);
+      border-radius: 3px;
+      padding: 7px 11px;
+      font-size: 0.8rem;
+      font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+      color: var(--text);
+      pointer-events: none;
+      opacity: 0;
+      transition: opacity 0.12s;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+      z-index: 200;
+      line-height: 1.55;
+    }
+
+    @media (max-width: 768px) {
+      .section-inner, #intro, footer { padding: 28px 24px; }
+      #byline { left: 24px; }
+      #scrolly-inner, #map-inner { flex-direction: column; overflow-y: auto; }
+      #chapters { min-height: 160px; }
+    }
   </style>
 </head>
 <body>
 
-<header>
-  <h1>Displaced <span>27 Years of Eviction in San Francisco</span></h1>
-  <p class="description">
-    This project explores 48,000+ eviction notices filed in San Francisco from 1997 to 2026.
-    Using scrollytelling and interactive dashboards built with D3.js, it reveals how
-    displacement patterns shifted across neighborhoods and economic cycles.
+<!-- INTRO -->
+<section class="snap-section" id="intro">
+  <div id="byline">Miranda Cavalie</div>
+  <h1>Displaced</h1>
+  <p class="subtitle">Nearly Three Decades of Eviction in San Francisco</p>
+  <p class="intro-body">
+    In 1997, San Francisco began requiring landlords to file eviction notices with the Rent Board.
+    What followed was a record of displacement: over 48,000 notices spanning tech booms,
+    housing crises, a pandemic, and the reshaping of entire neighborhoods.
+    This is that story, told through data.
   </p>
-  <div class="basic-info">
-    <div><span>Project Title:</span> Displaced: 27 Years of Eviction in San Francisco</div>
-    <div><span>Name:</span> Miranda Cavalie</div>
-    <div><span>Dataset:</span> <a href="https://data.sfgov.org/Housing-and-Buildings/Eviction-Notices/5cei-gny5" target="_blank">SF Rent Board Eviction Notices</a></div>
-    <div><span>Dataset Portal:</span> <a href="https://datasf.org/opendata" target="_blank">DataSF</a></div>
-    <div style="margin-top:14px;"><span>Features completed:</span></div>
-    <div style="color:#444;font-size:0.88rem;max-width:660px;margin-top:4px;">All four static visualizations are done. The choropleth map shows SF's 41 neighborhoods colored by eviction count using D3 and the DataSF GeoJSON. The line chart shows total evictions per year from 1997 to 2025 with annotations for the dot-com peak and COVID drop. The stacked area chart breaks down evictions by reason over time. The horizontal bar chart ranks the top 10 neighborhoods. The map and line chart are built in D3.js.</div>
-    <div style="margin-top:10px;"><span>Upcoming milestones:</span></div>
-    <div style="color:#444;font-size:0.88rem;max-width:660px;margin-top:4px;">Next is the Beta Release. The main goals are adding the scrollytelling narrative.</div>
-  </div>
-</header>
+  <p class="scroll-hint">Scroll to explore</p>
+</section>
 
-<section id="scrolly-section">
-  <p class="section-title" style="margin-bottom:16px;">The Story in Five Chapters</p>
-  <div id="scrolly">
-    <div id="sticky-chart">
-      <div id="era-buttons"></div>
-      <p id="scrolly-linechart-title">Evictions per year, 1997–2026</p>
-      <div id="scrolly-linechart"></div>
+<!-- SECTION 1: Five Chapters -->
+<section class="snap-section">
+  <div class="section-inner">
+    <div class="section-header">
+      <p class="section-label">The Full Picture</p>
+      <h2 class="section-title">Five Chapters of Displacement</h2>
+      <p class="section-desc">Click each era on the timeline to see how eviction patterns shifted through San Francisco's economic cycles.</p>
     </div>
-    <div id="chapters"></div>
+    <div class="chart-area">
+      <div id="scrolly-inner">
+        <div id="sticky-chart">
+          <div id="era-buttons"></div>
+          <p id="scrolly-linechart-title">Evictions per year, 1997–2026</p>
+          <div id="scrolly-linechart"></div>
+        </div>
+        <div id="chapters"></div>
+      </div>
+    </div>
   </div>
 </section>
 
-<main>
-  <p class="section-title">Continue the Story</p>
-
-  <!-- map + stacked area -->
-  <div class="dash-row">
-    <div class="dash-cell">
-      <p class="chart-title">Evictions by Neighborhood</p>
-      <div class="viz-mockup">
+<!-- SECTION 2: Map -->
+<section class="snap-section">
+  <div class="section-inner">
+    <div class="section-header">
+      <p class="section-label">Geography of Displacement</p>
+      <h2 class="section-title">Evictions by Neighborhood</h2>
+      <p class="section-desc">Darker shading indicates more eviction notices filed since 1997. Click any neighborhood to see its breakdown.</p>
+    </div>
+    <div class="chart-area">
+      <div id="map-inner">
         <div id="map-container"></div>
         <div id="nbr-panel">
           <button id="nbr-panel-close" title="Close">×</button>
           <h4></h4>
           <div class="nbr-total"></div>
-          <div class="nbr-section-label">Top 3 eviction reasons</div>
+          <div class="nbr-section-label">Top eviction reasons</div>
           <ul class="nbr-reason-list"></ul>
           <p class="nbr-compare"></p>
         </div>
       </div>
-      <p class="chart-caption">Click a neighborhood to see its eviction breakdown.</p>
     </div>
-    <div class="dash-cell">
-      <p class="chart-title">Evictions by Reason Over Time</p>
-      <div class="viz-mockup">
+  </div>
+</section>
+
+<!-- SECTION 3: Stacked Area -->
+<section class="snap-section">
+  <div class="section-inner">
+    <div class="section-header">
+      <p class="section-label">Patterns Over Time</p>
+      <h2 class="section-title">The Anatomy of Eviction</h2>
+      <p class="section-desc">Eviction notices by stated reason, 1997–2026. Hover a layer to identify it. Click a neighborhood on the map to filter.</p>
+    </div>
+    <div class="chart-area">
+      <div class="stacked-wrap">
+        <div id="stacked-header">
+          <span id="stacked-filter-label"></span>
+          <button id="stacked-show-all">Show All SF</button>
+        </div>
         <div id="stacked-container"></div>
       </div>
-      <p class="chart-caption">Stacked area showing the mix of eviction reasons, 1997–2026. Filters when you click a neighborhood.</p>
     </div>
   </div>
+</section>
 
-  <!-- line chart + bar chart -->
-  <div class="dash-row dash-row-border">
-    <div class="dash-cell">
-      <p class="chart-title">Annual Evictions, 1997–2026</p>
-      <div class="viz-mockup">
-        <div id="linechart-container"></div>
-      </div>
-      <p class="chart-caption">Hover over the chart to see exact counts for each year.</p>
+<!-- SECTION 4: Bar Chart -->
+<section class="snap-section">
+  <div class="section-inner">
+    <div class="section-header">
+      <p class="section-label">Neighborhood Rankings</p>
+      <h2 class="section-title">Where Evictions Hit Hardest</h2>
+      <p class="section-desc">The ten neighborhoods with the most eviction notices. Use the sliders to filter by year range.</p>
     </div>
-    <div class="dash-cell">
-      <p class="chart-title">Top Neighborhoods by Evictions</p>
-      <div class="viz-mockup">
+    <div class="chart-area">
+      <div class="bar-wrap">
+        <div id="bar-filter">
+          <span class="bar-filter-label">Year range: <strong id="yr-range-display">1997 – 2026</strong></span>
+          <div class="bar-slider-row">
+            <span class="yr-lbl">From</span>
+            <input type="range" id="yr-slider-min" min="1997" max="2026" value="1997" step="1">
+            <span class="yr-lbl">To</span>
+            <input type="range" id="yr-slider-max" min="1997" max="2026" value="2026" step="1">
+          </div>
+        </div>
         <div id="barchart-container"></div>
       </div>
-      <p class="chart-caption">Ranked by total eviction notices. Use the year filter to narrow the period.</p>
     </div>
   </div>
+</section>
 
-</main>
+<!-- SECTION 5: Dual-axis -->
+<section class="snap-section">
+  <div class="section-inner">
+    <div class="section-header">
+      <p class="section-label">Rent &amp; Evictions</p>
+      <h2 class="section-title">When Rent Rises, People Leave</h2>
+      <p class="section-desc">HUD Fair Market Rent (2-bedroom, SF County) alongside annual eviction counts, 2006–2025. Hover to see both values for any year.</p>
+    </div>
+    <div class="chart-area">
+      <div id="dual-chart-container"></div>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <h3>About This Project</h3>
+  <p>
+    Eviction data comes from the SF Rent Board Eviction Notices dataset published by
+    <a href="https://datasf.org/opendata" target="_blank">DataSF</a>,
+    covering 48,000+ notices filed between 1997 and 2026.
+    Rent figures are HUD Fair Market Rents (2-bedroom) for San Francisco County,
+    sourced from <a href="https://www.huduser.gov/portal/datasets/fmr.html" target="_blank">HUD User</a>.
+    
+  </p>
+  <div class="footer-meta">
+    <div><strong>Dataset:</strong> <a href="https://data.sfgov.org/Housing-and-Buildings/Eviction-Notices/5cei-gny5" target="_blank">SF Rent Board Eviction Notices</a> via DataSF</div>
+    <div><strong>Rent data:</strong> HUD Fair Market Rents, San Francisco County (FIPS 06075), FY2006–2025</div>
+  </div>
+</footer>
+
+<div id="tooltip"></div>
 
 <script>
-function showError(containerId, msg) {
-  var el = document.getElementById(containerId);
-  el.innerHTML = '<svg viewBox="0 0 400 220" width="100%" style="max-width:420px;display:block;margin:0 auto"><text x="200" y="115" text-anchor="middle" font-size="13" fill="#aaa" font-family="system-ui">' + (msg || 'Data not loaded') + '</text></svg>';
+// ─── shared utilities ─────────────────────────────────────────────────────────
+var FONT = "'Helvetica Neue', Helvetica, Arial, sans-serif";
+
+function normalizeReason(r) {
+  if (r === 'Ellis Act WithDrawal') return 'Ellis Act Withdrawal';
+  return r;
 }
 
 function makeSVG(container, W, H) {
   return d3.select(container).append('svg')
     .attr('viewBox', '0 0 ' + W + ' ' + H)
     .attr('width', '100%')
-    .style('max-width', W + 'px')
-    .style('display', 'block')
-    .style('margin', '0 auto');
+    .style('display', 'block');
 }
 
 function styleAxis(ax) {
-  ax.select('.domain').attr('stroke', '#bbb');
-  ax.selectAll('text').attr('font-size', 9).attr('fill', '#666').attr('font-family', 'system-ui');
-  ax.selectAll('line').attr('stroke', '#ccc');
+  ax.select('.domain').attr('stroke', '#c4b8aa');
+  ax.selectAll('text').attr('font-size', 10).attr('fill', '#6b6560').attr('font-family', FONT);
+  ax.selectAll('line').attr('stroke', '#d4c9bb');
 }
 
-// geo names in the shapefile don't always match the rent board data
+var _tooltip = document.getElementById('tooltip');
+
+function showTip(html, event) {
+  _tooltip.innerHTML = html;
+  _tooltip.style.opacity = 1;
+  moveTip(event);
+}
+function moveTip(event) {
+  var x = event.clientX + 14, y = event.clientY - 32;
+  if (x + 200 > window.innerWidth) x = event.clientX - 210;
+  _tooltip.style.left = x + 'px';
+  _tooltip.style.top  = y + 'px';
+}
+function hideTip() { _tooltip.style.opacity = 0; }
+
 var MAP_NAME_MAP = {
   'Bayview': 'Bayview Hunters Point',
   'Parkside': 'Sunset/Parkside',
@@ -463,6 +527,8 @@ var MAP_NAME_MAP = {
   'Diamond Heights': 'Castro/Upper Market'
 };
 
+
+// ─── choropleth map ───────────────────────────────────────────────────────────
 (async function drawMap() {
   var container = document.getElementById('map-container');
   var geo, summary;
@@ -470,17 +536,14 @@ var MAP_NAME_MAP = {
     geo     = await d3.json('data/sf_neighborhoods.geo.json');
     summary = await d3.json('data/neighborhood_summary.json');
   } catch(e) {
-    console.error('Map data error:', e);
-    showError('map-container');
+    container.innerHTML = '<p style="color:#aaa;padding:20px">Map data unavailable</p>';
     return;
   }
 
   var totalByNeighborhood = {};
   summary.forEach(function(d) { totalByNeighborhood[d.neighborhood] = d.total; });
 
-  // these three aren't tracked separately by the rent board
   var mergedNeighborhoods = ['Crocker Amazon', 'Ocean View', 'Diamond Heights'];
-
   geo.features.forEach(function(f) {
     var geoName = f.properties.name;
     var lookupName = MAP_NAME_MAP[geoName] || geoName;
@@ -488,14 +551,12 @@ var MAP_NAME_MAP = {
     f.properties.isMerged = mergedNeighborhoods.indexOf(geoName) !== -1;
   });
 
-  var W = 400, H = 240;
+  var W = 620, H = 360;
   var svg = makeSVG(container, W, H);
-
   var maxTotal = d3.max(summary, function(d) { return d.total; });
-  var colorScale = d3.scaleSequential(d3.interpolateBlues).domain([0, maxTotal]);
+  var colorScale = d3.scaleSequential(d3.interpolateRgb('#f0ddd0', '#7a1508')).domain([0, maxTotal]);
 
-  // leave 55px on the right for the legend
-  var projection = d3.geoMercator().fitExtent([[0, 5], [W - 55, H - 5]], geo);
+  var projection = d3.geoMercator().fitExtent([[0, 5], [W - 95, H - 5]], geo);
   var path = d3.geoPath().projection(projection);
 
   var paths = svg.selectAll('path')
@@ -503,469 +564,48 @@ var MAP_NAME_MAP = {
     .join('path')
       .attr('d', path)
       .attr('fill', function(d) {
-        if (d.properties.isMerged) return '#d8d8d8';
-        return d.properties.total > 0 ? colorScale(d.properties.total) : '#e0e0e0';
+        if (d.properties.isMerged) return '#d8cfc5';
+        return d.properties.total > 0 ? colorScale(d.properties.total) : '#e8e0d8';
       })
-      .attr('stroke', '#fff')
-      .attr('stroke-width', 0.6);
+      .attr('stroke', '#f7f3ed')
+      .attr('stroke-width', 0.8)
+      .style('cursor', 'pointer');
 
-  paths.filter(function(d) { return d.properties.isMerged; })
-    .append('title')
-    .text(function(d) {
-      return d.properties.name + ': No separate data available.\nBoundaries use SF Rent Board analysis districts.';
+  paths.filter(function(d) { return !d.properties.isMerged; })
+    .on('mouseover', function(event, d) {
+      if (!d3.select(this).classed('map-path-selected')) {
+        d3.select(this).attr('stroke', '#c0392b').attr('stroke-width', 2);
+      }
+      showTip('<strong>' + d.properties.name + '</strong><br>' + (d.properties.total || 0).toLocaleString() + ' notices', event);
+    })
+    .on('mousemove', moveTip)
+    .on('mouseout', function(event, d) {
+      if (!d3.select(this).classed('map-path-selected')) {
+        d3.select(this).attr('stroke', '#f7f3ed').attr('stroke-width', 0.8);
+      }
+      hideTip();
     });
 
   // gradient legend
   var defs = svg.append('defs');
   var grad = defs.append('linearGradient')
-    .attr('id', 'map-legend-grad')
-    .attr('x1', '0%').attr('x2', '0%')
-    .attr('y1', '0%').attr('y2', '100%');
+    .attr('id', 'map-legend-grad').attr('x1','0%').attr('x2','0%').attr('y1','0%').attr('y2','100%');
   grad.append('stop').attr('offset', '0%').attr('stop-color', colorScale(maxTotal));
   grad.append('stop').attr('offset', '100%').attr('stop-color', colorScale(0));
 
-  var lx = W - 48, ly = 40, lh = 90;
-  svg.append('text')
-    .attr('x', lx + 6).attr('y', ly - 8)
-    .attr('text-anchor', 'middle')
-    .attr('font-size', 8).attr('fill', '#666')
-    .attr('font-family', 'system-ui')
-    .text('Count');
-  svg.append('rect')
-    .attr('x', lx).attr('y', ly)
-    .attr('width', 12).attr('height', lh)
-    .attr('fill', 'url(#map-legend-grad)')
-    .attr('stroke', '#bbb').attr('stroke-width', 0.5);
-  svg.append('text')
-    .attr('x', lx + 16).attr('y', ly + 8)
-    .attr('font-size', 8).attr('fill', '#666')
-    .attr('font-family', 'system-ui').text('High');
-  svg.append('text')
-    .attr('x', lx + 16).attr('y', ly + lh)
-    .attr('font-size', 8).attr('fill', '#666')
-    .attr('font-family', 'system-ui').text('Low');
+  var lx = W - 80, ly = 50, lh = 130;
+  svg.append('text').attr('x', lx).attr('y', ly - 16)
+    .attr('font-size', 10).attr('font-weight', 700).attr('fill', '#3a342f').attr('font-family', FONT).text('Eviction notices');
+  svg.append('rect').attr('x', lx).attr('y', ly).attr('width', 16).attr('height', lh)
+    .attr('fill', 'url(#map-legend-grad)').attr('stroke', '#8b7e70').attr('stroke-width', 0.8);
+  svg.append('text').attr('x', lx + 22).attr('y', ly + 10)
+    .attr('font-size', 10).attr('fill', '#3a342f').attr('font-family', FONT).text(maxTotal.toLocaleString());
+  svg.append('text').attr('x', lx + 22).attr('y', ly + lh)
+    .attr('font-size', 10).attr('fill', '#3a342f').attr('font-family', FONT).text('0');
 })();
 
 
-(async function drawLineChart() {
-  var container = document.getElementById('linechart-container');
-  var data;
-  try {
-    data = await d3.json('data/evictions_by_year.json');
-  } catch(e) {
-    console.error('Line chart data error:', e);
-    showError('linechart-container');
-    return;
-  }
-
-  var margin = { top: 28, right: 16, bottom: 36, left: 44 };
-  var W = 400, H = 240;
-  var iw = W - margin.left - margin.right;
-  var ih = H - margin.top - margin.bottom;
-
-  var svg = makeSVG(container, W, H);
-  var g = svg.append('g').attr('transform', 'translate(' + margin.left + ',' + margin.top + ')');
-
-  var x = d3.scaleLinear()
-    .domain(d3.extent(data, function(d) { return d.year; }))
-    .range([0, iw]);
-
-  var y = d3.scaleLinear()
-    .domain([0, d3.max(data, function(d) { return d.count; }) * 1.12])
-    .range([ih, 0]);
-
-  // shaded area under the line
-  var area = d3.area()
-    .x(function(d) { return x(d.year); })
-    .y0(ih)
-    .y1(function(d) { return y(d.count); })
-    .curve(d3.curveMonotoneX);
-
-  g.append('path')
-    .datum(data)
-    .attr('d', area)
-    .attr('fill', '#2471a3')
-    .attr('opacity', 0.12);
-
-  var line = d3.line()
-    .x(function(d) { return x(d.year); })
-    .y(function(d) { return y(d.count); })
-    .curve(d3.curveMonotoneX);
-
-  g.append('path')
-    .datum(data)
-    .attr('d', line)
-    .attr('fill', 'none')
-    .attr('stroke', '#2471a3')
-    .attr('stroke-width', 1.8);
-
-  g.append('g')
-    .attr('transform', 'translate(0,' + ih + ')')
-    .call(d3.axisBottom(x).tickFormat(d3.format('d')).ticks(7))
-    .call(styleAxis);
-
-  g.append('g')
-    .call(d3.axisLeft(y).ticks(5).tickFormat(function(d) { return d >= 1000 ? d / 1000 + 'k' : d; }))
-    .call(styleAxis);
-
-  g.append('text')
-    .attr('x', iw / 2).attr('y', ih + 30)
-    .attr('text-anchor', 'middle')
-    .attr('font-size', 9).attr('fill', '#777').attr('font-family', 'system-ui')
-    .text('Year');
-
-  g.append('text')
-    .attr('transform', 'rotate(-90)')
-    .attr('x', -ih / 2).attr('y', -36)
-    .attr('text-anchor', 'middle')
-    .attr('font-size', 9).attr('fill', '#777').attr('font-family', 'system-ui')
-    .text('Eviction notices');
-
-  // dot-com annotation
-  var dotcomYear = 1999;
-  var dotcomRow = data.find(function(d) { return d.year === dotcomYear; });
-  if (dotcomRow) {
-    var dcx = x(dotcomYear), dcy = y(dotcomRow.count);
-    g.append('circle')
-      .attr('cx', dcx).attr('cy', dcy).attr('r', 4)
-      .attr('fill', '#e07b39').attr('stroke', '#fff').attr('stroke-width', 1.5);
-    g.append('line')
-      .attr('x1', dcx).attr('x2', dcx)
-      .attr('y1', dcy - 5).attr('y2', dcy - 26)
-      .attr('stroke', '#e07b39').attr('stroke-width', 1.4).attr('stroke-dasharray', '3,2');
-    g.append('text')
-      .attr('x', dcx).attr('y', dcy - 30)
-      .attr('text-anchor', 'middle')
-      .attr('font-size', 9.5).attr('fill', '#e07b39')
-      .attr('font-family', 'system-ui').attr('font-weight', '700')
-      .text('Dot-com peak');
-  }
-
-  // covid annotation
-  var covidYear = 2020;
-  var covidRow = data.find(function(d) { return d.year === covidYear; });
-  if (covidRow) {
-    var cvx = x(covidYear), cvy = y(covidRow.count);
-    g.append('circle')
-      .attr('cx', cvx).attr('cy', cvy).attr('r', 4)
-      .attr('fill', '#9C27B0').attr('stroke', '#fff').attr('stroke-width', 1.5);
-    g.append('line')
-      .attr('x1', cvx).attr('x2', cvx)
-      .attr('y1', cvy - 5).attr('y2', cvy - 26)
-      .attr('stroke', '#9C27B0').attr('stroke-width', 1.4).attr('stroke-dasharray', '3,2');
-    g.append('text')
-      .attr('x', cvx).attr('y', cvy - 30)
-      .attr('text-anchor', 'middle')
-      .attr('font-size', 9.5).attr('fill', '#9C27B0')
-      .attr('font-family', 'system-ui').attr('font-weight', '700')
-      .text('COVID drop');
-  }
-
-  // hover: vertical line + dot + label
-  var bisect = d3.bisector(function(d) { return d.year; }).left;
-
-  var hoverLine = g.append('line')
-    .attr('y1', 0).attr('y2', ih)
-    .attr('stroke', '#333').attr('stroke-width', 1).attr('stroke-dasharray', '4,3')
-    .style('opacity', 0).style('pointer-events', 'none');
-
-  var hoverDot = g.append('circle')
-    .attr('r', 4).attr('fill', '#2471a3').attr('stroke', '#fff').attr('stroke-width', 1.5)
-    .style('opacity', 0).style('pointer-events', 'none');
-
-  var hoverLabel = g.append('text')
-    .attr('font-size', 10).attr('fill', '#111').attr('font-family', 'system-ui').attr('font-weight', '600')
-    .style('opacity', 0).style('pointer-events', 'none');
-
-  g.append('rect')
-    .attr('width', iw).attr('height', ih).attr('fill', 'none').attr('pointer-events', 'all')
-    .on('mousemove', function(event) {
-      var mx = d3.pointer(event)[0];
-      var yr = x.invert(mx);
-      var i = bisect(data, yr, 1);
-      var d0 = data[i - 1], d1 = data[i];
-      var d = (!d0 || (d1 && Math.abs(yr - d1.year) < Math.abs(yr - d0.year))) ? d1 : d0;
-      if (!d) return;
-      var cx = x(d.year), cy = y(d.count);
-      hoverLine.attr('x1', cx).attr('x2', cx).style('opacity', 1);
-      hoverDot.attr('cx', cx).attr('cy', cy).style('opacity', 1);
-      var lx = cx > iw * 0.72 ? cx - 6 : cx + 6;
-      var anchor = cx > iw * 0.72 ? 'end' : 'start';
-      var ly = cy > ih * 0.25 ? cy - 10 : cy + 16;
-      hoverLabel.attr('x', lx).attr('y', ly).attr('text-anchor', anchor)
-        .text(d.year + ': ' + d.count.toLocaleString()).style('opacity', 1);
-    })
-    .on('mouseleave', function() {
-      hoverLine.style('opacity', 0);
-      hoverDot.style('opacity', 0);
-      hoverLabel.style('opacity', 0);
-    });
-})();
-
-
-(async function drawBarChart() {
-  var container = document.getElementById('barchart-container');
-  var data;
-  try {
-    data = await d3.json('data/neighborhood_summary.json');
-  } catch(e) {
-    console.error('Bar chart data error:', e);
-    showError('barchart-container');
-    return;
-  }
-
-  var top10 = data.slice().sort(function(a, b) { return b.total - a.total; }).slice(0, 10);
-
-  var margin = { top: 12, right: 46, bottom: 28, left: 112 };
-  var W = 400, H = 240;
-  var iw = W - margin.left - margin.right;
-  var ih = H - margin.top - margin.bottom;
-
-  var svg = makeSVG(container, W, H);
-  var g = svg.append('g').attr('transform', 'translate(' + margin.left + ',' + margin.top + ')');
-
-  var x = d3.scaleLinear()
-    .domain([0, d3.max(top10, function(d) { return d.total; })])
-    .range([0, iw]);
-  var y = d3.scaleBand()
-    .domain(top10.map(function(d) { return d.neighborhood; }))
-    .range([0, ih]).padding(0.28);
-
-  g.selectAll('rect').data(top10).join('rect')
-    .attr('y', function(d) { return y(d.neighborhood); })
-    .attr('width', function(d) { return x(d.total); })
-    .attr('height', y.bandwidth()).attr('fill', '#6a9bb5');
-
-  g.selectAll('.bar-label').data(top10).join('text')
-    .attr('class', 'bar-label')
-    .attr('x', function(d) { return x(d.total) + 4; })
-    .attr('y', function(d) { return y(d.neighborhood) + y.bandwidth() / 2 + 4; })
-    .attr('font-size', 8).attr('fill', '#555').attr('font-family', 'system-ui')
-    .text(function(d) { return d3.format(',')(d.total); });
-
-  g.append('g')
-    .attr('transform', 'translate(0,' + ih + ')')
-    .call(d3.axisBottom(x).ticks(5).tickFormat(function(d) { return d >= 1000 ? d / 1000 + 'k' : d; }))
-    .call(styleAxis);
-
-  g.append('g')
-    .call(d3.axisLeft(y).tickSize(0).tickFormat(function(d) { return d.length > 15 ? d.slice(0, 14) + '…' : d; }))
-    .call(function(ax) { ax.select('.domain').remove(); ax.selectAll('text').attr('font-size', 8.5).attr('fill', '#444'); });
-})();
-
-
-// shared app state used by the scrollytelling and interactive charts
-var _APP = {
-  yearData: null,
-  nbrReasonData: null,
-  nbrYearData: null,
-  summaryData: null,
-  evictionsByReasonYear: null,
-  selectedNeighborhood: null,
-  scrollyG: null, scrollyX: null, scrollyY: null,
-  scrollyIW: 0, scrollyIH: 0,
-  scrollyLineFn: null, scrollyAreaFn: null
-};
-
-// data for the 5 era chapters
-var CHAPTERS = [
-  { era: '1997–2026', title: 'Introduction',     text: 'San Francisco has filed over 48,000 eviction notices since 1997. Click each era to explore the story of displacement.',                                                         yearMin: 1997, yearMax: 2026, color: '#666666', annotation: null },
-  { era: '1997–2003', title: 'Dot-com Boom',     text: 'The late 1990s tech explosion pushed evictions to a peak of nearly 3,000 notices in 1998, the highest count in recorded history.',                                                  yearMin: 1997, yearMax: 2003, color: '#e07b39', annotation: 'Dot-com peak: 2,911 (1998)' },
-  { era: '2013–2016', title: 'Tech Surge',       text: 'A second wave hit as major tech IPOs flooded the Bay Area with capital. Evictions climbed back toward 2,000 per year.',                                                        yearMin: 2013, yearMax: 2016, color: '#2196F3', annotation: 'Tech Surge peak: 2,135 (2015)' },
-  { era: '2020–2022', title: 'COVID Moratorium', text: 'The pandemic brought an emergency eviction moratorium. Filings dropped sharply, marking the steepest single-year decline ever recorded.',                                                yearMin: 2020, yearMax: 2022, color: '#9C27B0', annotation: 'COVID moratorium: filings dropped 60%' },
-  { era: '2023–2026', title: 'Recovery',         text: 'As the moratorium ended, evictions returned to pre-pandemic levels, with no-fault evictions rising. Data runs through early 2026. With the AI boom now reshaping the Bay Area economy, historical patterns suggest another wave of displacement may be underway.',                yearMin: 2023, yearMax: 2026, color: '#4CAF50', annotation: 'Recovery: no-fault evictions rising' }
-];
-
-function buildScrollyLineChart(data) {
-  var container = document.getElementById('scrolly-linechart');
-  if (!container || !data) return;
-  var margin = { top: 28, right: 18, bottom: 38, left: 46 };
-  var W = 440, H = 290;
-  var iw = W - margin.left - margin.right;
-  var ih = H - margin.top - margin.bottom;
-
-  var svg = d3.select(container).append('svg')
-    .attr('viewBox', '0 0 ' + W + ' ' + H)
-    .attr('width', '100%').style('display', 'block');
-
-  var g = svg.append('g').attr('transform', 'translate(' + margin.left + ',' + margin.top + ')');
-
-  var x = d3.scaleLinear()
-    .domain(d3.extent(data, function(d) { return d.year; })).range([0, iw]);
-  var y = d3.scaleLinear()
-    .domain([0, d3.max(data, function(d) { return d.count; }) * 1.15]).range([ih, 0]);
-
-  var areaFn = d3.area().x(function(d){ return x(d.year); }).y0(ih).y1(function(d){ return y(d.count); }).curve(d3.curveMonotoneX);
-  var lineFn = d3.line().x(function(d){ return x(d.year); }).y(function(d){ return y(d.count); }).curve(d3.curveMonotoneX);
-
-  // layers from bottom to top: gray area, era band, gray line, era highlight, annotation
-  g.append('path').attr('class', 'main-area')
-    .datum(data).attr('d', areaFn)
-    .attr('fill', '#e8e8e8').attr('opacity', 1);
-
-  g.append('rect').attr('class', 'scrolly-band')
-    .attr('y', 0).attr('height', ih).attr('x', 0).attr('width', 0)
-    .attr('fill', '#555').attr('opacity', 0.15);
-
-  g.append('path').attr('class', 'main-line')
-    .datum(data).attr('d', lineFn)
-    .attr('fill', 'none').attr('stroke', '#cccccc').attr('stroke-width', 1.5);
-
-  g.append('g').attr('class', 'era-highlight-group');
-  g.append('g').attr('class', 'scrolly-ann');
-
-  g.append('g').attr('transform', 'translate(0,' + ih + ')')
-    .call(d3.axisBottom(x).tickFormat(d3.format('d')).ticks(7))
-    .call(function(ax){ ax.select('.domain').attr('stroke','#ccc'); ax.selectAll('text').attr('font-size',9).attr('fill','#777').attr('font-family','system-ui'); ax.selectAll('line').attr('stroke','#ddd'); });
-
-  g.append('g')
-    .call(d3.axisLeft(y).ticks(5).tickFormat(function(d){ return d>=1000 ? d/1000+'k' : d; }))
-    .call(function(ax){ ax.select('.domain').attr('stroke','#ccc'); ax.selectAll('text').attr('font-size',9).attr('fill','#777').attr('font-family','system-ui'); ax.selectAll('line').attr('stroke','#ddd'); });
-
-  _APP.scrollyG = g; _APP.scrollyX = x; _APP.scrollyY = y;
-  _APP.scrollyIW = iw; _APP.scrollyIH = ih;
-  _APP.scrollyLineFn = lineFn; _APP.scrollyAreaFn = areaFn;
-}
-
-function highlightChapter(idx) {
-  var ch = CHAPTERS[idx] || CHAPTERS[0];
-  if (!_APP.scrollyG || !_APP.yearData) return;
-  var data = _APP.yearData;
-  var g = _APP.scrollyG;
-  var x = _APP.scrollyX, y = _APP.scrollyY, iw = _APP.scrollyIW;
-  var color = ch.color;
-  var lineFn = _APP.scrollyLineFn;
-  var areaFn = _APP.scrollyAreaFn;
-
-  g.select('.main-line').attr('stroke', '#cccccc').attr('stroke-width', 1.5);
-  g.select('.main-area').attr('fill', '#e8e8e8').attr('opacity', 1);
-  g.select('.scrolly-band').attr('width', 0);
-  g.select('.era-highlight-group').selectAll('*').remove();
-  g.select('.scrolly-ann').selectAll('*').remove();
-
-  if (idx === 0) {
-    // intro shows the whole line in gray, no era coloring
-    g.select('.main-line').attr('stroke', '#666666').attr('stroke-width', 2);
-    return;
-  }
-
-  g.select('.scrolly-band')
-    .attr('x', x(ch.yearMin))
-    .attr('width', Math.max(0, x(ch.yearMax) - x(ch.yearMin)))
-    .attr('fill', color).attr('opacity', 0.15);
-
-  var seg = data.filter(function(d){ return d.year >= ch.yearMin && d.year <= ch.yearMax; });
-  var eraGroup = g.select('.era-highlight-group');
-
-  eraGroup.append('path')
-    .datum(seg).attr('d', areaFn)
-    .attr('fill', color).attr('opacity', 0.3);
-
-  eraGroup.append('path')
-    .datum(seg).attr('d', lineFn)
-    .attr('fill', 'none').attr('stroke', color).attr('stroke-width', 3);
-
-  var ann = g.select('.scrolly-ann');
-  if (seg.length && ch.annotation) {
-    var peak = seg.reduce(function(a,b){ return b.count > a.count ? b : a; });
-    var ax = x(peak.year), ay = y(peak.count);
-    var anchor = ax > iw * 0.75 ? 'end' : ax < iw * 0.25 ? 'start' : 'middle';
-
-    ann.append('line')
-      .attr('x1', ax).attr('x2', ax).attr('y1', ay).attr('y2', ay - 22)
-      .attr('stroke', color).attr('stroke-width', 1.5).attr('stroke-dasharray', '3,2');
-
-    var textEl = ann.append('text')
-      .attr('x', ax).attr('y', ay - 28)
-      .attr('text-anchor', anchor)
-      .attr('font-size', 13).attr('fill', color)
-      .attr('font-family', 'system-ui').attr('font-weight', '600')
-      .text(ch.annotation);
-
-    try {
-      var bbox = textEl.node().getBBox();
-      ann.insert('rect', 'text')
-        .attr('x', bbox.x - 4).attr('y', bbox.y - 3)
-        .attr('width', bbox.width + 8).attr('height', bbox.height + 6)
-        .attr('fill', 'white').attr('opacity', 0.85).attr('rx', 2);
-    } catch(e) { /* getBBox fails outside the DOM */ }
-  }
-}
-
-function buildEraButtons() {
-  var btnContainer = document.getElementById('era-buttons');
-  var chaptersEl = document.getElementById('chapters');
-  if (!btnContainer || !chaptersEl) return;
-
-  var timeline = document.createElement('div');
-  timeline.id = 'era-timeline';
-  timeline.innerHTML =
-    '<div class="timeline-track">' +
-    '<div class="timeline-line"></div>' +
-    '<div class="timeline-line-fill" id="timeline-fill"></div>' +
-    '<div class="timeline-dots">' +
-    CHAPTERS.map(function(ch, i) {
-      return '<div class="timeline-stop" data-chapter="' + i + '">' +
-        '<div class="timeline-dot"></div>' +
-        '<div class="timeline-label">' + ch.title + '</div>' +
-        '<div class="timeline-year">' + ch.era + '</div>' +
-        '</div>';
-    }).join('') +
-    '</div></div>';
-  btnContainer.appendChild(timeline);
-
-  function activateEra(idx) {
-    var ch = CHAPTERS[idx] || CHAPTERS[0];
-
-    btnContainer.querySelectorAll('.timeline-stop').forEach(function(stop) {
-      var i = +stop.getAttribute('data-chapter');
-      var dot   = stop.querySelector('.timeline-dot');
-      var label = stop.querySelector('.timeline-label');
-      var year  = stop.querySelector('.timeline-year');
-      if (i === idx) {
-        stop.classList.add('active');
-        dot.style.background   = ch.color;
-        dot.style.borderColor  = ch.color;
-        label.style.color      = ch.color;
-        year.style.color       = ch.color;
-      } else {
-        stop.classList.remove('active');
-        dot.style.background   = 'white';
-        dot.style.borderColor  = '#ccc';
-        label.style.color      = '#888';
-        year.style.color       = '#bbb';
-      }
-    });
-
-    // move the fill line to the active dot
-    var fill = document.getElementById('timeline-fill');
-    if (fill) {
-      var pct = (CHAPTERS.length > 1) ? (idx / (CHAPTERS.length - 1)) * 90 : 0;
-      fill.style.width      = pct + '%';
-      fill.style.background = ch.color;
-    }
-
-    chaptersEl.innerHTML = [
-      '<div class="chapter-inner" style="border-left-color:' + ch.color + '">',
-        '<div class="chapter-era">' + ch.era + '</div>',
-        '<div class="chapter-title" style="color:' + ch.color + ';margin-bottom:10px;font-size:1rem;font-weight:700">' + ch.title + '</div>',
-        '<p class="chapter-text">' + ch.text + '</p>',
-      '</div>'
-    ].join('');
-
-    highlightChapter(idx);
-  }
-
-  btnContainer.querySelectorAll('.timeline-stop').forEach(function(stop) {
-    stop.addEventListener('click', function() {
-      activateEra(+stop.getAttribute('data-chapter'));
-    });
-  });
-
-  activateEra(0);
-}
-
-// stacked area for all of SF
+// ─── stacked area chart ───────────────────────────────────────────────────────
 function renderStackedAreaAllSF(data) {
   var container = document.getElementById('stacked-container');
   if (!container || !data) return;
@@ -995,39 +635,60 @@ function renderStackedAreaAllSF(data) {
   });
 
   var keys = top5.concat(['Other']);
-  var colors = ['#4a7fa0','#7aa3bc','#a3c4d6','#c5dce8','#deedf5','#c8c8c8'];
+  var colors = ['#7a1508','#c0392b','#e07b54','#e8a87c','#c4b8aa','#a09080'];
   var series = d3.stack().keys(keys)(pivoted);
-  var margin = { top: 20, right: 105, bottom: 36, left: 40 };
-  var W = 400, H = 240, iw = W-margin.left-margin.right, ih = H-margin.top-margin.bottom;
+
+  var containerH = container.clientHeight || 300;
+  var margin = { top: 14, right: 150, bottom: 36, left: 46 };
+  var W = 900, H = Math.max(200, containerH);
+  var iw = W - margin.left - margin.right;
+  var ih = H - margin.top - margin.bottom;
 
   var svg = makeSVG(container, W, H);
-  var g = svg.append('g').attr('transform','translate('+margin.left+','+margin.top+')');
+  var g = svg.append('g').attr('transform', 'translate(' + margin.left + ',' + margin.top + ')');
   var x = d3.scaleLinear().domain(d3.extent(years)).range([0, iw]);
   var yMax = d3.max(series, function(s){ return d3.max(s, function(d){ return d[1]; }); });
   var y = d3.scaleLinear().domain([0, yMax]).range([ih, 0]);
   var area = d3.area()
     .x(function(d){ return x(d.data.year); })
-    .y0(function(d){ return y(d[0]); }).y1(function(d){ return y(d[1]); })
+    .y0(function(d){ return y(d[0]); })
+    .y1(function(d){ return y(d[1]); })
     .curve(d3.curveMonotoneX);
-  g.selectAll('.area').data(series).join('path').attr('class','area')
-    .attr('d', area).attr('fill', function(d,i){ return colors[i]; });
-  g.append('g').attr('transform','translate(0,'+ih+')')
-    .call(d3.axisBottom(x).tickFormat(d3.format('d')).ticks(7))
-    .call(styleAxis);
+
+  var layers = g.selectAll('.area').data(series).join('path')
+    .attr('class', 'area')
+    .attr('d', area)
+    .attr('fill', function(d,i){ return colors[i]; })
+    .style('cursor', 'pointer');
+
+  layers
+    .on('mouseover', function(event, d) {
+      layers.style('opacity', 0.3);
+      d3.select(this).style('opacity', 1);
+      showTip('<strong>' + d.key + '</strong>', event);
+    })
+    .on('mousemove', moveTip)
+    .on('mouseout', function() {
+      layers.style('opacity', 1);
+      hideTip();
+    });
+
+  g.append('g').attr('transform', 'translate(0,' + ih + ')')
+    .call(d3.axisBottom(x).tickFormat(d3.format('d')).ticks(7)).call(styleAxis);
   g.append('g')
-    .call(d3.axisLeft(y).ticks(5).tickFormat(function(d){ return d>=1000 ? d/1000+'k' : d; }))
-    .call(styleAxis);
-  g.append('text').attr('transform','rotate(-90)').attr('x',-ih/2).attr('y',-32)
-    .attr('text-anchor','middle').attr('font-size',9).attr('fill','#777').attr('font-family','system-ui').text('Eviction notices');
-  var legend = g.append('g').attr('transform','translate('+(iw+8)+', 10)');
-  keys.forEach(function(k,i){
-    legend.append('rect').attr('x',0).attr('y',i*20).attr('width',10).attr('height',10).attr('fill',colors[i]);
-    legend.append('text').attr('x',13).attr('y',i*20+9).attr('font-size',8).attr('fill','#444').attr('font-family','system-ui')
-      .text(k.length>13 ? k.slice(0,12)+'…' : k);
+    .call(d3.axisLeft(y).ticks(5).tickFormat(function(d){ return d>=1000 ? d/1000+'k' : d; })).call(styleAxis);
+  g.append('text').attr('transform', 'rotate(-90)').attr('x', -ih/2).attr('y', -36)
+    .attr('text-anchor', 'middle').attr('font-size', 10).attr('fill', '#6b6560').attr('font-family', FONT).text('Eviction notices');
+
+  var legend = g.append('g').attr('transform', 'translate(' + (iw + 12) + ', 10)');
+  keys.forEach(function(k, i) {
+    legend.append('rect').attr('x', 0).attr('y', i * 22).attr('width', 12).attr('height', 12).attr('fill', colors[i]);
+    legend.append('text').attr('x', 16).attr('y', i * 22 + 10)
+      .attr('font-size', 10).attr('fill', '#6b6560').attr('font-family', FONT)
+      .text(k.length > 14 ? k.slice(0,13) + '…' : k);
   });
 }
 
-// bar chart showing reasons for one neighborhood
 function renderNeighborhoodReasons(neighborhood, nbrReasonData) {
   var container = document.getElementById('stacked-container');
   if (!container || !nbrReasonData) return;
@@ -1036,87 +697,487 @@ function renderNeighborhoodReasons(neighborhood, nbrReasonData) {
     .sort(function(a,b){ return b.count - a.count; });
   if (!rows.length) return;
 
-  var margin = { top: 14, right: 50, bottom: 28, left: 120 };
-  var W = 400, H = 240, iw = W-margin.left-margin.right, ih = H-margin.top-margin.bottom;
+  var containerH = container.clientHeight || 300;
+  var margin = { top: 14, right: 70, bottom: 42, left: 150 };
+  var W = 820, H = Math.max(190, containerH);
+  var iw = W - margin.left - margin.right;
+  var ih = H - margin.top - margin.bottom;
+
   var svg = makeSVG(container, W, H);
-  var g = svg.append('g').attr('transform','translate('+margin.left+','+margin.top+')');
-  var x = d3.scaleLinear().domain([0, d3.max(rows,function(d){ return d.count; })]).range([0, iw]);
-  var y = d3.scaleBand().domain(rows.map(function(d){ return d.reason; })).range([0, ih]).padding(0.25);
-  g.selectAll('rect').data(rows).join('rect')
-    .attr('y',function(d){ return y(d.reason); })
-    .attr('width',function(d){ return x(d.count); })
-    .attr('height', y.bandwidth()).attr('fill','#6a9bb5');
-  g.selectAll('.lbl').data(rows).join('text').attr('class','lbl')
-    .attr('x',function(d){ return x(d.count)+4; })
-    .attr('y',function(d){ return y(d.reason)+y.bandwidth()/2+4; })
-    .attr('font-size',8).attr('fill','#555').attr('font-family','system-ui')
+  var g = svg.append('g').attr('transform', 'translate(' + margin.left + ',' + margin.top + ')');
+  // fixed scale: max single (neighborhood, reason) count across the entire dataset
+  var fixedMax = (_APP && _APP.nbrReasonGlobalMax) || d3.max(rows, function(d){ return d.count; });
+  var x = d3.scaleLinear().domain([0, fixedMax]).range([0, iw]);
+  var y = d3.scaleBand().domain(rows.map(function(d){ return d.reason; })).range([0, ih]).padding(0.28);
+
+  // gridlines
+  g.append('g').attr('class', 'grid').attr('transform', 'translate(0,' + ih + ')')
+    .call(d3.axisBottom(x).ticks(6).tickSize(-ih).tickFormat(''))
+    .call(function(ax){ ax.select('.domain').remove(); ax.selectAll('line').attr('stroke', '#e8e0d8').attr('stroke-dasharray', '3,3'); });
+
+  g.selectAll('rect.bar2').data(rows).join('rect')
+    .attr('class', 'bar2')
+    .attr('y', function(d){ return y(d.reason); })
+    .attr('width', function(d){ return x(d.count); })
+    .attr('height', y.bandwidth())
+    .attr('fill', '#c0392b')
+    .style('transition', 'fill 0.15s')
+    .on('mouseover', function(event, d) {
+      d3.select(this).attr('fill', '#e07b54');
+      showTip('<strong>' + d.reason + '</strong><br>' + d.count.toLocaleString() + ' notices', event);
+    })
+    .on('mousemove', moveTip)
+    .on('mouseout', function() { d3.select(this).attr('fill', '#c0392b'); hideTip(); });
+
+  g.selectAll('.lbl').data(rows).join('text').attr('class', 'lbl')
+    .attr('x', function(d){ return x(d.count) + 4; })
+    .attr('y', function(d){ return y(d.reason) + y.bandwidth()/2 + 4; })
+    .attr('font-size', 10).attr('fill', '#6b6560').attr('font-family', FONT)
     .text(function(d){ return d3.format(',')(d.count); });
-  g.append('g').attr('transform','translate(0,'+ih+')')
-    .call(d3.axisBottom(x).ticks(5).tickFormat(function(d){ return d>=1000 ? d/1000+'k' : d; }))
-    .call(styleAxis);
+
+  g.append('g').attr('transform', 'translate(0,' + ih + ')')
+    .call(d3.axisBottom(x).ticks(6).tickFormat(function(d){ return d>=1000 ? d/1000+'k' : d; })).call(styleAxis);
   g.append('g').call(d3.axisLeft(y).tickSize(0))
-    .call(function(ax){ ax.select('.domain').remove(); ax.selectAll('text').attr('font-size',8.5).attr('fill','#444'); });
+    .call(function(ax){ ax.select('.domain').remove(); ax.selectAll('text').attr('font-size', 10).attr('fill', '#555').attr('font-family', FONT); });
+
+  g.append('text').attr('x', iw/2).attr('y', ih + 34)
+    .attr('text-anchor', 'middle').attr('font-size', 10).attr('fill', '#6b6560').attr('font-family', FONT)
+    .text('Eviction notices');
 }
 
+
+// ─── bar chart (persistent SVG with transitions) ──────────────────────────────
+var _bar = { svg: null, g: null, x: null, y: null };
+
+function renderBarChart(minYear, maxYear, nbrYearData) {
+  var container = document.getElementById('barchart-container');
+  if (!container || !nbrYearData) return;
+
+  var filtered = nbrYearData.filter(function(d){ return d.year >= minYear && d.year <= maxYear; });
+  var byNbr = d3.rollup(filtered, function(v){ return d3.sum(v, function(d){ return d.count; }); }, function(d){ return d.neighborhood; });
+  var top10 = Array.from(byNbr.entries())
+    .map(function(e){ return { neighborhood: e[0], total: e[1] }; })
+    .sort(function(a,b){ return b.total - a.total; }).slice(0, 10);
+  if (!top10.length) return;
+
+  var margin = { top: 10, right: 70, bottom: 42, left: 150 };
+  var containerH = container.clientHeight || 280;
+  var W = 820, H = Math.max(180, containerH);
+  var iw = W - margin.left - margin.right;
+  var ih = H - margin.top - margin.bottom;
+
+  // fixed x-axis: max neighborhood total across the entire 1997-2026 period
+  var fixedMax = (_APP && _APP.barChartGlobalMax) || d3.max(top10, function(d){ return d.total; });
+
+  if (!_bar.svg) {
+    var svg = makeSVG(container, W, H);
+    var g   = svg.append('g').attr('transform', 'translate(' + margin.left + ',' + margin.top + ')');
+
+    var xScale = d3.scaleLinear().domain([0, fixedMax]).range([0, iw]);
+    var yScale = d3.scaleBand().domain(top10.map(function(d){ return d.neighborhood; })).range([0, ih]).padding(0.28);
+
+    g.append('g').attr('class', 'grid').attr('transform', 'translate(0,' + ih + ')')
+      .call(d3.axisBottom(xScale).ticks(6).tickSize(-ih).tickFormat(''))
+      .call(function(ax){ ax.select('.domain').remove(); ax.selectAll('line').attr('stroke', '#e8e0d8').attr('stroke-dasharray', '3,3'); });
+
+    g.append('g').attr('class', 'x-axis').attr('transform', 'translate(0,' + ih + ')')
+      .call(d3.axisBottom(xScale).ticks(6).tickFormat(function(d){ return d>=1000 ? d/1000+'k' : d; })).call(styleAxis);
+
+    g.append('g').attr('class', 'y-axis')
+      .call(d3.axisLeft(yScale).tickSize(0).tickFormat(function(d){ return d.length > 19 ? d.slice(0,18)+'…' : d; }))
+      .call(function(ax){ ax.select('.domain').remove(); ax.selectAll('text').attr('font-size', 10.5).attr('fill', '#555').attr('font-family', FONT); });
+
+    g.append('text').attr('class', 'x-label').attr('x', iw/2).attr('y', ih + 34)
+      .attr('text-anchor', 'middle').attr('font-size', 10).attr('fill', '#6b6560').attr('font-family', FONT)
+      .text('Eviction notices');
+
+    g.selectAll('.bar').data(top10, function(d){ return d.neighborhood; }).join('rect')
+      .attr('class', 'bar')
+      .attr('y', function(d){ return yScale(d.neighborhood); })
+      .attr('width', function(d){ return xScale(d.total); })
+      .attr('height', yScale.bandwidth())
+      .attr('fill', '#8b1a10')
+      .style('transition', 'fill 0.15s')
+      .on('mouseover', function(event, d) {
+        d3.select(this).attr('fill', '#e07b54');
+        showTip('<strong>' + d.neighborhood + '</strong><br>' + d.total.toLocaleString() + ' notices', event);
+      })
+      .on('mousemove', moveTip)
+      .on('mouseout', function() { d3.select(this).attr('fill', '#8b1a10'); hideTip(); });
+
+    g.selectAll('.bar-lbl').data(top10, function(d){ return d.neighborhood; }).join('text')
+      .attr('class', 'bar-lbl')
+      .attr('x', function(d){ return xScale(d.total) + 4; })
+      .attr('y', function(d){ return yScale(d.neighborhood) + yScale.bandwidth()/2 + 4; })
+      .attr('font-size', 10).attr('fill', '#6b6560').attr('font-family', FONT)
+      .text(function(d){ return d3.format(',')(d.total); });
+
+    _bar.svg = svg; _bar.g = g; _bar.x = xScale; _bar.y = yScale;
+    return;
+  }
+
+  // subsequent renders: y rescale + bar transition (x is fixed across selections)
+  var g = _bar.g, xScale = _bar.x, yScale = _bar.y;
+  yScale.domain(top10.map(function(d){ return d.neighborhood; }));
+
+  g.select('.x-axis')
+    .call(d3.axisBottom(xScale).ticks(6).tickFormat(function(d){ return d>=1000 ? d/1000+'k' : d; })).call(styleAxis);
+
+  g.select('.y-axis').transition().duration(420)
+    .call(d3.axisLeft(yScale).tickSize(0).tickFormat(function(d){ return d.length > 19 ? d.slice(0,18)+'…' : d; }))
+    .call(function(ax){ ax.select('.domain').remove(); ax.selectAll('text').attr('font-size', 10.5).attr('fill', '#555').attr('font-family', FONT); });
+
+  g.selectAll('.bar').data(top10, function(d){ return d.neighborhood; })
+    .join(
+      function(enter) {
+        return enter.append('rect').attr('class', 'bar')
+          .attr('y', function(d){ return yScale(d.neighborhood); })
+          .attr('width', 0).attr('height', yScale.bandwidth())
+          .attr('fill', '#8b1a10').style('transition', 'fill 0.15s')
+          .on('mouseover', function(event, d) { d3.select(this).attr('fill', '#e07b54'); showTip('<strong>' + d.neighborhood + '</strong><br>' + d.total.toLocaleString() + ' notices', event); })
+          .on('mousemove', moveTip)
+          .on('mouseout', function() { d3.select(this).attr('fill', '#8b1a10'); hideTip(); });
+      },
+      function(update) { return update; },
+      function(exit) { return exit.transition().duration(420).attr('width', 0).remove(); }
+    )
+    .transition().duration(420)
+    .attr('y', function(d){ return yScale(d.neighborhood); })
+    .attr('width', function(d){ return xScale(d.total); })
+    .attr('height', yScale.bandwidth());
+
+  g.selectAll('.bar-lbl').data(top10, function(d){ return d.neighborhood; })
+    .join(
+      function(enter) {
+        return enter.append('text').attr('class', 'bar-lbl')
+          .attr('x', function(d){ return xScale(d.total) + 4; })
+          .attr('y', function(d){ return yScale(d.neighborhood) + yScale.bandwidth()/2 + 4; })
+          .attr('font-size', 10).attr('fill', '#6b6560').attr('font-family', FONT)
+          .text(function(d){ return d3.format(',')(d.total); });
+      },
+      function(update) { return update; },
+      function(exit) { return exit.remove(); }
+    )
+    .transition().duration(420)
+    .attr('x', function(d){ return xScale(d.total) + 4; })
+    .attr('y', function(d){ return yScale(d.neighborhood) + yScale.bandwidth()/2 + 4; })
+    .text(function(d){ return d3.format(',')(d.total); });
+}
+
+
+// ─── dual-axis chart ──────────────────────────────────────────────────────────
+(async function drawDualAxis() {
+  var container = document.getElementById('dual-chart-container');
+  var evictionData, rentData;
+  try {
+    evictionData = await d3.json('data/evictions_by_year.json');
+    rentData     = await d3.json('data/rent_fmr.json');
+  } catch(e) {
+    container.innerHTML = '<p style="color:#aaa;padding:20px">Data unavailable</p>';
+    return;
+  }
+
+  var rentMap = new Map(rentData.map(function(d){ return [d.year, d.rent]; }));
+  var data = evictionData
+    .filter(function(d){ return d.year >= 2006 && d.year <= 2025 && rentMap.has(d.year); })
+    .map(function(d){ return { year: d.year, evictions: d.count, rent: rentMap.get(d.year) }; });
+
+  var margin = { top: 40, right: 78, bottom: 46, left: 60 };
+  var W = 900, H = 360;
+  var iw = W - margin.left - margin.right;
+  var ih = H - margin.top - margin.bottom;
+
+  var svg = makeSVG(container, W, H);
+  var g   = svg.append('g').attr('transform', 'translate(' + margin.left + ',' + margin.top + ')');
+
+  var x      = d3.scaleLinear().domain([2006, 2025]).range([0, iw]);
+  var yLeft  = d3.scaleLinear().domain([0, d3.max(data, function(d){ return d.evictions; }) * 1.18]).range([ih, 0]);
+  var yRight = d3.scaleLinear().domain([0, d3.max(data, function(d){ return d.rent;      }) * 1.18]).range([ih, 0]);
+
+  // subtle grid
+  g.append('g').call(d3.axisLeft(yLeft).ticks(5).tickSize(-iw).tickFormat(''))
+    .call(function(ax){ ax.select('.domain').remove(); ax.selectAll('line').attr('stroke', '#e8e0d8').attr('stroke-dasharray', '3,3'); });
+
+  // axes
+  g.append('g').attr('transform', 'translate(0,' + ih + ')')
+    .call(d3.axisBottom(x).tickFormat(d3.format('d')).ticks(10)).call(styleAxis);
+  g.append('g').call(d3.axisLeft(yLeft).ticks(5).tickFormat(function(d){ return d>=1000 ? d/1000+'k' : d; })).call(styleAxis);
+  g.append('g').attr('transform', 'translate(' + iw + ',0)')
+    .call(d3.axisRight(yRight).ticks(5).tickFormat(function(d){ return '$' + (d>=1000 ? (d/1000).toFixed(1)+'k' : d); })).call(styleAxis);
+
+  // axis labels
+  g.append('text').attr('transform', 'rotate(-90)').attr('x', -ih/2).attr('y', -46)
+    .attr('text-anchor', 'middle').attr('font-size', 11).attr('fill', '#8b1a10').attr('font-family', FONT).text('Eviction notices');
+  g.append('text').attr('transform', 'rotate(90)').attr('x', ih/2).attr('y', -(iw + 58))
+    .attr('text-anchor', 'middle').attr('font-size', 11).attr('fill', '#2c6e8a').attr('font-family', FONT).text('Monthly rent (2BR FMR)');
+
+  // evictions area + line
+  var evictionArea = d3.area()
+    .x(function(d){ return x(d.year); }).y0(ih).y1(function(d){ return yLeft(d.evictions); }).curve(d3.curveMonotoneX);
+  var evictionLine = d3.line()
+    .x(function(d){ return x(d.year); }).y(function(d){ return yLeft(d.evictions); }).curve(d3.curveMonotoneX);
+
+  g.append('path').datum(data).attr('d', evictionArea).attr('fill', '#8b1a10').attr('opacity', 0.07);
+  g.append('path').datum(data).attr('d', evictionLine)
+    .attr('fill', 'none').attr('stroke', '#8b1a10').attr('stroke-width', 2.5);
+
+  // rent line (dashed blue)
+  var rentLine = d3.line()
+    .x(function(d){ return x(d.year); }).y(function(d){ return yRight(d.rent); }).curve(d3.curveMonotoneX);
+  g.append('path').datum(data).attr('d', rentLine)
+    .attr('fill', 'none').attr('stroke', '#2c6e8a').attr('stroke-width', 2.5).attr('stroke-dasharray', '7,3');
+
+  // annotations
+  function annotate(yr, lines, anchorSide, evOrRent, color) {
+    var row = data.find(function(d){ return d.year === yr; });
+    if (!row) return;
+    var ax = x(yr);
+    var ay = evOrRent === 'ev' ? yLeft(row.evictions) : yRight(row.rent);
+    var offX = anchorSide === 'right' ? 14 : -14;
+    var anchor = anchorSide === 'right' ? 'start' : 'end';
+    g.append('line').attr('x1', ax).attr('y1', ay - 6).attr('x2', ax).attr('y2', ay - 26)
+      .attr('stroke', color).attr('stroke-width', 1.3).attr('stroke-dasharray', '3,2');
+    var txt = g.append('text').attr('x', ax + offX).attr('y', ay - 30)
+      .attr('text-anchor', anchor).attr('font-size', 10.5).attr('fill', color)
+      .attr('font-family', FONT).attr('font-style', 'italic');
+    lines.forEach(function(line, i) {
+      txt.append('tspan').attr('x', ax + offX).attr('dy', i === 0 ? 0 : 14).text(line);
+    });
+  }
+
+  annotate(2015, ['Tech boom:', 'rents and evictions surge'], 'right', 'ev', '#8b1a10');
+  annotate(2021, ['COVID aftermath:', 'rents fall, evictions stay low'], 'left', 'ev', '#6b6560');
+
+  // legend
+  var leg = g.append('g').attr('transform', 'translate(' + (iw * 0.06) + ', 8)');
+  leg.append('line').attr('x1',0).attr('x2',26).attr('y1',8).attr('y2',8).attr('stroke','#8b1a10').attr('stroke-width',2.5);
+  leg.append('text').attr('x',30).attr('y',12).attr('font-size',10).attr('fill','#6b6560').attr('font-family',FONT).text('Eviction notices');
+  leg.append('line').attr('x1',150).attr('x2',176).attr('y1',8).attr('y2',8).attr('stroke','#2c6e8a').attr('stroke-width',2.5).attr('stroke-dasharray','7,3');
+  leg.append('text').attr('x',180).attr('y',12).attr('font-size',10).attr('fill','#6b6560').attr('font-family',FONT).text('2BR Fair Market Rent');
+
+  // hover: crosshair + tooltip
+  var bisect = d3.bisector(function(d){ return d.year; }).left;
+  var vLine   = g.append('line').attr('y1',0).attr('y2',ih).attr('stroke','#b0a090').attr('stroke-width',1).attr('stroke-dasharray','4,3').style('opacity',0).style('pointer-events','none');
+  var dotEv   = g.append('circle').attr('r',5).attr('fill','#8b1a10').attr('stroke','#f7f3ed').attr('stroke-width',2).style('opacity',0).style('pointer-events','none');
+  var dotRent = g.append('circle').attr('r',5).attr('fill','#2c6e8a').attr('stroke','#f7f3ed').attr('stroke-width',2).style('opacity',0).style('pointer-events','none');
+
+  g.append('rect').attr('width',iw).attr('height',ih).attr('fill','none').attr('pointer-events','all')
+    .on('mousemove', function(event) {
+      var mx = d3.pointer(event)[0];
+      var yr = x.invert(mx);
+      var i  = bisect(data, yr, 1);
+      var d0 = data[i-1], d1 = data[i];
+      var d  = (!d0 || (d1 && Math.abs(yr - d1.year) < Math.abs(yr - d0.year))) ? d1 : d0;
+      if (!d) return;
+      var cx = x(d.year);
+      vLine.attr('x1',cx).attr('x2',cx).style('opacity',1);
+      dotEv.attr('cx',cx).attr('cy',yLeft(d.evictions)).style('opacity',1);
+      dotRent.attr('cx',cx).attr('cy',yRight(d.rent)).style('opacity',1);
+      showTip(
+        '<strong>' + d.year + '</strong><br>' +
+        '<span style="color:#8b1a10">&#9632;</span> ' + d.evictions.toLocaleString() + ' evictions<br>' +
+        '<span style="color:#2c6e8a">&#9632;</span> $' + d3.format(',')(d.rent) + '/mo rent',
+        event
+      );
+    })
+    .on('mouseleave', function() {
+      vLine.style('opacity',0); dotEv.style('opacity',0); dotRent.style('opacity',0); hideTip();
+    });
+})();
+
+
+// ─── scrollytelling ───────────────────────────────────────────────────────────
+var _APP = {
+  yearData: null, nbrReasonData: null, nbrYearData: null,
+  summaryData: null, evictionsByReasonYear: null,
+  scrollyG: null, scrollyX: null, scrollyY: null,
+  scrollyIW: 0, scrollyIH: 0, scrollyLineFn: null, scrollyAreaFn: null
+};
+
+var CHAPTERS = [
+  { era: '1997–2026', title: 'Introduction',     color: '#6b6560',
+    text: 'San Francisco has filed over 48,000 eviction notices since 1997. Click each era to explore the story of displacement.',
+    yearMin: 1997, yearMax: 2026, annotation: null },
+  { era: '1997–2003', title: 'Dot-com Boom',     color: '#c0392b',
+    text: 'The late 1990s tech explosion pushed evictions to a peak of nearly 3,000 notices in 1998, the highest count in recorded history.',
+    yearMin: 1997, yearMax: 2003, annotation: 'Dot-com peak: 2,911 (1998)' },
+  { era: '2013–2016', title: 'Tech Surge',       color: '#2c6e8a',
+    text: 'A second wave hit as major tech IPOs flooded the Bay Area with capital. Evictions climbed back toward 2,000 per year.',
+    yearMin: 2013, yearMax: 2016, annotation: 'Tech surge peak: 2,135 (2015)' },
+  { era: '2020–2022', title: 'COVID Moratorium', color: '#7a5c8b',
+    text: 'The pandemic brought an emergency eviction moratorium. Filings dropped sharply, marking the steepest single-year decline ever recorded.',
+    yearMin: 2020, yearMax: 2022, annotation: 'COVID moratorium: filings dropped 60%' },
+  { era: '2023–2026', title: 'Recovery',         color: '#3a7a4a',
+    text: 'As the moratorium ended, evictions returned to pre-pandemic levels with no-fault evictions rising. With the AI boom now reshaping Bay Area economics, historical patterns suggest another wave of displacement may be underway.',
+    yearMin: 2023, yearMax: 2026, annotation: 'Recovery: no-fault evictions rising' }
+];
+
+function buildScrollyLineChart(data) {
+  var container = document.getElementById('scrolly-linechart');
+  if (!container || !data) return;
+  var margin = { top: 26, right: 18, bottom: 36, left: 44 };
+  var W = 440, H = 255;
+  var iw = W - margin.left - margin.right;
+  var ih = H - margin.top - margin.bottom;
+
+  var svg = d3.select(container).append('svg')
+    .attr('viewBox', '0 0 ' + W + ' ' + H).attr('width','100%').style('display','block');
+  var g = svg.append('g').attr('transform','translate('+margin.left+','+margin.top+')');
+
+  var x = d3.scaleLinear().domain(d3.extent(data, function(d){ return d.year; })).range([0, iw]);
+  var y = d3.scaleLinear().domain([0, d3.max(data, function(d){ return d.count; }) * 1.15]).range([ih, 0]);
+  var areaFn = d3.area().x(function(d){ return x(d.year); }).y0(ih).y1(function(d){ return y(d.count); }).curve(d3.curveMonotoneX);
+  var lineFn = d3.line().x(function(d){ return x(d.year); }).y(function(d){ return y(d.count); }).curve(d3.curveMonotoneX);
+
+  g.append('path').attr('class','main-area').datum(data).attr('d',areaFn).attr('fill','#d4c9bb').attr('opacity',0.55);
+  g.append('rect').attr('class','scrolly-band').attr('y',0).attr('height',ih).attr('x',0).attr('width',0).attr('fill','#555').attr('opacity',0.1);
+  g.append('path').attr('class','main-line').datum(data).attr('d',lineFn).attr('fill','none').attr('stroke','#b0a090').attr('stroke-width',1.5);
+  g.append('g').attr('class','era-highlight-group');
+  g.append('g').attr('class','scrolly-ann');
+
+  g.append('g').attr('transform','translate(0,'+ih+')')
+    .call(d3.axisBottom(x).tickFormat(d3.format('d')).ticks(7))
+    .call(function(ax){ ax.select('.domain').attr('stroke','#c4b8aa'); ax.selectAll('text').attr('font-size',9).attr('fill','#6b6560').attr('font-family',FONT); ax.selectAll('line').attr('stroke','#d4c9bb'); });
+  g.append('g')
+    .call(d3.axisLeft(y).ticks(5).tickFormat(function(d){ return d>=1000 ? d/1000+'k' : d; }))
+    .call(function(ax){ ax.select('.domain').attr('stroke','#c4b8aa'); ax.selectAll('text').attr('font-size',9).attr('fill','#6b6560').attr('font-family',FONT); ax.selectAll('line').attr('stroke','#d4c9bb'); });
+
+  _APP.scrollyG = g; _APP.scrollyX = x; _APP.scrollyY = y;
+  _APP.scrollyIW = iw; _APP.scrollyIH = ih;
+  _APP.scrollyLineFn = lineFn; _APP.scrollyAreaFn = areaFn;
+}
+
+function highlightChapter(idx) {
+  var ch = CHAPTERS[idx] || CHAPTERS[0];
+  if (!_APP.scrollyG || !_APP.yearData) return;
+  var data = _APP.yearData;
+  var g = _APP.scrollyG;
+  var x = _APP.scrollyX, y = _APP.scrollyY, iw = _APP.scrollyIW;
+  var lineFn = _APP.scrollyLineFn, areaFn = _APP.scrollyAreaFn;
+
+  g.select('.main-line').attr('stroke','#b0a090').attr('stroke-width',1.5);
+  g.select('.main-area').attr('fill','#d4c9bb').attr('opacity',0.55);
+  g.select('.scrolly-band').attr('width',0);
+  g.select('.era-highlight-group').selectAll('*').remove();
+  g.select('.scrolly-ann').selectAll('*').remove();
+
+  if (idx === 0) {
+    g.select('.main-line').attr('stroke','#6b6560').attr('stroke-width',2);
+    return;
+  }
+
+  var color = ch.color;
+  g.select('.scrolly-band').attr('x',x(ch.yearMin)).attr('width',Math.max(0,x(ch.yearMax)-x(ch.yearMin))).attr('fill',color).attr('opacity',0.1);
+
+  var seg = data.filter(function(d){ return d.year >= ch.yearMin && d.year <= ch.yearMax; });
+  var eg  = g.select('.era-highlight-group');
+  eg.append('path').datum(seg).attr('d',areaFn).attr('fill',color).attr('opacity',0.22);
+  eg.append('path').datum(seg).attr('d',lineFn).attr('fill','none').attr('stroke',color).attr('stroke-width',3);
+
+  if (seg.length && ch.annotation) {
+    var peak = seg.reduce(function(a,b){ return b.count > a.count ? b : a; });
+    var ax = x(peak.year), ay = y(peak.count);
+    var anchor = ax > iw * 0.75 ? 'end' : ax < iw * 0.25 ? 'start' : 'middle';
+    var ann = g.select('.scrolly-ann');
+    ann.append('line').attr('x1',ax).attr('x2',ax).attr('y1',ay).attr('y2',ay-22)
+      .attr('stroke',color).attr('stroke-width',1.5).attr('stroke-dasharray','3,2');
+    var textEl = ann.append('text').attr('x',ax).attr('y',ay-28).attr('text-anchor',anchor)
+      .attr('font-size',11).attr('fill',color).attr('font-family',FONT).attr('font-weight','700')
+      .text(ch.annotation);
+    try {
+      var bbox = textEl.node().getBBox();
+      ann.insert('rect','text').attr('x',bbox.x-4).attr('y',bbox.y-3)
+        .attr('width',bbox.width+8).attr('height',bbox.height+6).attr('fill','#f7f3ed').attr('opacity',0.88).attr('rx',2);
+    } catch(e) {}
+  }
+}
+
+function buildEraButtons() {
+  var btnContainer = document.getElementById('era-buttons');
+  var chaptersEl   = document.getElementById('chapters');
+  if (!btnContainer || !chaptersEl) return;
+
+  var timeline = document.createElement('div');
+  timeline.id  = 'era-timeline';
+  timeline.innerHTML =
+    '<div class="timeline-track"><div class="timeline-line"></div><div class="timeline-line-fill" id="timeline-fill"></div><div class="timeline-dots">' +
+    CHAPTERS.map(function(ch, i) {
+      return '<div class="timeline-stop" data-chapter="' + i + '">' +
+        '<div class="timeline-dot"></div>' +
+        '<div class="timeline-label">' + ch.title + '</div>' +
+        '<div class="timeline-year">' + ch.era + '</div></div>';
+    }).join('') + '</div></div>';
+  btnContainer.appendChild(timeline);
+
+  function activateEra(idx) {
+    var ch = CHAPTERS[idx] || CHAPTERS[0];
+    btnContainer.querySelectorAll('.timeline-stop').forEach(function(stop) {
+      var i   = +stop.getAttribute('data-chapter');
+      var dot = stop.querySelector('.timeline-dot');
+      var lbl = stop.querySelector('.timeline-label');
+      var yr  = stop.querySelector('.timeline-year');
+      if (i === idx) {
+        stop.classList.add('active');
+        dot.style.background = ch.color; dot.style.borderColor = ch.color;
+        lbl.style.color = ch.color; yr.style.color = ch.color;
+      } else {
+        stop.classList.remove('active');
+        dot.style.background = ''; dot.style.borderColor = '';
+        lbl.style.color = ''; yr.style.color = '';
+      }
+    });
+    var fill = document.getElementById('timeline-fill');
+    if (fill) { fill.style.width = ((CHAPTERS.length > 1 ? idx/(CHAPTERS.length-1) : 0) * 90) + '%'; fill.style.background = ch.color; }
+    chaptersEl.innerHTML =
+      '<div class="chapter-inner" style="border-left-color:' + ch.color + '">' +
+      '<div class="chapter-era">' + ch.era + '</div>' +
+      '<div class="chapter-title" style="color:' + ch.color + '">' + ch.title + '</div>' +
+      '<p class="chapter-text">' + ch.text + '</p></div>';
+    highlightChapter(idx);
+  }
+
+  btnContainer.querySelectorAll('.timeline-stop').forEach(function(stop) {
+    stop.addEventListener('click', function() { activateEra(+stop.getAttribute('data-chapter')); });
+  });
+  activateEra(0);
+}
+
+
+// ─── map click handlers ───────────────────────────────────────────────────────
 function showNeighborhoodPanel(lookupName, summaryData, nbrReasonData) {
   var panel = document.getElementById('nbr-panel');
   if (!panel) return;
   var rec = summaryData.find(function(d){ return d.neighborhood === lookupName; });
-  if (!rec) { panel.style.display = 'none'; return; }
+  if (!rec) { panel.classList.remove('visible'); return; }
 
   var totalAll = d3.sum(summaryData, function(d){ return d.total; });
-  var cityAvg = totalAll / summaryData.length;
-  var ratio = (rec.total / cityAvg).toFixed(1);
-
-  var reasons = nbrReasonData
+  var cityAvg  = totalAll / summaryData.length;
+  var ratio    = (rec.total / cityAvg).toFixed(1);
+  var reasons  = nbrReasonData
     .filter(function(d){ return d.neighborhood === lookupName; })
-    .sort(function(a,b){ return b.count - a.count; }).slice(0, 3);
+    .sort(function(a,b){ return b.count - a.count; }).slice(0, 5);
 
   panel.querySelector('h4').textContent = rec.neighborhood;
-  panel.querySelector('.nbr-total').textContent =
-    rec.total.toLocaleString() + ' total evictions · peak year: ' + rec.peak_year;
+  panel.querySelector('.nbr-total').textContent = rec.total.toLocaleString() + ' notices · peak year: ' + rec.peak_year;
   panel.querySelector('.nbr-reason-list').innerHTML = reasons.map(function(r){
     return '<li><span>' + r.reason + '</span><span>' + r.count.toLocaleString() + '</span></li>';
   }).join('');
   panel.querySelector('.nbr-compare').textContent =
     rec.neighborhood + ' has ' + ratio + '× the city average (' + Math.round(cityAvg).toLocaleString() + ' avg per neighborhood).';
-  panel.style.display = 'block';
+  panel.classList.add('visible');
 }
 
 function closeNeighborhoodPanel() {
   var panel = document.getElementById('nbr-panel');
-  if (panel) panel.style.display = 'none';
+  if (panel) panel.classList.remove('visible');
   d3.select('#map-container').selectAll('path').classed('map-path-selected', false);
-  var lbl = document.getElementById('stacked-filter-label');
-  var btn = document.getElementById('stacked-show-all');
-  if (lbl) lbl.textContent = '';
-  if (btn) btn.style.display = 'none';
-  if (_APP.evictionsByReasonYear) renderStackedAreaAllSF(_APP.evictionsByReasonYear);
-  _APP.selectedNeighborhood = null;
 }
 
-function buildStackedHeader() {
-  var mockup = document.querySelector('#stacked-container') &&
-    document.querySelector('#stacked-container').closest('.viz-mockup');
-  if (!mockup) return;
-  var hdr = document.createElement('div');
-  hdr.id = 'stacked-header';
-  hdr.innerHTML = '<span id="stacked-filter-label"></span>' +
-    '<button id="stacked-show-all">Show All</button>';
-  mockup.insertBefore(hdr, mockup.firstChild);
-  document.getElementById('stacked-show-all').addEventListener('click', function() {
-    closeNeighborhoodPanel();
-  });
-}
-
-// wait for D3 to finish drawing paths before attaching click handlers
 function waitForMapPaths(cb) {
   var el = document.getElementById('map-container');
   if (!el) return;
   if (el.querySelector('path')) { cb(); return; }
-  var obs = new MutationObserver(function(_, o){
-    if (el.querySelector('path')){ o.disconnect(); cb(); }
-  });
+  var obs = new MutationObserver(function(_, o){ if (el.querySelector('path')){ o.disconnect(); cb(); } });
   obs.observe(el, { childList: true, subtree: true });
 }
 
@@ -1124,106 +1185,28 @@ function addMapClickHandlers(summaryData, nbrReasonData) {
   d3.select('#map-container').selectAll('path')
     .on('click', function(event, d) {
       if (!d || !d.properties) return;
-      var geoName = d.properties.name;
-      var lbl = document.getElementById('stacked-filter-label');
-      var btn = document.getElementById('stacked-show-all');
-
       d3.select('#map-container').selectAll('path').classed('map-path-selected', false);
       d3.select(this).classed('map-path-selected', true);
 
       if (d.properties.isMerged) {
-        var panel = document.getElementById('nbr-panel');
-        if (panel) panel.style.display = 'none';
-        if (lbl) lbl.textContent = '';
-        if (btn) btn.style.display = 'none';
-        var sc = document.getElementById('stacked-container');
-        if (sc) sc.innerHTML =
-          '<div style="padding:20px 16px;font-size:0.85rem;color:#666;font-style:italic;line-height:1.5;">' +
-          geoName + ' is not tracked separately by the SF Rent Board. ' +
-          'Its evictions are recorded under the ' + MAP_NAME_MAP[geoName] + ' district.' +
-          '</div>';
-        _APP.selectedNeighborhood = null;
+        closeNeighborhoodPanel();
         return;
       }
-
-      var lookupName = MAP_NAME_MAP[geoName] || geoName;
-      _APP.selectedNeighborhood = lookupName;
+      var lookupName = MAP_NAME_MAP[d.properties.name] || d.properties.name;
       showNeighborhoodPanel(lookupName, summaryData, nbrReasonData);
-      if (lbl) lbl.textContent = geoName;
+
+      // update stacked area section
+      var lbl = document.getElementById('stacked-filter-label');
+      var btn = document.getElementById('stacked-show-all');
+      if (lbl) lbl.textContent = d.properties.name;
       if (btn) btn.style.display = 'inline-block';
       renderNeighborhoodReasons(lookupName, nbrReasonData);
     });
 }
 
-// bar chart filtered by year range
-function renderBarChart(minYear, maxYear, nbrYearData) {
-  var container = document.getElementById('barchart-container');
-  if (!container || !nbrYearData) return;
-  container.innerHTML = '';
 
-  var filtered = nbrYearData.filter(function(d){ return d.year >= minYear && d.year <= maxYear; });
-  var byNbr = d3.rollup(filtered, function(v){ return d3.sum(v,function(d){ return d.count; }); }, function(d){ return d.neighborhood; });
-  var top10 = Array.from(byNbr.entries())
-    .map(function(e){ return { neighborhood: e[0], total: e[1] }; })
-    .sort(function(a,b){ return b.total - a.total; }).slice(0, 10);
-  if (!top10.length) return;
-
-  var margin = { top: 12, right: 46, bottom: 28, left: 112 };
-  var W = 400, H = 240, iw = W-margin.left-margin.right, ih = H-margin.top-margin.bottom;
-  var svg = makeSVG(container, W, H);
-  var g = svg.append('g').attr('transform','translate('+margin.left+','+margin.top+')');
-  var x = d3.scaleLinear().domain([0, d3.max(top10,function(d){ return d.total; })]).range([0, iw]);
-  var y = d3.scaleBand().domain(top10.map(function(d){ return d.neighborhood; })).range([0, ih]).padding(0.28);
-  g.selectAll('rect').data(top10).join('rect')
-    .attr('y',function(d){ return y(d.neighborhood); })
-    .attr('width',function(d){ return x(d.total); })
-    .attr('height', y.bandwidth()).attr('fill','#6a9bb5');
-  g.selectAll('.bl').data(top10).join('text').attr('class','bl')
-    .attr('x',function(d){ return x(d.total)+4; })
-    .attr('y',function(d){ return y(d.neighborhood)+y.bandwidth()/2+4; })
-    .attr('font-size',8).attr('fill','#555').attr('font-family','system-ui')
-    .text(function(d){ return d3.format(',')(d.total); });
-  g.append('g').attr('transform','translate(0,'+ih+')')
-    .call(d3.axisBottom(x).ticks(5).tickFormat(function(d){ return d>=1000 ? d/1000+'k' : d; }))
-    .call(styleAxis);
-  g.append('g').call(d3.axisLeft(y).tickSize(0)
-    .tickFormat(function(d){ return d.length>15 ? d.slice(0,14)+'…' : d; }))
-    .call(function(ax){ ax.select('.domain').remove(); ax.selectAll('text').attr('font-size',8.5).attr('fill','#444'); });
-}
-
-function buildYearSlider() {
-  var mockup = document.querySelector('#barchart-container') &&
-    document.querySelector('#barchart-container').closest('.viz-mockup');
-  if (!mockup) return;
-  var wrap = document.createElement('div');
-  wrap.id = 'bar-filter';
-  wrap.innerHTML =
-    '<span class="bar-filter-label">Filter by year range: <strong id="yr-range-display">1997 – 2026</strong></span>' +
-    '<div class="bar-slider-row">' +
-    '<span class="yr-lbl">From</span>' +
-    '<input type="range" id="yr-slider-min" min="1997" max="2026" value="1997" step="1">' +
-    '<span class="yr-lbl">To</span>' +
-    '<input type="range" id="yr-slider-max" min="1997" max="2026" value="2026" step="1">' +
-    '</div>';
-  mockup.insertBefore(wrap, mockup.firstChild);
-
-  function onChange() {
-    var lo = +document.getElementById('yr-slider-min').value;
-    var hi = +document.getElementById('yr-slider-max').value;
-    // keep sliders from crossing each other
-    if (lo > hi) {
-      if (this.id === 'yr-slider-min') { document.getElementById('yr-slider-min').value = hi; lo = hi; }
-      else { document.getElementById('yr-slider-max').value = lo; hi = lo; }
-    }
-    document.getElementById('yr-range-display').textContent = lo + ' – ' + hi;
-    if (_APP.nbrYearData) renderBarChart(lo, hi, _APP.nbrYearData);
-  }
-  document.getElementById('yr-slider-min').addEventListener('input', onChange);
-  document.getElementById('yr-slider-max').addEventListener('input', onChange);
-}
-
-// load all data files and kick everything off
-(async function initInteractive() {
+// ─── init ─────────────────────────────────────────────────────────────────────
+(async function init() {
   try {
     var res = await Promise.all([
       d3.json('data/evictions_by_year.json'),
@@ -1237,21 +1220,51 @@ function buildYearSlider() {
     _APP.nbrYearData           = res[2];
     _APP.summaryData           = res[3];
     _APP.evictionsByReasonYear = res[4];
-  } catch(e) { console.error('Interactive init failed:', e); return; }
+  } catch(e) { console.error('Init failed:', e); return; }
+
+  // normalize reason labels: "Ellis Act WithDrawal" → "Ellis Act Withdrawal"
+  _APP.nbrReasonData.forEach(function(d){ d.reason = normalizeReason(d.reason); });
+  _APP.evictionsByReasonYear.forEach(function(d){ d.reason = normalizeReason(d.reason); });
+
+  // fixed bar-chart axis maxes (computed once across the full dataset)
+  var totalsByNbr = d3.rollup(_APP.nbrYearData,
+    function(v){ return d3.sum(v, function(d){ return d.count; }); },
+    function(d){ return d.neighborhood; });
+  _APP.barChartGlobalMax  = d3.max(Array.from(totalsByNbr.values()));
+  _APP.nbrReasonGlobalMax = d3.max(_APP.nbrReasonData, function(d){ return d.count; });
 
   buildScrollyLineChart(_APP.yearData);
   buildEraButtons();
 
-  buildStackedHeader();
-  buildYearSlider();
+  renderStackedAreaAllSF(_APP.evictionsByReasonYear);
+  renderBarChart(1997, 2026, _APP.nbrYearData);
 
   document.getElementById('nbr-panel-close').addEventListener('click', closeNeighborhoodPanel);
+
+  document.getElementById('stacked-show-all').addEventListener('click', function() {
+    renderStackedAreaAllSF(_APP.evictionsByReasonYear);
+    document.getElementById('stacked-filter-label').textContent = '';
+    this.style.display = 'none';
+  });
+
+  document.getElementById('yr-slider-min').addEventListener('input', function() {
+    var lo = +this.value, hi = +document.getElementById('yr-slider-max').value;
+    if (lo > hi) { this.value = hi; lo = hi; }
+    document.getElementById('yr-range-display').textContent = lo + ' – ' + hi;
+    if (_APP.nbrYearData) renderBarChart(lo, hi, _APP.nbrYearData);
+  });
+
+  document.getElementById('yr-slider-max').addEventListener('input', function() {
+    var lo = +document.getElementById('yr-slider-min').value, hi = +this.value;
+    if (hi < lo) { this.value = lo; hi = lo; }
+    document.getElementById('yr-range-display').textContent = lo + ' – ' + hi;
+    if (_APP.nbrYearData) renderBarChart(lo, hi, _APP.nbrYearData);
+  });
 
   waitForMapPaths(function() {
     addMapClickHandlers(_APP.summaryData, _APP.nbrReasonData);
   });
 })();
 </script>
-
 </body>
 </html>
